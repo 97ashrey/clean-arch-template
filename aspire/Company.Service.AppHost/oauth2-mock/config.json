@@ -1,0 +1,18 @@
+{
+  "tokenCallbacks": [
+    {
+      "issuerId": "connect",
+      "requestMappings": [
+        {
+          "requestParam": "scope",
+          "match": "ServiceDomainPlaceholderServiceRestApi",
+          "claims": {
+            "scope": [ "ServiceDomainPlaceholderServiceRestApi" ],
+            "aud": [ "${clientId}" ],
+            "client_id": "${clientId}"
+          }
+        }
+      ]
+    }
+  ]
+}

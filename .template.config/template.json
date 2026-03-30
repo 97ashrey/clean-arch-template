@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "97ashrey",
+  "classifications": [
+    "Web API",
+    "Clean Architecture",
+    "Domain Driven Design",
+    "CQRS"
+  ],
+  "identity": "Company.DomainService.ProjectTemplate",
+  "name": "Clean Arch Template",
+  "description": "A project template for creating a Web Service following Clean Architecture principles and Domain-Driven Design principles with CQRS design pattern.",
+  "shortName": "clean-arch",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Company.Service",
+  "preferNameDirectory": true,
+  "defaultName": "Company.Service",
+  "guids": [
+    "71A5C91B-77BF-4B77-A730-9D74C3DC0684",    
+    "2F2F3870-16B3-42C8-B2A3-12DF4E328894",
+    "D539E0B8-BE60-44EC-A26D-35A76C8289E3",
+    "8F269B3F-6617-4736-BC20-C8E861CFBD8D",
+    "32EF6710-9861-4886-9FDB-70D97844ACDB",
+    "A99A1566-CAF8-466F-8B06-0119F274CADA",
+    "8FF9E0E4-601A-4CF7-A0CB-C4BBDA803B56",
+    "2CB3D3D9-2CEC-47BC-B16C-FBD728435649",
+    "E00BE20F-DDD5-44E4-9E5F-9C313565EBB8",
+    "D31712BD-6908-4E80-B262-595F48955F89",    
+    "48FEE5FD-A1CE-40B2-9700-28530D0482C0",    
+    "B61D6EF0-74FA-494F-9F36-55CA9AB5022D",    
+    "075A5932-6DFE-478C-AE52-F01B0C09B3F5",    
+    "2CA541A3-B490-4E50-896B-9E7E03CA2442"    
+  ],
+  "symbols": {
+    "serviceDomain": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The name of the service domain. Must be an alphanumeric text that starts with a letter.",
+      "replaces": "ServiceDomainPlaceholder",
+      "fileRename": "ServiceDomainPlaceholder",
+      "isRequired": true
+    },
+    "serviceDomainLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "serviceDomain",
+        "toLower": true
+      },
+      "replaces": "serviceDomainPlaceholder",
+      "fileRename": "serviceDomainPlaceholder"
+    },
+    "companyName": {
+      "type": "parameter",
+      "datatype": "string",
+      "description": "The name of the company. Must be an alphanumeric text that starts with a letter.",
+      "replaces": "CompanyNamePlaceholder",
+      "fileRename": "CompanyNamePlaceholder",
+      "isRequired": true
+    },
+    "companyNameLower": {
+      "type": "generated",
+      "generator": "casing",
+      "parameters": {
+        "source": "companyName",
+        "toLower": true
+      },
+      "replaces": "companyNamePlaceholder",
+      "fileRename": "companyNamePlaceholder"
+    }
+  }
+}

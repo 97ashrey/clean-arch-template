@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.8" />
+	  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Company.Service.Application\Company.Service.Application.csproj" />
+    <ProjectReference Include="..\Company.Service.Infrastructure.Data\Company.Service.Infrastructure.Data.csproj" />
+  </ItemGroup>
+
+</Project>

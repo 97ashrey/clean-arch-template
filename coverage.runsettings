@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<DataCollectionRunSettings>
+		<DataCollectors>
+			<DataCollector friendlyName="XPlat Code Coverage">
+				<Configuration>
+					<ExcludeByFile>
+						**/Program.cs,
+						**/ConfigureServices.cs,
+						**/Company.Service.RestApi/**/Controllers/*Controller.cs,
+						**/Company.Service.RestApi/Common/Configurations/*.cs,
+						**/Company.Service.Infrastructure.Data/**/*.cs,
+						**/Company.Service.Infrastructure/Persistence/ApplicationDbContext.cs,
+						**/Company.Service.Domain/Entities/*.cs,
+					</ExcludeByFile>
+					<ExcludeByAttribute>ExcludeFromCodeCoverage,Obsolete,GeneratedCode</ExcludeByAttribute>
+					<Format>opencover,cobertura</Format>
+				</Configuration>
+			</DataCollector>
+		</DataCollectors>
+	</DataCollectionRunSettings>
+</RunSettings>
