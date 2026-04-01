@@ -1,4 +1,5 @@
-using Company.Service.Domain.Common;
+using Company.Service.Domain.Common.Types;
+using Company.Service.Domain.Common.Types.Errors;
 
 namespace Company.Service.Domain.Entities;
 
@@ -40,43 +41,74 @@ public class Account
         InvoiceAddressId = invoiceAddressId;
     }
 
-    public void Update(string name)
+    public Result<ValidationError> ChangeName(string name)
     {
-        Guard.AgainstNullOrEmpty(name, nameof(name));
+        var error = Validate.ExecuteRules(
+            Validate.NotEmpty(name, nameof(name))
+        );
+
+        if (error is not null)
+        {
+            return error;
+        }
 
         Name = name;
+
+        return new();
     }
 
-    public void Suspend(DateTime suspendedDate)
+    public Result<ValidationError> ChangeEmail(string email)
+    {
+        var error = Validate.ExecuteRules(
+            Validate.NotEmpty(email, nameof(email))
+        );
+
+        if (error is not null)
+        {
+            return error;
+        }
+
+        Email = email;
+
+        return new();
+    }
+
+    public Result<InvalidOperationError> Suspend(DateTime suspendedDate)
     {
         if (Status != AccountStatus.Active)
         {
-            throw new InvalidOperationException($"Can't suspend the account it is not in {AccountStatus.Active} state!");
+            return new InvalidOperationError($"Can't suspend the account it is not in {AccountStatus.Active} state!");
         }
 
         Status = AccountStatus.Suspended;
         SuspendedDate = suspendedDate;
+
+        return new();
     }
 
-    public void ReActivate()
+    public Result<InvalidOperationError> ReActivate()
     {
         if (Status != AccountStatus.Suspended)
         {
-            throw new InvalidOperationException($"Can't re-activate the account it is not in {AccountStatus.Suspended} state!");
+            return new InvalidOperationError($"Can't re-activate the account it is not in {AccountStatus.Suspended} state!");
         }
 
         Status = AccountStatus.Active;
         SuspendedDate = null;
+
+        return new();
     }
 
-    public void Remove()
+    public Result<InvalidOperationError> Remove()
     {
         if (Status != AccountStatus.Suspended)
         {
-            throw new InvalidOperationException($"Can't remove the account it is not in {AccountStatus.Suspended} state!");
+            return new InvalidOperationError($"Can't remove the account it is not in {AccountStatus.Suspended} state!");
         }
 
         Status = AccountStatus.Removed;
+
+        return new();
     }
 }
 
@@ -98,10 +130,19 @@ public static class AccountConstruction
 {
     extension(Account)
     {
-        public static Account CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
+        public static Result<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
         {
-            Guard.AgainstNullOrEmpty(name, nameof(name));
-            Guard.AgainstNullOrEmpty(email, nameof(email));
+            var error = Validate.ExecuteRules(
+                Validate.NotEmpty(tenantId, nameof(tenantId)),
+                Validate.NotEmpty(name, nameof(name)),
+                Validate.NotEmpty(email, nameof(email)),
+                Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
+            );
+
+            if (error is not null)
+            {
+                return error;
+            }
 
             return new Account(id: Guid.NewGuid(), tenantId, name, email, tier, AccountStatus.Active, suspendedDate: null, invoiceAddressId);
         }
