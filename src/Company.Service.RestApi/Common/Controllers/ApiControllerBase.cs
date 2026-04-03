@@ -71,7 +71,7 @@ public class ApiControllerBase : ControllerBase
     //     return StatusCode(StatusCodes.Status500InternalServerError, problemDetails);
     // }
 
-    protected NotFound<ProblemDetails> NotFoundProblem(NotFoundError error)
+    protected NotFound<ProblemDetails> NotFoundProblemResponse(NotFoundError error)
     {
         var problemDetails = ProblemDetailsFactory.CreateProblemDetails(
             HttpContext,
@@ -83,7 +83,7 @@ public class ApiControllerBase : ControllerBase
         return TypedResults.NotFound(problemDetails);
     }
         
-    protected BadRequest<ProblemDetails> BadRequestProblem(BadRequestError error)
+    protected BadRequest<ProblemDetails> BadRequestProblemResponse(BadRequestError error)
     {
         var problemDetails = ProblemDetailsFactory.CreateProblemDetails(
             HttpContext,
@@ -95,7 +95,7 @@ public class ApiControllerBase : ControllerBase
         return TypedResults.BadRequest(problemDetails);
     }
 
-    protected BadRequest<ValidationProblemDetails> Validationproblem(ValidationError error)
+    protected BadRequest<ValidationProblemDetails> ValidationproblemResponse(ValidationError error)
     {
         var validationProblem = ProblemDetailsFactory.CreateValidationProblemDetails(HttpContext, ModelState, detail: error.Message, statusCode: StatusCodes.Status400BadRequest);
 
@@ -104,7 +104,7 @@ public class ApiControllerBase : ControllerBase
         return TypedResults.BadRequest(validationProblem);
     }
 
-    protected InternalServerError<ProblemDetails> InternalServerErrorProblem(ApplicationError error)
+    protected InternalServerError<ProblemDetails> InternalServerErrorProblemResponse(ApplicationError error)
     {
         var problemDetails = ProblemDetailsFactory.CreateProblemDetails(
             HttpContext,

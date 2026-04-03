@@ -1,4 +1,5 @@
-using Company.Service.Domain.Common;
+using Company.Service.Domain.Common.Types;
+using Company.Service.Domain.Common.Types.Errors;
 
 namespace Company.Service.Domain.Entities;
 
@@ -75,21 +76,42 @@ public enum AccountOrderStatus
     Completed,
 }
 
-public record ContactInformation(string FirstName, string LastName, string Email, string PhoneNumber);
+public record ContactInformation()
+{
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName { get; private set; } = string.Empty;
+    public string Email { get; private set; } = string.Empty;
+    public string PhoneNumber { get; private set; } = string.Empty;
+
+    private ContactInformation(string firstName, string lastName, string email, string phoneNumber) : this()
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Email = email;
+        PhoneNumber = phoneNumber;
+    }
+
+    public static Result<ContactInformation, ValidationError> CreateNew(
+        string firstName, string lastName, string email, string phoneNumber)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(firstName, nameof(firstName)),
+            Validate.NotEmpty(lastName, nameof(lastName)),
+            Validate.NotEmpty(email, nameof(email)),
+            Validate.NotEmpty(phoneNumber, nameof(phoneNumber))
+        ).Map(() => new ContactInformation(firstName, lastName, email, phoneNumber));
+    }
+}
 
 public static class AccountOrderConstruction
 {
     extension(AccountOrder)
     {
-        public static AccountOrder CreateNew(Guid tenantId, string accountName, AccountTier tier, ContactInformation contactInformation, DateTime createdDate, Guid invoiceAddressId)
+        public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, string accountName, AccountTier tier, ContactInformation contactInformation, DateTime createdDate, Guid invoiceAddressId)
         {
-            Guard.AgainstNullOrEmpty(accountName, nameof(accountName));
-            Guard.AgainstNullOrEmpty(contactInformation.FirstName, nameof(contactInformation.FirstName));
-            Guard.AgainstNullOrEmpty(contactInformation.LastName, nameof(contactInformation.LastName));
-            Guard.AgainstNullOrEmpty(contactInformation.Email, nameof(contactInformation.Email));
-            Guard.AgainstNullOrEmpty(contactInformation.PhoneNumber, nameof(contactInformation.PhoneNumber));
-
-            return new AccountOrder(id: Guid.NewGuid(), tenantId, accountName, tier, contactInformation, AccountOrderStatus.Pending, createdDate, accountId: null, invoiceAddressId);
+            return Validate.ExecuteRules(
+                Validate.NotEmpty(accountName, nameof(accountName))
+            ).Map(() => new AccountOrder(id: Guid.NewGuid(), tenantId, accountName, tier, contactInformation, AccountOrderStatus.Pending, createdDate, accountId: null, invoiceAddressId));
         }
     }
 }

@@ -1,3 +1,4 @@
+using Company.Service.Application.Accounts.Commands;
 using Company.Service.Application.Accounts.Queries;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Domain.Entities;
@@ -21,10 +22,27 @@ namespace Company.Service.RestApi.Api.Controllers
                 value => TypedResults.Ok(value),
                 error => error switch
                 {
-                    NotFoundError nf => NotFoundProblem(nf),
-                    _ => InternalServerErrorProblem(error)
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    _ => InternalServerErrorProblemResponse(error)
                 }
             );
         }
+
+        [HttpPost("orders")]
+        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<AccountOrder>>> CreateAccountOrder(
+            [FromBody] CreateAccountOrderCommand command, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(command, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<AccountOrder>>>(
+                value => TypedResults.Ok(value),
+                error => error switch
+                {
+                    ValidationError ve => ValidationproblemResponse(ve),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
     }
 }
