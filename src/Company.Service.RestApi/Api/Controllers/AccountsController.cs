@@ -1,5 +1,6 @@
 using Company.Service.Application.Accounts.Commands;
 using Company.Service.Application.Accounts.Queries;
+using Company.Service.Application.Common.Types;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Domain.Entities;
 using Company.Service.RestApi.Common.Controllers;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Company.Service.RestApi.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/accounts")]
     [ApiController]
     public class AccountsController : ApiControllerBase
     {
@@ -25,6 +26,34 @@ namespace Company.Service.RestApi.Api.Controllers
                     NotFoundError nf => NotFoundProblemResponse(nf),
                     _ => InternalServerErrorProblemResponse(error)
                 }
+            );
+        }
+
+        [HttpGet("orders/{id:guid}")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<AccountOrder>>> GetAccountOrderById(
+            [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new GetAccountOrderByIdQuery() { Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<AccountOrder>>>(
+                value => TypedResults.Ok(value),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpGet("orders")]
+        public async Task<Results<InternalServerError<ProblemDetails>, Ok<PagedList<AccountOrder>>>> GetAccountOrders(
+            [FromQuery] GetAccountOrdersQuery query, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(query, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, Ok<PagedList<AccountOrder>>>>(
+                value => TypedResults.Ok(value),
+                error => InternalServerErrorProblemResponse(error)
             );
         }
 
