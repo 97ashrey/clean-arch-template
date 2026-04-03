@@ -6,7 +6,7 @@ public record SingleFailure(string PropertyName, string Error);
 
 public static class Validate
 {
-    public static ValidationError? ExecuteRules(params IEnumerable<SingleFailure?> rules)
+    public static Result<ValidationError> ExecuteRules(params IEnumerable<SingleFailure?> rules)
     {
         var singleFailures = new List<SingleFailure>();
 
@@ -20,7 +20,7 @@ public static class Validate
 
         if (singleFailures.Count == 0)
         {
-            return null;
+            return new();
         }
 
         var groupedFailures = singleFailures.GroupBy(f => f.PropertyName).Select(g => new ValidationFailure(g.Key, [.. g.Select(x => x.Error)]));

@@ -26,6 +26,25 @@ public readonly struct Result<TError>
             Func<TResult> success,
             Func<TError, TResult> failure
         ) => this.IsSuccess ? success() : failure(this.error!);
+
+    public Result<TError> Bind(Func<Result<TError>> bind)
+        => this.IsSuccess ? bind() : this;
+
+    public Result<TError> Tap(Action action)
+    {
+        if (this.IsSuccess)
+            action();
+
+        return this;
+    }
+
+    public Result<TError> TapError(Action<TError> action)
+    {
+        if (!this.IsSuccess)
+            action(this.error!);
+
+        return this;
+    }
 }
 
 public readonly struct Result<TValue, TError>
@@ -59,4 +78,44 @@ public readonly struct Result<TValue, TError>
             Func<TValue, TResult> success,
             Func<TError, TResult> failure
         ) => this.IsSuccess ? success(this.value!) : failure(this.error!);
+
+    public Result<TResult, TError> Bind<TResult>(Func<TValue, Result<TResult, TError>> bind)
+        => this.IsSuccess ? bind(this.value!) : (Result<TResult, TError>)this.error!;
+
+    public Result<TValueOther, TError> Map<TValueOther>(Func<TValue, TValueOther> map)
+        => this.IsSuccess ? map(this.value!) : this.error!;
+
+    public Result<TValue, TErrorOther> MapError<TErrorOther>(Func<TError, TErrorOther> map)
+        => this.IsSuccess ? this.value! : map(this.error!);
+
+    public Result<TValue, TError> Tap(Action<TValue> action)
+    {
+        if (this.IsSuccess)
+            action(this.value!);
+
+        return this;
+    }
+
+    public Result<TValue, TError> TapError(Action<TError> action)
+    {
+        if (!this.IsSuccess)
+            action(this.error!);
+
+        return this;
+    }
+}
+
+public static class ResultExtensions
+{
+    extension<TError>(Result<TError> result)
+    {
+        public Result<TValue, TError> Map<TValue>(Func<TValue> map)
+            => result.IsSuccess ? map() : result.Error!;
+    }
+
+    extension<TValue, TError>(Result<TValue, TError> result)
+    {
+        public Result<TError> Bind<TValueOther>(Func<TValue, Result<TError>> bind)
+            => result.IsSuccess ? bind(result.Value!) : result.Error!;
+    }
 }

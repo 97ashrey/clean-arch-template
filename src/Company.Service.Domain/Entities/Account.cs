@@ -43,34 +43,25 @@ public class Account
 
     public Result<ValidationError> ChangeName(string name)
     {
-        var error = Validate.ExecuteRules(
+        return Validate.ExecuteRules(
             Validate.NotEmpty(name, nameof(name))
-        );
-
-        if (error is not null)
+        ).Bind(() =>
         {
-            return error;
-        }
+            Name = name;
+            return new();
+        });
 
-        Name = name;
-
-        return new();
     }
 
     public Result<ValidationError> ChangeEmail(string email)
     {
-        var error = Validate.ExecuteRules(
+        return Validate.ExecuteRules(
             Validate.NotEmpty(email, nameof(email))
-        );
-
-        if (error is not null)
+        ).Bind(() =>
         {
-            return error;
-        }
-
-        Email = email;
-
-        return new();
+            Email = email;
+            return new();
+        });
     }
 
     public Result<InvalidOperationError> Suspend(DateTime suspendedDate)
@@ -132,19 +123,14 @@ public static class AccountConstruction
     {
         public static Result<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
         {
-            var error = Validate.ExecuteRules(
+            return Validate.ExecuteRules(
                 Validate.NotEmpty(tenantId, nameof(tenantId)),
                 Validate.NotEmpty(name, nameof(name)),
                 Validate.NotEmpty(email, nameof(email)),
                 Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
+            ).Map(() => 
+                new Account(id: Guid.NewGuid(), tenantId, name, email, tier, AccountStatus.Active, suspendedDate: null, invoiceAddressId)
             );
-
-            if (error is not null)
-            {
-                return error;
-            }
-
-            return new Account(id: Guid.NewGuid(), tenantId, name, email, tier, AccountStatus.Active, suspendedDate: null, invoiceAddressId);
         }
     }
 }

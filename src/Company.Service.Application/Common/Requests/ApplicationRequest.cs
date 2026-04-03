@@ -1,4 +1,4 @@
-﻿using Company.Service.Application.Common.Types;
+﻿using Company.Service.Domain.Common.Types;
 using Company.Service.Application.Common.Types.Errors;
 using Mediator;
 
