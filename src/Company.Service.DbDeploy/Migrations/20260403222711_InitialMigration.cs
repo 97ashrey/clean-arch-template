@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Company.Service.DbDeploy.Migrations
 {
     /// <inheritdoc />
-    public partial class InitalMigration : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -41,11 +41,11 @@ namespace Company.Service.DbDeploy.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ZipCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Street = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Address_Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address_City = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Address_ZipCode = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Address_Street = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
+                    Address_Number = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {

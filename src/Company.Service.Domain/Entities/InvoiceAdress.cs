@@ -14,6 +14,8 @@ public class InvoiceAdress
 
     public Address Address { get; private set; } = default!;
 
+    private InvoiceAdress() { }
+
     internal InvoiceAdress(Guid id, Guid tenantId, string name, Address address)
     {
         Id = id;

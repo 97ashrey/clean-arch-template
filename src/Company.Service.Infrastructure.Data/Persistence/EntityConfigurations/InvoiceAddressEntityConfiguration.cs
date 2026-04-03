@@ -17,25 +17,28 @@ internal class InvoiceAddressEntityConfiguration : IEntityTypeConfiguration<Invo
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(ia => ia.Country)
-            .IsRequired()
-            .HasMaxLength(100);
+        builder.OwnsOne(ia => ia.Address, addressBuilder =>
+        {
+            addressBuilder.Property(a => a.Country)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        builder.Property(ia => ia.City)
-            .IsRequired()
-            .HasMaxLength(100);
+            addressBuilder.Property(a => a.City)
+                .IsRequired()
+                .HasMaxLength(100);
 
-        builder.Property(ia => ia.ZipCode)
-            .IsRequired()
-            .HasMaxLength(20);
+            addressBuilder.Property(a => a.ZipCode)
+                .IsRequired()
+                .HasMaxLength(20);
 
-        builder.Property(ia => ia.Street)
-            .IsRequired()
-            .HasMaxLength(255);
+            addressBuilder.Property(a => a.Street)
+                .IsRequired()
+                .HasMaxLength(255);
 
-        builder.Property(ia => ia.Number)
-            .IsRequired()
-            .HasMaxLength(50);
+            addressBuilder.Property(a => a.Number)
+                .IsRequired()
+                .HasMaxLength(50);
+        });
 
         builder.ToTable("InvoiceAddresses");
     }

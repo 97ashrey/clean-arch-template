@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Company.Service.DbDeploy.Migrations
 {
     [DbContext(typeof(ServiceDomainPlaceholderDbContext))]
-    [Migration("20260326211705_InitalMigration")]
-    partial class InitalMigration
+    [Migration("20260403222711_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -113,38 +113,13 @@ namespace Company.Service.DbDeploy.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("Number")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Street")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
 
                     b.HasKey("Id");
 
@@ -386,7 +361,7 @@ namespace Company.Service.DbDeploy.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.OwnsOne("Company.Service.Domain.Entities.ContactInformation", "ContactInformation", b1 =>
+                    b.OwnsOne("ContactInformation", "ContactInformation", b1 =>
                         {
                             b1.Property<Guid>("AccountOrderId")
                                 .HasColumnType("uniqueidentifier");
@@ -420,6 +395,50 @@ namespace Company.Service.DbDeploy.Migrations
                         });
 
                     b.Navigation("ContactInformation")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Company.Service.Domain.Entities.InvoiceAdress", b =>
+                {
+                    b.OwnsOne("Company.Service.Domain.ValueObjects.Address", "Address", b1 =>
+                        {
+                            b1.Property<Guid>("InvoiceAdressId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)");
+
+                            b1.Property<string>("Country")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)");
+
+                            b1.Property<string>("Number")
+                                .IsRequired()
+                                .HasMaxLength(50)
+                                .HasColumnType("nvarchar(50)");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("nvarchar(255)");
+
+                            b1.Property<string>("ZipCode")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("nvarchar(20)");
+
+                            b1.HasKey("InvoiceAdressId");
+
+                            b1.ToTable("InvoiceAddresses");
+
+                            b1.WithOwner()
+                                .HasForeignKey("InvoiceAdressId");
+                        });
+
+                    b.Navigation("Address")
                         .IsRequired();
                 });
 
