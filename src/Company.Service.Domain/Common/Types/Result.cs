@@ -1,5 +1,7 @@
 ﻿namespace Company.Service.Domain.Common.Types;
 
+using System.Threading.Tasks;
+
 public readonly struct Result<TError>
 {
     private readonly TError? error;
@@ -42,6 +44,30 @@ public readonly struct Result<TError>
     {
         if (!this.IsSuccess)
             action(this.error!);
+
+        return this;
+    }
+
+    public async Task<TResult> MatchAsync<TResult>(
+            Func<Task<TResult>> success,
+            Func<TError, Task<TResult>> failure
+        ) => this.IsSuccess ? await success() : await failure(this.error!);
+
+    public async Task<Result<TError>> BindAsync(Func<Task<Result<TError>>> bind)
+        => this.IsSuccess ? await bind() : this;
+
+    public async Task<Result<TError>> TapAsync(Func<Task> action)
+    {
+        if (this.IsSuccess)
+            await action();
+
+        return this;
+    }
+
+    public async Task<Result<TError>> TapErrorAsync(Func<TError, Task> action)
+    {
+        if (!this.IsSuccess)
+            await action(this.error!);
 
         return this;
     }
@@ -103,6 +129,36 @@ public readonly struct Result<TValue, TError>
 
         return this;
     }
+
+    public async Task<TResult> MatchAsync<TResult>(
+            Func<TValue, Task<TResult>> success,
+            Func<TError, Task<TResult>> failure
+        ) => this.IsSuccess ? await success(this.value!) : await failure(this.error!);
+
+    public async Task<Result<TResult, TError>> BindAsync<TResult>(Func<TValue, Task<Result<TResult, TError>>> bind)
+        => this.IsSuccess ? await bind(this.value!) : (Result<TResult, TError>)this.error!;
+
+    public async Task<Result<TValueOther, TError>> MapAsync<TValueOther>(Func<TValue, Task<TValueOther>> map)
+        => this.IsSuccess ? await map(this.value!) : this.error!;
+
+    public async Task<Result<TValue, TErrorOther>> MapErrorAsync<TErrorOther>(Func<TError, Task<TErrorOther>> map)
+        => this.IsSuccess ? this.value! : await map(this.error!);
+
+    public async Task<Result<TValue, TError>> TapAsync(Func<TValue, Task> action)
+    {
+        if (this.IsSuccess)
+            await action(this.value!);
+
+        return this;
+    }
+
+    public async Task<Result<TValue, TError>> TapErrorAsync(Func<TError, Task> action)
+    {
+        if (!this.IsSuccess)
+            await action(this.error!);
+
+        return this;
+    }
 }
 
 public static class ResultExtensions
@@ -111,11 +167,17 @@ public static class ResultExtensions
     {
         public Result<TValue, TError> Map<TValue>(Func<TValue> map)
             => result.IsSuccess ? map() : result.Error!;
+
+        public async Task<Result<TValue, TError>> MapAsync<TValue>(Func<Task<TValue>> map)
+            => result.IsSuccess ? await map() : result.Error!;
     }
 
     extension<TValue, TError>(Result<TValue, TError> result)
     {
         public Result<TError> Bind<TValueOther>(Func<TValue, Result<TError>> bind)
             => result.IsSuccess ? bind(result.Value!) : result.Error!;
+
+        public async Task<Result<TError>> BindAsync<TValueOther>(Func<TValue, Task<Result<TError>>> bind)
+            => result.IsSuccess ? await bind(result.Value!) : result.Error!;
     }
 }
