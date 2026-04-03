@@ -24,4 +24,10 @@
     <ProjectReference Include="..\Company.Service.Domain\Company.Service.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="InvoiceAddresses/" />
+    <Folder Include="InvoiceAddresses/Commands/" />
+    <Folder Include="InvoiceAddresses/Queries/" />
+  </ItemGroup>
+
 </Project>
