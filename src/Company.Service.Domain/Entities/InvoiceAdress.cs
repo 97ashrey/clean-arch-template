@@ -21,6 +21,22 @@ public class InvoiceAdress
         Name = name;
         Address = address;
     }
+
+    public Result<ValidationError> ChangeName(string name)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(name, nameof(name))
+        ).Bind(() =>
+        {
+            Name = name;
+            return new();
+        });
+    }
+
+    public void ChangeAddress(Address address)
+    {
+        Address = address;
+    }
 }
 
 public static class InvoiceAdressConstruction
