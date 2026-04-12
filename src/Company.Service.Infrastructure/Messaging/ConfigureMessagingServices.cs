@@ -1,5 +1,5 @@
 ﻿using Company.Service.Application;
-using Company.Service.Infrastructure.Persistence;
+using Company.Service.Infrastructure.Data.Persistence;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +12,7 @@ internal static class ConfigureMessagingServices
     {
         services.AddMassTransit(x =>
         {
-            x.AddEntityFrameworkOutbox<ApplicationDbContext>(o =>
+            x.AddEntityFrameworkOutbox<ServiceDomainPlaceholderDbContext>(o =>
             {
                o.QueryDelay = TimeSpan.FromSeconds(60);
                o.UseSqlServer();

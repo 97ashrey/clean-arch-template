@@ -1,4 +1,5 @@
 ﻿using Company.Service.Application.Common.Interfaces.Persistence;
+using Company.Service.Infrastructure.Data.Persistence;
 using Company.Service.Infrastructure.Messaging;
 using Company.Service.Infrastructure.Persistence;
 using MassTransit;
@@ -16,13 +17,13 @@ public static class ConfigureServices
 
         services.AddMessaging(configuration);
 
-        services.AddDbContext<ApplicationDbContext>((sp, optionsBuilder) =>
+        services.AddDbContext<ServiceDomainPlaceholderDbContext>((sp, optionsBuilder) =>
         {
             var connectionString = configuration.GetConnectionString("ServiceDomainPlaceholderDb")!;
             optionsBuilder.UseSqlServer(connectionString);
         });
 
-        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
         services.AddMemoryCache();
 

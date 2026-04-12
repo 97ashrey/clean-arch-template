@@ -7,17 +7,15 @@ namespace Company.Service.Application.Common.Interfaces.Persistence;
 
 public interface IApplicationDbContext
 {
-    DbSet<Account> Accounts { get; set; }
+    DbSet<Account> Accounts { get; }
 
-    DbSet<AccountOrder> AccountOrders { get; set; }
+    DbSet<AccountOrder> AccountOrders { get; }
 
-    DbSet<InvoiceAdress> InvoiceAdresses { get; set; }
+    DbSet<InvoiceAdress> InvoiceAdresses { get; }
 
-    DbSet<Subscription> Subscriptions { get; set; }
+    DbSet<Subscription> Subscriptions { get; }
 
     DatabaseFacade Database { get; }
-
-    EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

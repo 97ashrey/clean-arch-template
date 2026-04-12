@@ -1,13 +1,12 @@
+using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
-public class AccountOrder
+public class AccountOrder : Entity
 {
-    public Guid Id { get; private set; }
-
     public Guid TenantId { get; private set; }
 
     public string AccountName { get; private set; } = string.Empty;
@@ -48,6 +47,30 @@ public class AccountOrder
 
     private AccountOrder(){}
 
+    public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, string accountName, AccountTier tier, ContactInformation contactInformation, DateTime createdDate, Guid invoiceAddressId)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(accountName, nameof(accountName))
+        ).Map(() =>
+        {
+            var accountOrder = new AccountOrder
+            {
+                Id = Guid.NewGuid(),
+                TenantId = tenantId,
+                AccountName = accountName,
+                Tier = tier,
+                ContactInformation = contactInformation,
+                Status = AccountOrderStatus.Pending,
+                CreatedDate = createdDate,
+                InvoiceAddressId = invoiceAddressId
+            };
+
+            accountOrder.RaiseDomainEvent(new AccountOrderCreated(accountOrder.Id));
+
+            return accountOrder;
+        });
+    }
+
     public void StartProcessing()
     {
         if (Status != AccountOrderStatus.Pending)
@@ -77,15 +100,4 @@ public enum AccountOrderStatus
     Completed,
 }
 
-public static class AccountOrderConstruction
-{
-    extension(AccountOrder)
-    {
-        public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, string accountName, AccountTier tier, ContactInformation contactInformation, DateTime createdDate, Guid invoiceAddressId)
-        {
-            return Validate.ExecuteRules(
-                Validate.NotEmpty(accountName, nameof(accountName))
-            ).Map(() => new AccountOrder(id: Guid.NewGuid(), tenantId, accountName, tier, contactInformation, AccountOrderStatus.Pending, createdDate, accountId: null, invoiceAddressId));
-        }
-    }
-}
+public record AccountOrderCreated(Guid AccountOrderId) : IDomainEvent;
