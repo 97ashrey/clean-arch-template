@@ -1,5 +1,6 @@
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
+using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
@@ -20,6 +21,8 @@ public class Account
     public DateTime? SuspendedDate { get; private set; }
 
     public Guid InvoiceAddressId { get; private set; }
+
+    private Account() { }
 
     internal Account(
         Guid id,

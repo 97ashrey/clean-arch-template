@@ -1,6 +1,6 @@
 using Company.Service.Domain.Common.Types.Errors;
 
-namespace Company.Service.Domain.Common.Types;
+namespace Company.Service.Domain.Common.Types.Utils;
 
 public record SingleFailure(string PropertyName, string Error);
 
@@ -28,6 +28,11 @@ public static class Validate
         return new ValidationError("Validation failed!", [.. groupedFailures]);
     }
 
+    public static SingleFailure? Must(Func<SingleFailure?> rule)
+    {
+        return rule();
+    }
+
     public static SingleFailure? NotEmpty(string value, string propertyName)
     {
         if (string.IsNullOrEmpty(value))
@@ -45,6 +50,46 @@ public static class Validate
             return new (propertyName, "Must not be empty!");
         }
         
+        return null;
+    }
+
+    public static SingleFailure? NotZero(int value, string propertyName)
+    {
+        if (value == 0)
+        {
+            return new(propertyName, "Must not be zero!");
+        }
+
+        return null;
+    }
+
+    public static SingleFailure? NotZero(decimal value, string propertyName)
+    {
+        if (value == 0)
+        {
+            return new(propertyName, "Must not be zero!");
+        }
+
+        return null;
+    }
+
+    public static SingleFailure? NotZero(float value, string propertyName)
+    {
+        if (value == 0)
+        {
+            return new(propertyName, "Must not be zero!");
+        }
+
+        return null;
+    }
+
+    public static SingleFailure? NotZero(double value, string propertyName)
+    {
+        if (value == 0)
+        {
+            return new(propertyName, "Must not be zero!");
+        }
+
         return null;
     }
 }

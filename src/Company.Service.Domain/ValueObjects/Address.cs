@@ -1,5 +1,6 @@
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
+using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.ValueObjects;
 

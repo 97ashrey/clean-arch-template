@@ -1,4 +1,6 @@
-using Company.Service.Domain.Common;
+using Company.Service.Domain.Common.Types;
+using Company.Service.Domain.Common.Types.Errors;
+using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
@@ -26,7 +28,7 @@ public class Subscription
 
     public Guid ProductId { get; private set; }
 
-    private Subscription() {}
+    private Subscription() { }
 
     internal Subscription(
         Guid id,
@@ -54,43 +56,51 @@ public class Subscription
         ProductId = productId;
     }
 
-    public void Update(string friendlyName)
+    public Result<ValidationError> Update(string friendlyName)
     {
-        Guard.AgainstNullOrEmpty(friendlyName, nameof(friendlyName));
-
-        FriendlyName = friendlyName;
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(friendlyName, nameof(friendlyName))
+        ).Bind(() =>
+        {
+            FriendlyName = friendlyName;
+            return new();
+        });
     }
 
-    public void Suspend(DateTime suspendedDate)
+    public Result<InvalidOperationError> Suspend(DateTime suspendedDate)
     {
         if (Status != SubscriptionStatus.Active)
         {
-            throw new InvalidOperationException($"Can't suspend the subscription it is not in {SubscriptionStatus.Active} state!");
+            return new InvalidOperationError($"Can't suspend the subscription it is not in {SubscriptionStatus.Active} state!");
         }
 
         Status = SubscriptionStatus.Suspended;
         SuspendedDate = suspendedDate;
+
+        return new();
     }
 
-    public void ReActivate()
+    public Result<InvalidOperationError> ReActivate()
     {
         if (Status != SubscriptionStatus.Suspended)
         {
-            throw new InvalidOperationException($"Can't re-activate the subscription it is not in {SubscriptionStatus.Suspended} state!");
+            return new InvalidOperationError($"Can't re-activate the subscription it is not in {SubscriptionStatus.Suspended} state!");
         }
 
         Status = SubscriptionStatus.Active;
         SuspendedDate = null;
+        return new();
     }
 
-    public void Cancel()
+    public Result<InvalidOperationError> Cancel()
     {
         if (Status != SubscriptionStatus.Suspended)
         {
-            throw new InvalidOperationException($"Can't cancel the subscription it is not in {SubscriptionStatus.Suspended} state!");
+            return new InvalidOperationError($"Can't cancel the subscription it is not in {SubscriptionStatus.Suspended} state!");
         }
 
         Status = SubscriptionStatus.Canceled;
+        return new();
     }
 }
 
@@ -113,7 +123,7 @@ public static class SubscriptionConstruction
 {
     extension(Subscription)
     {
-        public static Subscription CreateNew(
+        public static Result<Subscription, ValidationError> CreateNew(
             Guid accountId,
             string name,
             string friendlyName,
@@ -123,18 +133,23 @@ public static class SubscriptionConstruction
             DateTime endDate,
             Guid productId)
         {
-            Guard.AgainstNullOrEmpty(name, nameof(name));
-            Guard.AgainstNullOrEmpty(friendlyName, nameof(friendlyName));
+            return Validate.ExecuteRules(
+                Validate.NotEmpty(accountId, nameof(accountId)),
+                Validate.NotEmpty(name, nameof(name)),
+                Validate.NotEmpty(friendlyName, nameof(friendlyName)),
+                Validate.NotZero(purchasePrice.Value, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Value)}"),
+                Validate.NotEmpty(purchasePrice.Currency, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Currency)}"),
+                Validate.Must(() =>
+                {
+                    if (startDate > endDate)
+                    {
+                        return new SingleFailure($"{nameof(startDate)}-{nameof(endDate)}", $"{nameof(startDate)} can't be greater than {nameof(endDate)}!");
+                    }
 
-            Guard.AgainstZero(purchasePrice.Value, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Value)}");
-            Guard.AgainstNullOrEmpty(purchasePrice.Currency, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Currency)}");
-
-            if (startDate > endDate)
-            {
-                throw new ArgumentException($"{nameof(startDate)} can't be greater than {nameof(endDate)}!");
-            }
-
-            return new Subscription(
+                    return null;
+                })
+            )
+            .Map(() => new Subscription(
                 id: Guid.NewGuid(),
                 accountId,
                 name,
@@ -146,7 +161,7 @@ public static class SubscriptionConstruction
                 SubscriptionStatus.Active,
                 suspendedDate: null,
                 productId
-            );
+            ));
         }
     }
 }
