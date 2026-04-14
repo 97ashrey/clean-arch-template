@@ -73,25 +73,29 @@ public class AccountOrder : Entity
         });
     }
 
-    public void StartProcessing()
+    public Result<InvalidOperationError> StartProcessing()
     {
         if (Status != AccountOrderStatus.Pending)
         {
-            throw new InvalidOperationException($"Can't start processing order. It is not in {AccountOrderStatus.Pending} state!");
+            return new InvalidOperationError($"Can't start processing order. It is not in {AccountOrderStatus.Pending} state!");
         }
 
         Status = AccountOrderStatus.Processing;
+
+        return new();
     }
 
-    public void Complete(Guid accountId)
+    public Result<InvalidOperationError> Complete(Guid accountId)
     {
         if (Status != AccountOrderStatus.Processing)
         {
-            throw new InvalidOperationException($"Can't complete order. It is not in {AccountOrderStatus.Processing} state!.");
+            return new InvalidOperationError($"Can't complete order. It is not in {AccountOrderStatus.Processing} state!.");
         }
 
         Status = AccountOrderStatus.Completed;
         AccountId = accountId;
+
+        return new();
     }
 }
 
