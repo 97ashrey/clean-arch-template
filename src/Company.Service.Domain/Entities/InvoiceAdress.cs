@@ -1,3 +1,4 @@
+using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
@@ -5,7 +6,7 @@ using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
 
-public class InvoiceAdress
+public class InvoiceAdress : Entity
 {
     public Guid Id { get; private set; }
 

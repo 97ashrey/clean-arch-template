@@ -7,6 +7,8 @@ namespace Company.Service.Domain.Entities;
 
 public class AccountOrder : Entity
 {
+    public Guid Id { get; private set; }
+
     public Guid TenantId { get; private set; }
 
     public string AccountName { get; private set; } = string.Empty;

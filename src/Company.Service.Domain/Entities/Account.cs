@@ -1,10 +1,11 @@
+using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
-public class Account
+public class Account : Entity
 {
     public Guid Id { get; private set; }
 
