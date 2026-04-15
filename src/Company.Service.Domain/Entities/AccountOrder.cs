@@ -1,11 +1,10 @@
-using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
-public class AccountOrder : Entity
+public class AccountOrder
 {
     public Guid Id { get; private set; }
 
@@ -20,6 +19,8 @@ public class AccountOrder : Entity
     public AccountOrderStatus Status { get; private set; }
 
     public DateTime CreatedDate { get; private set; }
+
+    public DateTime? CompletedDate { get; private set; }
 
     public Guid? AccountId { get; private set; }
 
@@ -53,9 +54,7 @@ public class AccountOrder : Entity
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(accountName, nameof(accountName))
-        ).Map(() =>
-        {
-            var accountOrder = new AccountOrder
+        ).MapToValueResult(new AccountOrder
             {
                 Id = Guid.NewGuid(),
                 TenantId = tenantId,
@@ -65,12 +64,8 @@ public class AccountOrder : Entity
                 Status = AccountOrderStatus.Pending,
                 CreatedDate = createdDate,
                 InvoiceAddressId = invoiceAddressId
-            };
-
-            accountOrder.RaiseDomainEvent(new AccountOrderCreated(accountOrder.Id));
-
-            return accountOrder;
-        });
+            }
+        );
     }
 
     public Result<InvalidOperationError> StartProcessing()
@@ -85,15 +80,21 @@ public class AccountOrder : Entity
         return new();
     }
 
-    public Result<InvalidOperationError> Complete(Guid accountId)
+    public Result<InvalidOperationError> Complete(Account account, DateTime completedDate)
     {
         if (Status != AccountOrderStatus.Processing)
         {
             return new InvalidOperationError($"Can't complete order. It is not in {AccountOrderStatus.Processing} state!.");
         }
 
+        if (completedDate < CreatedDate)
+        {
+            return new InvalidOperationError($"Can't complete order. Completed Date {completedDate} is before Created Date {CreatedDate}.");
+        }
+
         Status = AccountOrderStatus.Completed;
-        AccountId = accountId;
+        CompletedDate = completedDate;
+        AccountId = account.Id;
 
         return new();
     }
@@ -105,5 +106,3 @@ public enum AccountOrderStatus
     Processing,
     Completed,
 }
-
-public record AccountOrderCreated(Guid AccountOrderId) : IDomainEvent;

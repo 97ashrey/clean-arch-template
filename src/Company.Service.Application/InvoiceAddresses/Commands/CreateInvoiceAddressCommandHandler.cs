@@ -58,7 +58,7 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
                 request.Address.Number)
             .Bind(address =>
             {
-                return InvoiceAdressConstruction.CreateNew(
+                return InvoiceAdress.CreateNew(
                     tenantId: request.TenantId,
                     name: request.Name,
                     address: address);

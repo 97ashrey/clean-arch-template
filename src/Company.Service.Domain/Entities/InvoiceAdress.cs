@@ -1,4 +1,3 @@
-using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
@@ -6,7 +5,7 @@ using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
 
-public class InvoiceAdress : Entity
+public class InvoiceAdress
 {
     public Guid Id { get; private set; }
 
@@ -26,6 +25,14 @@ public class InvoiceAdress : Entity
         Address = address;
     }
 
+    public static Result<InvoiceAdress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(tenantId, nameof(tenantId)),
+            Validate.NotEmpty(name, nameof(name))
+        ).MapToValueResult(new InvoiceAdress(Guid.NewGuid(), tenantId, name, address));
+    }
+
     public Result<ValidationError> ChangeName(string name)
     {
         return Validate.ExecuteRules(
@@ -40,19 +47,5 @@ public class InvoiceAdress : Entity
     public void ChangeAddress(Address address)
     {
         Address = address;
-    }
-}
-
-public static class InvoiceAdressConstruction
-{
-    extension(InvoiceAdress)
-    {
-        public static Result<InvoiceAdress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
-        {
-            return Validate.ExecuteRules(
-                Validate.NotEmpty(tenantId, nameof(tenantId)),
-                Validate.NotEmpty(name, nameof(name))
-            ).Map(() => new InvoiceAdress(Guid.NewGuid(), tenantId, name, address));
-        }
     }
 }

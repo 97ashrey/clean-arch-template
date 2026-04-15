@@ -32,6 +32,9 @@ public readonly struct Result<TError>
     public Result<TError> Bind(Func<Result<TError>> bind)
         => this.IsSuccess ? bind() : this;
 
+    public Result<NewError> MapError<NewError>(Func<TError, NewError> map)
+        => this.IsSuccess ? new Result<NewError>() : map(this.Error!);
+
     public Result<TError> Tap(Action action)
     {
         if (this.IsSuccess)
@@ -55,6 +58,9 @@ public readonly struct Result<TError>
 
     public async Task<Result<TError>> BindAsync(Func<Task<Result<TError>>> bind)
         => this.IsSuccess ? await bind() : this;
+
+    public async Task<Result<NewError>> MapErrorAsync<NewError>(Func<TError, Task<NewError>> map)
+        => this.IsSuccess ? new Result<NewError>() : await map(this.Error!);
 
     public async Task<Result<TError>> TapAsync(Func<Task> action)
     {
@@ -106,7 +112,7 @@ public readonly struct Result<TValue, TError>
         ) => this.IsSuccess ? success(this.value!) : failure(this.error!);
 
     public Result<TResult, TError> Bind<TResult>(Func<TValue, Result<TResult, TError>> bind)
-        => this.IsSuccess ? bind(this.value!) : (Result<TResult, TError>)this.error!;
+        => this.IsSuccess ? bind(this.value!) : this.error!;
 
     public Result<TValueOther, TError> Map<TValueOther>(Func<TValue, TValueOther> map)
         => this.IsSuccess ? map(this.value!) : this.error!;
@@ -165,10 +171,13 @@ public static class ResultExtensions
 {
     extension<TError>(Result<TError> result)
     {
-        public Result<TValue, TError> Map<TValue>(Func<TValue> map)
+        public Result<TValue, TError> MapToValueResult<TValue>(Func<TValue> map)
             => result.IsSuccess ? map() : result.Error!;
 
-        public async Task<Result<TValue, TError>> MapAsync<TValue>(Func<Task<TValue>> map)
+        public Result<TValue, TError> MapToValueResult<TValue>(TValue value)
+            => result.IsSuccess ? value : result.Error!;
+
+        public async Task<Result<TValue, TError>> MapToValueResultAsync<TValue>(Func<Task<TValue>> map)
             => result.IsSuccess ? await map() : result.Error!;
     }
 

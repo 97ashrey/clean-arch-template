@@ -73,5 +73,38 @@ namespace Company.Service.RestApi.Api.Controllers
             );
         }
 
+        [HttpPut("orders/{accountOrderId:guid}/start-processing")]
+        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> StartProcessingAccountOrder(
+            [FromRoute] Guid accountOrderId, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new ProcessAccountOrderCommand() { AccountOrderId = accountOrderId }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
+                value => TypedResults.Ok(value),
+                error => error switch
+                {
+                    ValidationError ve => ValidationproblemResponse(ve),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("orders/{accountOrderId:guid}/complete")]
+        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> CompleteAccountOrder(
+            [FromRoute] Guid accountOrderId, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new CompleteAccountOrderCommand() { AccountOrderId = accountOrderId }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
+                value => TypedResults.Ok(value),
+                error => error switch
+                {
+                    ValidationError ve => ValidationproblemResponse(ve),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
     }
 }

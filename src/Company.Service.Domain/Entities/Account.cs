@@ -1,11 +1,10 @@
-using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
-public class Account : Entity
+public class Account
 {
     public Guid Id { get; private set; }
 
@@ -45,6 +44,26 @@ public class Account : Entity
         InvoiceAddressId = invoiceAddressId;
     }
 
+    public static Result<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(tenantId, nameof(tenantId)),
+            Validate.NotEmpty(name, nameof(name)),
+            Validate.NotEmpty(email, nameof(email)),
+            Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
+        ).MapToValueResult(new Account(
+                id: Guid.NewGuid(),
+                tenantId,
+                name,
+                email,
+                tier,
+                AccountStatus.Active,
+                suspendedDate: null,
+                invoiceAddressId
+            )
+        );
+    }
+
     public Result<ValidationError> ChangeName(string name)
     {
         return Validate.ExecuteRules(
@@ -52,18 +71,6 @@ public class Account : Entity
         ).Bind(() =>
         {
             Name = name;
-            return new();
-        });
-
-    }
-
-    public Result<ValidationError> ChangeEmail(string email)
-    {
-        return Validate.ExecuteRules(
-            Validate.NotEmpty(email, nameof(email))
-        ).Bind(() =>
-        {
-            Email = email;
             return new();
         });
     }
@@ -119,22 +126,4 @@ public enum AccountTier
     Individual,
     Business,
     Enterprise
-}
-
-public static class AccountConstruction
-{
-    extension(Account)
-    {
-        public static Result<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
-        {
-            return Validate.ExecuteRules(
-                Validate.NotEmpty(tenantId, nameof(tenantId)),
-                Validate.NotEmpty(name, nameof(name)),
-                Validate.NotEmpty(email, nameof(email)),
-                Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
-            ).Map(() => 
-                new Account(id: Guid.NewGuid(), tenantId, name, email, tier, AccountStatus.Active, suspendedDate: null, invoiceAddressId)
-            );
-        }
-    }
 }

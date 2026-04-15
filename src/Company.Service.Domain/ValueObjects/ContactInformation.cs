@@ -25,6 +25,6 @@ public record ContactInformation()
             Validate.NotEmpty(lastName, nameof(lastName)),
             Validate.NotEmpty(email, nameof(email)),
             Validate.NotEmpty(phoneNumber, nameof(phoneNumber))
-        ).Map(() => new ContactInformation(firstName, lastName, email, phoneNumber));
+        ).MapToValueResult(new ContactInformation(firstName, lastName, email, phoneNumber));
     }
 }

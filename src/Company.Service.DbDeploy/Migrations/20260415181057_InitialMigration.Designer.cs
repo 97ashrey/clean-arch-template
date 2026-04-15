@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Company.Service.DbDeploy.Migrations
 {
     [DbContext(typeof(ServiceDomainPlaceholderDbContext))]
-    [Migration("20260403222711_InitialMigration")]
+    [Migration("20260415181057_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -80,6 +80,9 @@ namespace Company.Service.DbDeploy.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");

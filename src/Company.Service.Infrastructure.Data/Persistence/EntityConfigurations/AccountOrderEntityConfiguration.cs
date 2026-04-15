@@ -49,6 +49,9 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
         builder.Property(ao => ao.CreatedDate)
             .IsRequired();
 
+        builder.Property(ao => ao.CompletedDate)
+            .IsRequired(false);
+
         builder.HasOne<InvoiceAdress>()
             .WithMany()
             .HasForeignKey(ao => ao.InvoiceAddressId)

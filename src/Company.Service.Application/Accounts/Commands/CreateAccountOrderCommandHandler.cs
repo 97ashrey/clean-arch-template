@@ -47,7 +47,6 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
         _dbContext = dbContext;
     }
 
-
     public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
     {
         return await ContactInformation
@@ -70,6 +69,8 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                 async accountOrder =>
                 {
                     _dbContext.AccountOrders.Add(accountOrder);
+
+                    // publish integration event
 
                     await _dbContext.SaveChangesAsync(cancellationToken);
 

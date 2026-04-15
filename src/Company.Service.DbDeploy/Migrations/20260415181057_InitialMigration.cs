@@ -82,6 +82,7 @@ namespace Company.Service.DbDeploy.Migrations
                     ContactInformation_PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CompletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     InvoiceAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },

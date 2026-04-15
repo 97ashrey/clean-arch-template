@@ -33,6 +33,8 @@ public record Address
             Validate.NotEmpty(zipCode, nameof(zipCode)),
             Validate.NotEmpty(street, nameof(street)),
             Validate.NotEmpty(number, nameof(number))
-        ).Map(() => new Address(country, city, zipCode, street, number));
+        ).MapToValueResult(
+            new Address(country, city, zipCode, street, number)
+        );
     }
 }

@@ -1,11 +1,10 @@
-using Company.Service.Domain.Common;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Types.Utils;
 
 namespace Company.Service.Domain.Entities;
 
-public class Subscription : Entity
+public class Subscription
 {
     public Guid Id { get; private set; }
 
@@ -55,6 +54,48 @@ public class Subscription : Entity
         Status = status;
         SuspendedDate = suspendedDate;
         ProductId = productId;
+    }
+
+    public static Result<Subscription, ValidationError> CreateNew(
+            Guid accountId,
+            string name,
+            string friendlyName,
+            Price purchasePrice,
+            BillCycle billCycle,
+            DateTime startDate,
+            DateTime endDate,
+            Guid productId)
+    {
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(accountId, nameof(accountId)),
+            Validate.NotEmpty(name, nameof(name)),
+            Validate.NotEmpty(friendlyName, nameof(friendlyName)),
+            Validate.NotZero(purchasePrice.Value, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Value)}"),
+            Validate.NotEmpty(purchasePrice.Currency, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Currency)}"),
+            Validate.Must(() =>
+            {
+                if (startDate > endDate)
+                {
+                    return new SingleFailure($"{nameof(startDate)}-{nameof(endDate)}", $"{nameof(startDate)} can't be greater than {nameof(endDate)}!");
+                }
+
+                return null;
+            })
+        )
+        .MapToValueResult(new Subscription(
+                id: Guid.NewGuid(),
+                accountId,
+                name,
+                friendlyName,
+                purchasePrice,
+                billCycle,
+                startDate,
+                endDate,
+                SubscriptionStatus.Active,
+                suspendedDate: null,
+                productId
+            )
+        );
     }
 
     public Result<ValidationError> Update(string friendlyName)
@@ -119,50 +160,3 @@ public enum BillCycle
 }
 
 public record Price(decimal Value, string Currency);
-
-public static class SubscriptionConstruction
-{
-    extension(Subscription)
-    {
-        public static Result<Subscription, ValidationError> CreateNew(
-            Guid accountId,
-            string name,
-            string friendlyName,
-            Price purchasePrice,
-            BillCycle billCycle,
-            DateTime startDate,
-            DateTime endDate,
-            Guid productId)
-        {
-            return Validate.ExecuteRules(
-                Validate.NotEmpty(accountId, nameof(accountId)),
-                Validate.NotEmpty(name, nameof(name)),
-                Validate.NotEmpty(friendlyName, nameof(friendlyName)),
-                Validate.NotZero(purchasePrice.Value, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Value)}"),
-                Validate.NotEmpty(purchasePrice.Currency, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Currency)}"),
-                Validate.Must(() =>
-                {
-                    if (startDate > endDate)
-                    {
-                        return new SingleFailure($"{nameof(startDate)}-{nameof(endDate)}", $"{nameof(startDate)} can't be greater than {nameof(endDate)}!");
-                    }
-
-                    return null;
-                })
-            )
-            .Map(() => new Subscription(
-                id: Guid.NewGuid(),
-                accountId,
-                name,
-                friendlyName,
-                purchasePrice,
-                billCycle,
-                startDate,
-                endDate,
-                SubscriptionStatus.Active,
-                suspendedDate: null,
-                productId
-            ));
-        }
-    }
-}

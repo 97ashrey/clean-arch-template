@@ -78,6 +78,9 @@ namespace Company.Service.DbDeploy.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
