@@ -51,16 +51,17 @@ public class Account
             Validate.NotEmpty(name, nameof(name)),
             Validate.NotEmpty(email, nameof(email)),
             Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
-        ).MapToValueResult(new Account(
-                id: Guid.NewGuid(),
-                tenantId,
-                name,
-                email,
-                tier,
-                AccountStatus.Active,
-                suspendedDate: null,
-                invoiceAddressId
-            )
+        ).MapToValueResult(new Account()
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Name = name,
+            Email = email,
+            Tier = tier,
+            Status = AccountStatus.Active,
+            SuspendedDate = null,
+            InvoiceAddressId = invoiceAddressId
+        }
         );
     }
 

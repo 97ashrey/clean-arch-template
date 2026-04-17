@@ -16,7 +16,7 @@ public record Address
 
     public string Number { get; private set; } = string.Empty;
 
-    private Address() {}
+    private Address() { }
 
     public static Result<Address, ValidationError> CreateNew(string country, string city, string zipCode, string street, string number)
     {
@@ -28,12 +28,12 @@ public record Address
             Validate.NotEmpty(number, nameof(number))
         ).MapToValueResult(
             new Address()
-            { 
-                Country =  country,
+            {
+                Country = country,
                 City = city,
                 ZipCode = zipCode,
-                Street = street, 
-                Number = number 
+                Street = street,
+                Number = number
             }
         );
     }

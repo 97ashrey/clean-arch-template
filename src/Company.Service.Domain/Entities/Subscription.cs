@@ -82,19 +82,20 @@ public class Subscription
                 return null;
             })
         )
-        .MapToValueResult(new Subscription(
-                id: Guid.NewGuid(),
-                accountId,
-                name,
-                friendlyName,
-                purchasePrice,
-                billCycle,
-                startDate,
-                endDate,
-                SubscriptionStatus.Active,
-                suspendedDate: null,
-                productId
-            )
+        .MapToValueResult(new Subscription()
+        {
+            Id = Guid.NewGuid(),
+            AccountId = accountId,
+            Name = name,
+            FriendlyName = friendlyName,
+            PurchasePrice = purchasePrice,
+            BillCycle = billCycle,
+            StartDate = startDate,
+            EndDate = endDate,
+            Status = SubscriptionStatus.Active,
+            SuspendedDate = null,
+            ProductId = productId
+        }
         );
     }
 

@@ -30,7 +30,13 @@ public class InvoiceAdress
         return Validate.ExecuteRules(
             Validate.NotEmpty(tenantId, nameof(tenantId)),
             Validate.NotEmpty(name, nameof(name))
-        ).MapToValueResult(new InvoiceAdress(Guid.NewGuid(), tenantId, name, address));
+        ).MapToValueResult(new InvoiceAdress()
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            Name = name,
+            Address = address
+        });
     }
 
     public Result<ValidationError> ChangeName(string name)

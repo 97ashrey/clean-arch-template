@@ -1,5 +1,6 @@
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
+using Company.Service.Domain.Common.Types.Utils;
 using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
@@ -47,7 +48,9 @@ public class AccountOrder
 
     public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, AccountDetails accountDetails, ContactInformation contactInformation, DateTime createdDate)
     {
-        return new AccountOrder
+        return Validate.ExecuteRules(
+            Validate.NotEmpty(tenantId, nameof(tenantId))
+        ).MapToValueResult(new AccountOrder
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,
@@ -55,7 +58,8 @@ public class AccountOrder
             ContactInformation = contactInformation,
             Status = AccountOrderStatus.Pending,
             CreatedDate = createdDate,
-        };
+        }
+        );
     }
 
     public Result<InvalidOperationError> StartProcessing()

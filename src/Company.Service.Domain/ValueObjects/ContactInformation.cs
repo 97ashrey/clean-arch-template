@@ -11,7 +11,7 @@ public record ContactInformation
     public string Email { get; private set; } = string.Empty;
     public string PhoneNumber { get; private set; } = string.Empty;
 
-    private ContactInformation() {}
+    private ContactInformation() { }
 
     public static Result<ContactInformation, ValidationError> CreateNew(
         string firstName, string lastName, string email, string phoneNumber)
