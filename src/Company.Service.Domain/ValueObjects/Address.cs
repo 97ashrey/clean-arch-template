@@ -10,9 +10,9 @@ public record Address
 
     public string City { get; private set; }
 
-    public string ZipCode {get; private set; } 
-    
-    public string Street { get; private set; } 
+    public string ZipCode { get; private set; }
+
+    public string Street { get; private set; }
 
     public string Number { get; private set; }
 

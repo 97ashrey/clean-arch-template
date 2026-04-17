@@ -26,7 +26,7 @@ internal class ProcessAccountOrderCommandHandler : IApplicationRequestHandler<Pr
     {
         var accountOrder = await _context.AccountOrders
             .FirstOrDefaultAsync(ao => ao.Id == request.AccountOrderId, cancellationToken);
-            
+
         if (accountOrder is null)
         {
             return new NotFoundError()

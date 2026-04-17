@@ -1,7 +1,7 @@
 ﻿using Company.Service.Application.Common.Types.Errors;
 using Mediator;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Company.Service.RestApi.Common.Controllers;
 
@@ -82,7 +82,7 @@ public class ApiControllerBase : ControllerBase
 
         return TypedResults.NotFound(problemDetails);
     }
-        
+
     protected BadRequest<ProblemDetails> BadRequestProblemResponse(BadRequestError error)
     {
         var problemDetails = ProblemDetailsFactory.CreateProblemDetails(
@@ -110,9 +110,9 @@ public class ApiControllerBase : ControllerBase
             HttpContext,
             statusCode: StatusCodes.Status500InternalServerError,
             detail: error.Message);
-        
+
         problemDetails.ApplyApplicationErrorCustomizations(error);
-        
+
         return TypedResults.InternalServerError(problemDetails);
     }
 }

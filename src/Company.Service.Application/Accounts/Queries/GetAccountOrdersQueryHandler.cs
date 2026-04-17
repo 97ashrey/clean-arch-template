@@ -16,11 +16,7 @@ public record GetAccountOrdersQuery : ApplicationRequest<PagedList<AccountOrder>
 
     public ICollection<Guid>? AccountIds { get; init; }
 
-    public ICollection<Guid>? InvoiceAddressIds { get; init; }
-
     public ICollection<AccountOrderStatus>? Statuses { get; init; }
-
-    public ICollection<AccountTier>? Tiers { get; init; }
 
     public int PageNumber { get; init; }
     public int PageSize { get; init; }
@@ -53,7 +49,7 @@ internal class GetAccountOrdersQueryHandler : IApplicationRequestHandler<GetAcco
             .ToListAsync(cancellationToken);
 
         var pagedList = new PagedList<AccountOrder>(
-            items: [..orders],
+            items: [.. orders],
             currentPage: pageNumber,
             pageSize: pageSize,
             totalCount: totalCount
@@ -79,19 +75,9 @@ internal class GetAccountOrdersQueryHandler : IApplicationRequestHandler<GetAcco
             query = query.Where(o => o.AccountId.HasValue && request.AccountIds.Contains(o.AccountId.Value));
         }
 
-        if (request.InvoiceAddressIds is not null && request.InvoiceAddressIds.Count > 0)
-        {
-            query = query.Where(o => request.InvoiceAddressIds.Contains(o.InvoiceAddressId));
-        }
-
         if (request.Statuses is not null && request.Statuses.Count > 0)
         {
             query = query.Where(o => request.Statuses.Contains(o.Status));
-        }
-
-        if (request.Tiers is not null && request.Tiers.Count > 0)
-        {
-            query = query.Where(o => request.Tiers.Contains(o.Tier));
         }
 
         return query;

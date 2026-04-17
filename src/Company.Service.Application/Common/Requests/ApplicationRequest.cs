@@ -1,5 +1,5 @@
-﻿using Company.Service.Domain.Common.Types;
-using Company.Service.Application.Common.Types.Errors;
+﻿using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Domain.Common.Types;
 using Mediator;
 
 namespace Company.Service.Application.Common.Requests;

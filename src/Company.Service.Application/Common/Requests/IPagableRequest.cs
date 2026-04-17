@@ -13,7 +13,7 @@ public static class PagableRequestExtensions
 {
     extension(IPagableRequest request)
     {
-        public int GetPageNumberOrDefault(int defaultPageNumber = 1) => 
+        public int GetPageNumberOrDefault(int defaultPageNumber = 1) =>
             request.PageNumber > 0 ? request.PageNumber : defaultPageNumber;
 
         public int GetPageSizeOrDefault(int defaultPageSize = 10) =>

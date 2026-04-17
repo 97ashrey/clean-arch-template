@@ -44,7 +44,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
             .ToListAsync(cancellationToken);
 
         var pagedList = new PagedList<InvoiceAdress>(
-            items: [..addresses],
+            items: [.. addresses],
             currentPage: pageNumber,
             pageSize: pageSize,
             totalCount: totalCount

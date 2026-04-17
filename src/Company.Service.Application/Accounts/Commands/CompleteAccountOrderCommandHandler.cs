@@ -26,7 +26,7 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
     {
         var accountOrder = await _context.AccountOrders
             .FirstOrDefaultAsync(ao => ao.Id == request.AccountOrderId, cancellationToken);
-            
+
         if (accountOrder is null)
         {
             return new NotFoundError()
@@ -37,18 +37,18 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
 
         return await Account.CreateNew(
                 accountOrder.TenantId,
-                accountOrder.AccountName,
-                accountOrder.ContactInformation.Email,
-                accountOrder.Tier,
-                accountOrder.InvoiceAddressId
+                accountOrder.AccountDetails.Name,
+                accountOrder.AccountDetails.Email,
+                accountOrder.AccountDetails.Tier,
+                accountOrder.AccountDetails.InvoiceAddressId
             )
             .MapError<ApplicationError>(error => new ValidationError()
-                {
-                    Message = "Validation failed!.",
-                    Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
-                })
+            {
+                Message = "Validation failed!.",
+                Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
+            })
             .Tap(account => _context.Accounts.Add(account))
-            .Bind(account => 
+            .Bind(account =>
                 accountOrder
                     .Complete(account, DateTime.UtcNow)
                     .MapToValueResult(accountOrder)
@@ -58,7 +58,7 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
                 async order =>
                 {
                     // publish integration event
-                    
+
                     await _context.SaveChangesAsync(cancellationToken);
 
                     return order;

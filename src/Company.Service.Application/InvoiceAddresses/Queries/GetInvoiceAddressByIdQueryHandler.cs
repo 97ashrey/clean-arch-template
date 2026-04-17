@@ -1,7 +1,7 @@
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
-using Company.Service.Domain.Common.Types;
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 

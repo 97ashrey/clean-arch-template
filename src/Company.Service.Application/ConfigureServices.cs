@@ -33,7 +33,7 @@ public static class ConfigureServices
             return member?.Name;
         };
         services.AddValidatorsFromAssembly(typeof(IApplicationAssemblyMarker).Assembly, includeInternalTypes: true);
-        
+
         services.AddScoped<IUserProvider, TUserProvider>();
 
         return services;

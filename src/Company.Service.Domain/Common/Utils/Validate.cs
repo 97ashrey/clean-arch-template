@@ -47,9 +47,9 @@ public static class Validate
     {
         if (value == Guid.Empty)
         {
-            return new (propertyName, "Must not be empty!");
+            return new(propertyName, "Must not be empty!");
         }
-        
+
         return null;
     }
 

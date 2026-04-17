@@ -34,21 +34,21 @@ internal class ApplicationUserProvider : IUserProvider
         if (!request.Headers.TryGetValue(USER_HEADER, out var value))
         {
             _logger.LogWarning("Missing header {header}. Can't construct a valid user context.", USER_HEADER);
-            
+
             return null;
         }
 
         try
         {
             var user = JsonSerializer.Deserialize<User>(value!);
-            
+
             return user;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Can't deserialize the user value {userValue}!", value!);
 
-            return null;            
+            return null;
         }
     }
 }

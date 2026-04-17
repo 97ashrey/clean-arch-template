@@ -14,9 +14,9 @@ internal static class ConfigureMessagingServices
         {
             x.AddEntityFrameworkOutbox<ServiceDomainPlaceholderDbContext>(o =>
             {
-               o.QueryDelay = TimeSpan.FromSeconds(60);
-               o.UseSqlServer();
-               o.UseBusOutbox();
+                o.QueryDelay = TimeSpan.FromSeconds(60);
+                o.UseSqlServer();
+                o.UseBusOutbox();
             });
 
             x.AddConsumersFromNamespaceContaining<IApplicationAssemblyMarker>();

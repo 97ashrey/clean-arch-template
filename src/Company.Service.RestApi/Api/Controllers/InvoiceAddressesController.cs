@@ -1,7 +1,7 @@
-using Company.Service.Application.InvoiceAddresses.Commands;
-using Company.Service.Application.InvoiceAddresses.Queries;
 using Company.Service.Application.Common.Types;
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Application.InvoiceAddresses.Commands;
+using Company.Service.Application.InvoiceAddresses.Queries;
 using Company.Service.Domain.Entities;
 using Company.Service.RestApi.Common.Controllers;
 using Microsoft.AspNetCore.Http.HttpResults;

@@ -1,6 +1,6 @@
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
-using Company.Service.Domain.Common.Types.Utils;
+using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
 
@@ -10,9 +10,9 @@ public class AccountOrder
 
     public Guid TenantId { get; private set; }
 
-    public string AccountName { get; private set; } = string.Empty;
+    public AccountDetails AccountDetails { get; private set; } = null!;
 
-    public AccountTier Tier { get; private set; }
+    public Guid? AccountId { get; private set; }
 
     public ContactInformation ContactInformation { get; private set; } = null!;
 
@@ -22,50 +22,40 @@ public class AccountOrder
 
     public DateTime? CompletedDate { get; private set; }
 
-    public Guid? AccountId { get; private set; }
-
-    public Guid InvoiceAddressId { get; private set; }
-
     internal AccountOrder(
         Guid id,
         Guid tenantId,
-        string accountName,
-        AccountTier tier,
+        AccountDetails accountDetails,
+        Guid? accountId,
         ContactInformation contactInformation,
         AccountOrderStatus status,
         DateTime createdDate,
-        Guid? accountId,
-        Guid invoiceAddressId)
+        DateTime? completedDate
+        )
     {
         Id = id;
         TenantId = tenantId;
-        AccountName = accountName;
-        Tier = tier;
+        AccountDetails = accountDetails;
+        AccountId = accountId;
         ContactInformation = contactInformation;
         Status = status;
         CreatedDate = createdDate;
-        AccountId = accountId;
-        InvoiceAddressId = invoiceAddressId;
+        CompletedDate = completedDate;
     }
 
-    private AccountOrder(){}
+    private AccountOrder() { }
 
-    public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, string accountName, AccountTier tier, ContactInformation contactInformation, DateTime createdDate, Guid invoiceAddressId)
+    public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, AccountDetails accountDetails, ContactInformation contactInformation, DateTime createdDate)
     {
-        return Validate.ExecuteRules(
-            Validate.NotEmpty(accountName, nameof(accountName))
-        ).MapToValueResult(new AccountOrder
-            {
-                Id = Guid.NewGuid(),
-                TenantId = tenantId,
-                AccountName = accountName,
-                Tier = tier,
-                ContactInformation = contactInformation,
-                Status = AccountOrderStatus.Pending,
-                CreatedDate = createdDate,
-                InvoiceAddressId = invoiceAddressId
-            }
-        );
+        return new AccountOrder
+        {
+            Id = Guid.NewGuid(),
+            TenantId = tenantId,
+            AccountDetails = accountDetails,
+            ContactInformation = contactInformation,
+            Status = AccountOrderStatus.Pending,
+            CreatedDate = createdDate,
+        };
     }
 
     public Result<InvalidOperationError> StartProcessing()

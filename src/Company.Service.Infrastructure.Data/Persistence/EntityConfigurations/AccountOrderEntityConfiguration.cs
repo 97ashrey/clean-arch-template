@@ -13,14 +13,7 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
         builder.Property(a => a.TenantId)
             .IsRequired();
 
-        builder.Property(ao => ao.AccountName)
-            .IsRequired()
-            .HasMaxLength(255);
 
-        builder.Property(ao => ao.Tier)
-            .IsRequired()
-            .HasConversion<string>()
-            .HasMaxLength(30);
 
         builder.OwnsOne(ao => ao.ContactInformation, ci =>
         {
@@ -52,11 +45,26 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
         builder.Property(ao => ao.CompletedDate)
             .IsRequired(false);
 
-        builder.HasOne<InvoiceAdress>()
-            .WithMany()
-            .HasForeignKey(ao => ao.InvoiceAddressId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired();
+        builder.OwnsOne(ao => ao.AccountDetails, ad =>
+        {
+            ad.Property(a => a.Name)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            ad.Property(a => a.Tier)
+                .IsRequired()
+                .HasConversion<string>()
+                .HasMaxLength(30);
+
+            ad.Property(a => a.InvoiceAddressId)
+                .IsRequired();
+
+            ad.HasOne<InvoiceAdress>()
+                .WithMany()
+                .HasForeignKey(a => a.InvoiceAddressId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired();
+        });
 
         builder.ToTable("AccountOrders");
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Company.Service.DbDeploy.Migrations
 {
     [DbContext(typeof(ServiceDomainPlaceholderDbContext))]
-    [Migration("20260415181057_InitialMigration")]
+    [Migration("20260417175059_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -76,19 +76,11 @@ namespace Company.Service.DbDeploy.Migrations
                     b.Property<Guid?>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<DateTime?>("CompletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("InvoiceAddressId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -98,14 +90,7 @@ namespace Company.Service.DbDeploy.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Tier")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("InvoiceAddressId");
 
                     b.ToTable("AccountOrders", (string)null);
                 });
@@ -358,11 +343,43 @@ namespace Company.Service.DbDeploy.Migrations
 
             modelBuilder.Entity("Company.Service.Domain.Entities.AccountOrder", b =>
                 {
-                    b.HasOne("Company.Service.Domain.Entities.InvoiceAdress", null)
-                        .WithMany()
-                        .HasForeignKey("InvoiceAddressId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.OwnsOne("Company.Service.Domain.ValueObjects.AccountDetails", "AccountDetails", b1 =>
+                        {
+                            b1.Property<Guid>("AccountOrderId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Email")
+                                .IsRequired()
+                                .HasColumnType("nvarchar(max)");
+
+                            b1.Property<Guid>("InvoiceAddressId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<string>("Name")
+                                .IsRequired()
+                                .HasMaxLength(255)
+                                .HasColumnType("nvarchar(255)");
+
+                            b1.Property<string>("Tier")
+                                .IsRequired()
+                                .HasMaxLength(30)
+                                .HasColumnType("nvarchar(30)");
+
+                            b1.HasKey("AccountOrderId");
+
+                            b1.HasIndex("InvoiceAddressId");
+
+                            b1.ToTable("AccountOrders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AccountOrderId");
+
+                            b1.HasOne("Company.Service.Domain.Entities.InvoiceAdress", null)
+                                .WithMany()
+                                .HasForeignKey("InvoiceAddressId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+                        });
 
                     b.OwnsOne("ContactInformation", "ContactInformation", b1 =>
                         {
@@ -396,6 +413,9 @@ namespace Company.Service.DbDeploy.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("AccountOrderId");
                         });
+
+                    b.Navigation("AccountDetails")
+                        .IsRequired();
 
                     b.Navigation("ContactInformation")
                         .IsRequired();

@@ -19,10 +19,10 @@ internal class ApplicationDbContext : IApplicationDbContext
         _publishEndpoint = publishEndpoint;
     }
 
-    public DbSet<Account> Accounts  => _dbContext.Accounts;
+    public DbSet<Account> Accounts => _dbContext.Accounts;
     public DbSet<AccountOrder> AccountOrders => _dbContext.AccountOrders;
-    public DbSet<InvoiceAdress> InvoiceAdresses  => _dbContext.InvoiceAdresses;
-    public DbSet<Subscription> Subscriptions  => _dbContext.Subscriptions;
+    public DbSet<InvoiceAdress> InvoiceAdresses => _dbContext.InvoiceAdresses;
+    public DbSet<Subscription> Subscriptions => _dbContext.Subscriptions;
 
     public DatabaseFacade Database => _dbContext.Database;
 

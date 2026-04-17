@@ -1,15 +1,15 @@
 using Company.Service.Application;
+using Company.Service.Infrastructure;
 using Company.Service.RestApi.Common.Authorization;
 using Company.Service.RestApi.Common.Configurations;
 using Company.Service.RestApi.Common.Filters;
+using Company.Service.RestApi.Common.Middleware;
 using Company.Service.RestApi.Common.UserContext;
-using Company.Service.Infrastructure;
 using Microsoft.OpenApi;
-using Swashbuckle.AspNetCore.SwaggerGen;
+using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using OpenTelemetry;
-using Company.Service.RestApi.Common.Middleware;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
