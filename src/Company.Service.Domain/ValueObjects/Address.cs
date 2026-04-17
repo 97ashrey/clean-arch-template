@@ -6,24 +6,17 @@ namespace Company.Service.Domain.ValueObjects;
 
 public record Address
 {
-    public string Country { get; private set; }
+    public string Country { get; private set; } = string.Empty;
 
-    public string City { get; private set; }
+    public string City { get; private set; } = string.Empty;
 
-    public string ZipCode { get; private set; }
+    public string ZipCode { get; private set; } = string.Empty;
 
-    public string Street { get; private set; }
+    public string Street { get; private set; } = string.Empty;
 
-    public string Number { get; private set; }
+    public string Number { get; private set; } = string.Empty;
 
-    private Address(string country, string city, string zipCode, string street, string number)
-    {
-        Country = country;
-        City = city;
-        ZipCode = zipCode;
-        Street = street;
-        Number = number;
-    }
+    private Address() {}
 
     public static Result<Address, ValidationError> CreateNew(string country, string city, string zipCode, string street, string number)
     {
@@ -34,7 +27,14 @@ public record Address
             Validate.NotEmpty(street, nameof(street)),
             Validate.NotEmpty(number, nameof(number))
         ).MapToValueResult(
-            new Address(country, city, zipCode, street, number)
+            new Address()
+            { 
+                Country =  country,
+                City = city,
+                ZipCode = zipCode,
+                Street = street, 
+                Number = number 
+            }
         );
     }
 }
