@@ -42,7 +42,7 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
                 accountOrder.AccountDetails.Tier,
                 accountOrder.AccountDetails.InvoiceAddressId
             )
-            .MapError<ApplicationError>(error => 
+            .MapError<ApplicationError>(error =>
                 new ValidationError()
                 {
                     Message = "Validation failed!.",

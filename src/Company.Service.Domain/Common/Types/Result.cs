@@ -230,7 +230,7 @@ public static class ResultExtensions
 
         public async Task<Result<TError>> BindAsync(Func<Result<TError>> bind)
             => (await resultTask).Bind(bind);
-        
+
         public async Task<Result<TError>> BindAsync(Func<Task<Result<TError>>> bindAsync)
             => await (await resultTask).BindAsync(bindAsync);
 

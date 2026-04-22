@@ -63,7 +63,7 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
 
     public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
     {
-        return await 
+        return await
             AccountDetails.CreateNew(
                 request.AccountDetails.Name,
                 request.AccountDetails.Email,
@@ -77,7 +77,7 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                     request.ContactInformation.Email,
                     request.ContactInformation.PhoneNumber
                 )
-                .Bind(ci => 
+                .Bind(ci =>
                     AccountOrder.CreateNew(
                         tenantId: request.TenantId,
                         accountDetails: ad,
@@ -86,7 +86,8 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                     )
                 )
             )
-            .MapError<ApplicationError>(error => new ValidationError()
+            .MapError<ApplicationError>(error =>
+                new ValidationError()
                 {
                     Message = "Validation failed!.",
                     Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
