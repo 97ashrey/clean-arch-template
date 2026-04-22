@@ -36,22 +36,8 @@ internal class ProcessAccountOrderCommandHandler : IApplicationRequestHandler<Pr
         }
 
         return await accountOrder.StartProcessing()
-            .MatchAsync<Result<AccountOrder, ApplicationError>>(
-                async () =>
-                {
-                    // publish integration event
-
-                    await _context.SaveChangesAsync(cancellationToken);
-
-                    return accountOrder;
-                },
-                async error =>
-                {
-                    return new BadRequestError()
-                    {
-                        Message = error.Message
-                    };
-                }
-            );
+            .TapAsync(async () => await _context.SaveChangesAsync(cancellationToken))
+            .MapToValueResultAsync(accountOrder)
+            .MapErrorAsync(error => new BadRequestError() { Message = error.Message} as ApplicationError );
     }
 }

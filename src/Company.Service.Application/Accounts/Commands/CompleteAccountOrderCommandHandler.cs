@@ -42,11 +42,13 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
                 accountOrder.AccountDetails.Tier,
                 accountOrder.AccountDetails.InvoiceAddressId
             )
-            .MapError<ApplicationError>(error => new ValidationError()
-            {
-                Message = "Validation failed!.",
-                Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
-            })
+            .MapError<ApplicationError>(error => 
+                new ValidationError()
+                {
+                    Message = "Validation failed!.",
+                    Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
+                }
+            )
             .Tap(account => _context.Accounts.Add(account))
             .Bind(account =>
                 accountOrder
@@ -54,16 +56,11 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
                     .MapToValueResult(accountOrder)
                     .MapError<ApplicationError>(error => new BadRequestError() { Message = error.Message })
             )
-            .MatchAsync<Result<AccountOrder, ApplicationError>>(
-                async order =>
-                {
-                    // publish integration event
+            .TapAsync(async order =>
+            {
+                // publish integration event
 
-                    await _context.SaveChangesAsync(cancellationToken);
-
-                    return order;
-                },
-                async error => error
-            );
+                await _context.SaveChangesAsync(cancellationToken);
+            });
     }
 }
