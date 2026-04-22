@@ -5,6 +5,7 @@ using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using FluentValidation;
+using MassTransit;
 
 namespace Company.Service.Application.Accounts.Commands;
 
@@ -52,15 +53,17 @@ internal class CreateAccountOrderCommandValidator : AbstractValidator<CreateAcco
 internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<CreateAccountOrderCommand, AccountOrder>
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public CreateAccountOrderCommandHandler(IApplicationDbContext dbContext)
+    public CreateAccountOrderCommandHandler(IApplicationDbContext dbContext, IPublishEndpoint publishEndpoint)
     {
         _dbContext = dbContext;
+        _publishEndpoint = publishEndpoint;
     }
 
     public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
     {
-        return await
+        return await 
             AccountDetails.CreateNew(
                 request.AccountDetails.Name,
                 request.AccountDetails.Email,
@@ -74,33 +77,47 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                     request.ContactInformation.Email,
                     request.ContactInformation.PhoneNumber
                 )
-                .Map(ci => (ad, ci))
-            )
-            .Bind(adAndCi =>
-                AccountOrder.CreateNew(
-                    tenantId: request.TenantId,
-                    accountDetails: adAndCi.ad,
-                    contactInformation: adAndCi.ci,
-                    createdDate: DateTime.UtcNow
+                .Bind(ci => 
+                    AccountOrder.CreateNew(
+                        tenantId: request.TenantId,
+                        accountDetails: ad,
+                        contactInformation: ci,
+                        createdDate: DateTime.UtcNow
+                    )
                 )
             )
-            .MatchAsync<Result<AccountOrder, ApplicationError>>(
-                async accountOrder =>
-                {
-                    _dbContext.AccountOrders.Add(accountOrder);
-
-                    // publish integration event
-
-                    await _dbContext.SaveChangesAsync(cancellationToken);
-
-                    return accountOrder;
-                },
-                async failure => new ValidationError()
+            .MapError<ApplicationError>(error => new ValidationError()
                 {
                     Message = "Validation failed!.",
-                    Failures = failure.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
+                    Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
                 }
-            );
+            )
+            .TapAsync(async accountOrder =>
+            {
+                _dbContext.AccountOrders.Add(accountOrder);
+
+                await _publishEndpoint.Publish(CreateAccountOrderCreatedEvent(accountOrder));
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            });
     }
+
+    private static IntegrationEvents.V1.Accounts.AccountOrderCreatedEvent CreateAccountOrderCreatedEvent(AccountOrder accountOrder)
+        => new(
+            AccountOrderId: accountOrder.Id,
+            TenantId: accountOrder.TenantId,
+            AccountDetails: new(
+                Name: accountOrder.AccountDetails.Name,
+                Email: accountOrder.AccountDetails.Email,
+                Tier: (IntegrationEvents.V1.Shared.AccountTier)accountOrder.AccountDetails.Tier
+            ),
+            ContactInformation: new(
+                accountOrder.ContactInformation.FirstName,
+                accountOrder.ContactInformation.LastName,
+                accountOrder.ContactInformation.Email,
+                accountOrder.ContactInformation.PhoneNumber
+            ),
+            CreatedDate: accountOrder.CreatedDate
+        );
 
 }
