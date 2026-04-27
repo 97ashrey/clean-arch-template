@@ -25,7 +25,7 @@ internal class ValidationPipelineBehaviour<TRequest, TResponse> : IPipelineBehav
                 return message.CreateApplicationErrorResponse(new ValidationError()
                 {
                     Message = "Validation failed.",
-                    Failures = res.ToDictionary().Select(kvp => new ValidationFailure(kvp.Key, kvp.Value)).ToArray()
+                    Failures = [.. res.ToDictionary().Select(kvp => new ValidationFailure(kvp.Key, kvp.Value))]
                 });
             }
         }

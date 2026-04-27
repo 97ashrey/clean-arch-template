@@ -13,8 +13,7 @@ internal class ResultLoggingPipelineBehaviour<TRequest, TResponse> : IPipelineBe
         _logger = logger;
     }
 
-
-    async ValueTask<TResponse> IPipelineBehavior<TRequest, TResponse>.Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
+    public async ValueTask<TResponse> Handle(TRequest message, MessageHandlerDelegate<TRequest, TResponse> next, CancellationToken cancellationToken)
     {
         var result = await next(message, cancellationToken);
 

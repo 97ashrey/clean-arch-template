@@ -22,13 +22,19 @@
 
   <ItemGroup>
     <ProjectReference Include="../Company.Service.Application.IntegrationEvents/Company.Service.Application.IntegrationEvents.csproj" />
-    <ProjectReference Include="..\Company.Service.Domain\Company.Service.Domain.csproj" />
+    <ProjectReference Include="../Company.Service.Domain/Company.Service.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="InvoiceAddresses/" />
     <Folder Include="InvoiceAddresses/Commands/" />
     <Folder Include="InvoiceAddresses/Queries/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    <InternalsVisibleTo Include="Company.Service.RestApi.IntegrationTests" />
   </ItemGroup>
 
 </Project>
