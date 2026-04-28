@@ -40,6 +40,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aspire", "aspire", "{2CA541
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Company.Service.Application.IntegrationEvents", "src\Company.Service.Application.IntegrationEvents\Company.Service.Application.IntegrationEvents.csproj", "{00D913C2-6FB4-41A9-B781-C948C0BA17A4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{C4AD9936-F0DF-1090-6077-3D4A6324E662}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\test-report.sh = scripts\test-report.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -279,3 +279,5 @@ __pycache__/
 
 # Azure Functions localsettings file
 local.settings.json
+
+test-coverage-reports
