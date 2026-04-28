@@ -8,9 +8,13 @@
 						**/Program.cs,
 						**/ConfigureServices.cs,
 						**/Company.Service.RestApi/**/Controllers/*Controller.cs,
+						**/Company.Service.RestApi/Health/PingController.cs,
 						**/Company.Service.RestApi/Common/Configurations/*.cs,
+						**/Company.Service.Application.IntegrationEvents/**/*.cs,
 						**/Company.Service.Infrastructure.Data/**/*.cs,
 						**/Company.Service.Infrastructure/Persistence/ApplicationDbContext.cs,
+						**/Company.Service.Infrastructure/Messaging/ConfigureMessagingServices.cs,
+						**/Company.Service.DbDeploy/**/*.cs,
 						**/Company.Service.Domain/Entities/*.cs,
 					</ExcludeByFile>
 					<ExcludeByAttribute>ExcludeFromCodeCoverage,Obsolete,GeneratedCode</ExcludeByAttribute>

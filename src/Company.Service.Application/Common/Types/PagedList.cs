@@ -8,7 +8,7 @@ public class PagedList<T>
     public int TotalPages { get; }
     public int TotalCount { get; }
 
-    public IReadOnlyCollection<T> Items => this.items;
+    public IReadOnlyCollection<T> Items => this.items.AsReadOnly();
 
     private readonly T[] items = [];
 

@@ -9,7 +9,7 @@ public interface IPagableRequest
     public int PageSize { get; init; }
 }
 
-public static class PagableRequestExtensions
+internal static class PagableRequestExtensions
 {
     extension(IPagableRequest request)
     {

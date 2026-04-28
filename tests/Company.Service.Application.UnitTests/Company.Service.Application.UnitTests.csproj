@@ -35,9 +35,4 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Common/" />
-	  <Folder Include="Common/Behaviours/" />
-	</ItemGroup>
-
 </Project>

@@ -3,16 +3,19 @@
 public interface IUserProvider
 {
     public Task<User?> GetCurrentUser();
+}
 
-    public async Task<User> GetCurrentUserOrDefault()
+internal static class UserProvivderExtensions
+{
+    private static readonly User DefaultUser = new User("0", "CompanyNamePlaceholder", "CompanyNamePlaceholder", "", "", 0);
+
+    extension (IUserProvider userProvider)
     {
-        var user = await GetCurrentUser();
-
-        if (user is null)
+        public async Task<User> GetCurrentUserOrDefault()
         {
-            user = new User("0", "CompanyNamePlaceholder", "CompanyNamePlaceholder", "", "", 0);
-        }
+            var user = await userProvider.GetCurrentUser();
 
-        return user;
+            return user ?? DefaultUser;
+        }
     }
 }
