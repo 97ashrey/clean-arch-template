@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "test-report": "./scripts/test-report.sh"
+  }
+}

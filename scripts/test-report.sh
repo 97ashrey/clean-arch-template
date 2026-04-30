@@ -1,5 +1,9 @@
 #!/bin/bash
-printf "Removing all previous TestResults\n"
+set -e
+
+source "$(dirname "$0")/logging.sh"
+
+info "Removing all previous TestResults"
 find . -type d -name "TestResults" -exec sh -c 'rm -rf "$1"/*' _ {} \;
 
 if [[ "$1" == "unit" ]]; then
@@ -10,14 +14,14 @@ else
     reportTestMatcher="**"
 fi
 
-printf "\nRunning tests and collecting coverage\n"
+info "Running tests and collecting coverage"
 dotnet test $testFilter --collect "XPlat Code Coverage;Format=opencover,cobertura" --settings coverage.runsettings --no-restore --no-build
 
-# currentDirectory=$(basename "$PWD")
 reportTargetDir="$PWD/test-coverage-reports/"
 
-printf "\nGenerating report\n"
-reportgenerator -reports:"./tests/${reportTestMatcher}/TestResults/**/coverage.cobertura.xml" -targetdir:"${reportTargetDir}"
+info "Generating report"
+
+dotnet reportgenerator -reports:"./tests/${reportTestMatcher}/TestResults/**/coverage.cobertura.xml" -targetdir:"${reportTargetDir}"
 
 if [[ "$2" == "open" ]]; then
     xdg-open "${reportTargetDir}/index.html"
