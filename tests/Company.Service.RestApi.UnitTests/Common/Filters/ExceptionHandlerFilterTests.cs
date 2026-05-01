@@ -218,8 +218,8 @@ namespace Company.Service.RestApi.UnitTests.Common.Filters.Tests
 
             var actionContext = new ActionContext
             {
-                RouteData = new (),
-                ActionDescriptor = new (),
+                RouteData = new(),
+                ActionDescriptor = new(),
                 HttpContext = httpContext
             };
 

@@ -54,6 +54,6 @@ internal static class HandleUnauthorizedMiddlewareExtensions
         public IApplicationBuilder UseHandleUnauthorized()
         {
             return builder.UseMiddleware<HandleUnauthorizedMiddleware>();
-        }    
+        }
     }
 }

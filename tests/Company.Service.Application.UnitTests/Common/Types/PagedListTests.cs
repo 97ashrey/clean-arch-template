@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Company.Service.Application.Common.Types;
+using FluentAssertions;
 
 namespace Company.Service.Application.UnitTests.Common.Types;
 

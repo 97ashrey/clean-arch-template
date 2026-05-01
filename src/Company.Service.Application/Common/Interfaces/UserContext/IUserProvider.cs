@@ -9,7 +9,7 @@ internal static class UserProvivderExtensions
 {
     private static readonly User DefaultUser = new User("0", "CompanyNamePlaceholder", "CompanyNamePlaceholder", "", "", 0);
 
-    extension (IUserProvider userProvider)
+    extension(IUserProvider userProvider)
     {
         public async Task<User> GetCurrentUserOrDefault()
         {

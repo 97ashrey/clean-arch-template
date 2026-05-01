@@ -10,13 +10,13 @@ namespace Company.Service.Application.UnitTests.Common.Behaviours;
 
 public class ExceptionHandlerPipelineBehaviourTests
 {
-    private readonly FakeLogger<ExceptionHandlerPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>>> fakeLogger = new ();
+    private readonly FakeLogger<ExceptionHandlerPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>>> fakeLogger = new();
 
     private readonly ExceptionHandlerPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>> _sut;
 
     public ExceptionHandlerPipelineBehaviourTests()
     {
-        _sut = new (fakeLogger);
+        _sut = new(fakeLogger);
     }
 
     private record FakeApiRequest : ApplicationRequest<string>;

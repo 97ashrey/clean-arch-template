@@ -1,11 +1,11 @@
-using System.Text.Json;
+using Company.Service.RestApi.Common.Middleware;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Primitives;
 using NSubstitute;
-using Company.Service.RestApi.Common.Middleware;
+using System.Text.Json;
 
 namespace Company.Service.RestApi.UnitTests.Common.Middleware;
 
@@ -64,7 +64,7 @@ public class HandleUnAuthorizedMiddlewareTests
             Arg.Any<HttpContext>(),
             detail: authError,
             statusCode: StatusCodes.Status401Unauthorized);
-        
+
         var responseBody = await ReadResponseBodyAsync(context);
         var deserializedDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
         deserializedDetails.Should().NotBeNull();
@@ -99,7 +99,7 @@ public class HandleUnAuthorizedMiddlewareTests
             Arg.Any<HttpContext>(),
             detail: default(StringValues),
             statusCode: StatusCodes.Status401Unauthorized);
-        
+
         var responseBody = await ReadResponseBodyAsync(context);
         var deserializedDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
         deserializedDetails.Should().NotBeNull();
@@ -132,7 +132,7 @@ public class HandleUnAuthorizedMiddlewareTests
             Arg.Any<HttpContext>(),
             detail: default(StringValues),
             statusCode: StatusCodes.Status401Unauthorized);
-        
+
         var responseBody = await ReadResponseBodyAsync(context);
         responseBody.Should().NotBeEmpty();
         var deserializedDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
@@ -163,7 +163,7 @@ public class HandleUnAuthorizedMiddlewareTests
         _problemDetailsFactory.Received(1).CreateProblemDetails(
             Arg.Any<HttpContext>(),
             statusCode: StatusCodes.Status403Forbidden);
-        
+
         var responseBody = await ReadResponseBodyAsync(context);
         responseBody.Should().NotBeEmpty();
         var deserializedDetails = JsonSerializer.Deserialize<ProblemDetails>(responseBody);
@@ -221,7 +221,7 @@ public class HandleUnAuthorizedMiddlewareTests
     {
         var context = new DefaultHttpContext();
         context.Response.StatusCode = statusCode;
-        
+
         // Use a MemoryStream to capture the response body
         var responseBody = new MemoryStream();
         context.Response.Body = responseBody;

@@ -12,7 +12,7 @@ public class ValidationErrorTests
         var id = Guid.NewGuid();
         var message = "Validation failed";
         var failures = new[] { new ValidationFailure("Name", ["Name is required"]) };
-        
+
         var error = new ValidationError
         {
             Id = id,
@@ -39,7 +39,7 @@ public class ValidationErrorTests
         {
             new ValidationFailure("Email", ["Email is required", "Email format invalid"])
         };
-        
+
         var error = new ValidationError
         {
             Message = "Validation failed",
@@ -63,7 +63,7 @@ public class ValidationErrorTests
             new ValidationFailure("Name", ["Name is required"]),
             new ValidationFailure("Age", ["Age must be positive"])
         };
-        
+
         var error = new ValidationError
         {
             Message = "Validation failed",
@@ -88,7 +88,7 @@ public class ValidationErrorTests
             new ValidationFailure("Name", ["Name required", "Name too long"]),
             new ValidationFailure("Email", ["Email required", "Email invalid"])
         };
-        
+
         var error = new ValidationError
         {
             Message = "Validation failed",
@@ -112,7 +112,7 @@ public class ValidationErrorTests
         {
             new ValidationFailure("Field", ["Error"])
         };
-        
+
         var error = new ValidationError
         {
             Message = "Validation failed",
@@ -138,7 +138,7 @@ public class ValidationErrorTests
         {
             new ValidationFailure("Property", ["Error message"])
         };
-        
+
         var error = new ValidationError
         {
             Id = id,

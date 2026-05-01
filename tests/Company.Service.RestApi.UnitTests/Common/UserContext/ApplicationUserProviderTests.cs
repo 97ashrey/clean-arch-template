@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Company.Service.Application.Common.Interfaces.UserContext;
 using Company.Service.RestApi.Common.UserContext;
 using FluentAssertions;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 using NSubstitute;
+using System.Text.Json;
 
 namespace Company.Service.RestApi.UnitTests.Common.UserContext;
 

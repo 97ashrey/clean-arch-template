@@ -25,11 +25,11 @@ public class ApiControllerBaseTests
     public ApiControllerBaseTests()
     {
         _httpContextMock.RequestServices.Returns(_serviceProvider);
-        
+
         _serviceProvider.GetService(typeof(IMediator)).Returns(_mediatorMock);
         _serviceProvider.GetService(typeof(ILogger<ApiControllerBase>)).Returns(_fakeLogger);
 
-        _sut = new TestApiController { ControllerContext = new ControllerContext { HttpContext = _httpContextMock }, ProblemDetailsFactory = _problemDetailsFactoryMock};
+        _sut = new TestApiController { ControllerContext = new ControllerContext { HttpContext = _httpContextMock }, ProblemDetailsFactory = _problemDetailsFactoryMock };
     }
 
     [Fact]
@@ -81,8 +81,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var notFoundError = new NotFoundError { Message = "Resource not found" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status404NotFound,
             Detail = "Resource not found"
         };
@@ -117,8 +117,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var notFoundError = new NotFoundError { Message = "Resource not found" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status404NotFound,
             Detail = "Resource not found"
         };
@@ -145,8 +145,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var notFoundError = new NotFoundError { Message = "" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status404NotFound,
             Detail = ""
         };
@@ -173,8 +173,8 @@ public class ApiControllerBaseTests
         // Arrange
         var message = "Resource with ID 12345 not found in database";
         var notFoundError = new NotFoundError { Message = message };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status404NotFound,
             Detail = message
         };
@@ -201,8 +201,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var badRequestError = new BadRequestError { Message = "Invalid request" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status400BadRequest,
             Detail = "Invalid request"
         };
@@ -231,8 +231,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var badRequestError = new BadRequestError { Message = "Invalid request" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status400BadRequest,
             Detail = "Invalid request"
         };
@@ -260,8 +260,8 @@ public class ApiControllerBaseTests
         // Arrange
         var message = "Invalid input: Field1 is required, Field2 must be positive";
         var badRequestError = new BadRequestError { Message = message };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status400BadRequest,
             Detail = message
         };
@@ -445,8 +445,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var applicationError = new ApplicationError { Message = "Internal server error" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status500InternalServerError,
             Detail = "Internal server error"
         };
@@ -475,8 +475,8 @@ public class ApiControllerBaseTests
     {
         // Arrange
         var applicationError = new ApplicationError { Message = "Internal server error" };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status500InternalServerError,
             Detail = "Internal server error"
         };
@@ -508,8 +508,8 @@ public class ApiControllerBaseTests
             Message = "Validation failed",
             Failures = failures
         };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status500InternalServerError,
             Detail = "Validation failed"
         };
@@ -538,8 +538,8 @@ public class ApiControllerBaseTests
         // Arrange
         var errorId = Guid.NewGuid();
         var notFoundError = new NotFoundError { Message = "Not found", Id = errorId };
-        var problemDetails = new ProblemDetails 
-        { 
+        var problemDetails = new ProblemDetails
+        {
             Status = StatusCodes.Status404NotFound,
             Detail = "Not found"
         };

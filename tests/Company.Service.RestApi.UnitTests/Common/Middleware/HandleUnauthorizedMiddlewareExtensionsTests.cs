@@ -1,8 +1,8 @@
+using Company.Service.RestApi.Common.Middleware;
 using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
-using NSubstitute;
-using Company.Service.RestApi.Common.Middleware;
 using Microsoft.AspNetCore.Http;
+using NSubstitute;
 
 namespace Company.Service.RestApi.UnitTests.Common.Middleware;
 
@@ -13,7 +13,7 @@ public class HandleUnauthorizedMiddlewareExtensionsTests
     {
         // Arrange
         var applicationBuilder = Substitute.For<IApplicationBuilder>();
-        
+
         applicationBuilder.Use(Arg.Any<Func<RequestDelegate, RequestDelegate>>()).Returns(applicationBuilder);
 
         // Act
