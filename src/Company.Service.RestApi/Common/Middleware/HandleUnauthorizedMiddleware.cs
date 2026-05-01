@@ -49,8 +49,11 @@ internal class HandleUnauthorizedMiddleware
 
 internal static class HandleUnauthorizedMiddlewareExtensions
 {
-    public static IApplicationBuilder UseHandleUnauthorized(this IApplicationBuilder builder)
+    extension(IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<HandleUnauthorizedMiddleware>();
+        public IApplicationBuilder UseHandleUnauthorized()
+        {
+            return builder.UseMiddleware<HandleUnauthorizedMiddleware>();
+        }    
     }
 }
