@@ -15,7 +15,7 @@
 						**/Company.Service.Infrastructure/Persistence/ApplicationDbContext.cs,
 						**/Company.Service.Infrastructure/Messaging/ConfigureMessagingServices.cs,
 						**/Company.Service.DbDeploy/**/*.cs,
-						**/Company.Service.Domain/Entities/*.cs,
+						**/Company.Service.Domain/Common/Types/Errors/*Error.cs,
 					</ExcludeByFile>
 					<ExcludeByAttribute>ExcludeFromCodeCoverage,Obsolete,GeneratedCode</ExcludeByAttribute>
 					<Format>opencover,cobertura</Format>
