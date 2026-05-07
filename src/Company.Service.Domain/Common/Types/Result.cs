@@ -253,12 +253,6 @@ public static class ResultExtensions
             => await (await resultTask).TapErrorAsync(actionAsync);
     }
 
-    extension<TValue, TError>(ValueResult<TValue, TError> result)
-    {
-        public Result<TError> MapToResult<TValueOther>()
-            => result.IsSuccess ? new Result<TError>() : result.Error!;
-    }
-
     extension<TValue, TError>(Task<ValueResult<TValue, TError>> resultTask)
     {
         public async Task<TResult> MatchAsync<TResult>(Func<TValue, TResult> success, Func<TError, TResult> failure)
