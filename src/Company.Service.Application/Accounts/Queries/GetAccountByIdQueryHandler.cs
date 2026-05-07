@@ -23,7 +23,7 @@ internal class GetAccountByIdQueryHandler : IApplicationRequestHandler<GetAccoun
         _context = context;
     }
 
-    public async ValueTask<Result<Account, ApplicationError>> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<Account, ApplicationError>> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
     {
         var query = _context.Accounts
             .AsNoTracking()

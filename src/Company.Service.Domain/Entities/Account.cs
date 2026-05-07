@@ -44,7 +44,7 @@ public class Account
         InvoiceAddressId = invoiceAddressId;
     }
 
-    public static Result<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
+    public static ValueResult<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(tenantId, nameof(tenantId)),

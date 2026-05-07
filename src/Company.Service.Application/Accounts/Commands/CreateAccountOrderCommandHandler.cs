@@ -61,7 +61,7 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
         _publishEndpoint = publishEndpoint;
     }
 
-    public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
     {
         return await
             AccountDetails.CreateNew(

@@ -56,7 +56,7 @@ public class Subscription
         ProductId = productId;
     }
 
-    public static Result<Subscription, ValidationError> CreateNew(
+    public static ValueResult<Subscription, ValidationError> CreateNew(
             Guid accountId,
             string name,
             string friendlyName,

@@ -27,7 +27,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
         _context = context;
     }
 
-    public async ValueTask<Result<PagedList<InvoiceAdress>, ApplicationError>> Handle(GetInvoiceAddressesQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<PagedList<InvoiceAdress>, ApplicationError>> Handle(GetInvoiceAddressesQuery request, CancellationToken cancellationToken)
     {
         var query = _context.InvoiceAdresses.AsNoTracking();
 

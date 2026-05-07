@@ -13,7 +13,7 @@ public record ContactInformation
 
     private ContactInformation() { }
 
-    public static Result<ContactInformation, ValidationError> CreateNew(
+    public static ValueResult<ContactInformation, ValidationError> CreateNew(
         string firstName, string lastName, string email, string phoneNumber)
     {
         return Validate.ExecuteRules(

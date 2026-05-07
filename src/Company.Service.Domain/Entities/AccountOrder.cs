@@ -46,7 +46,7 @@ public class AccountOrder
 
     private AccountOrder() { }
 
-    public static Result<AccountOrder, ValidationError> CreateNew(Guid tenantId, AccountDetails accountDetails, ContactInformation contactInformation, DateTime createdDate)
+    public static ValueResult<AccountOrder, ValidationError> CreateNew(Guid tenantId, AccountDetails accountDetails, ContactInformation contactInformation, DateTime createdDate)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(tenantId, nameof(tenantId))

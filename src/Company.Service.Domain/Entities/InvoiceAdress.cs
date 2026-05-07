@@ -25,7 +25,7 @@ public class InvoiceAdress
         Address = address;
     }
 
-    public static Result<InvoiceAdress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
+    public static ValueResult<InvoiceAdress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(tenantId, nameof(tenantId)),

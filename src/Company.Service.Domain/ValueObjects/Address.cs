@@ -18,7 +18,7 @@ public record Address
 
     private Address() { }
 
-    public static Result<Address, ValidationError> CreateNew(string country, string city, string zipCode, string street, string number)
+    public static ValueResult<Address, ValidationError> CreateNew(string country, string city, string zipCode, string street, string number)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(country, nameof(country)),

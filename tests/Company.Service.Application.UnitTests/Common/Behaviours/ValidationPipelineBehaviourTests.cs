@@ -31,9 +31,9 @@ public class ValidationPipelineBehaviourTests
     public async Task Handle_WhenValidatorIsNull_PassesThroughToNextHandler()
     {
         // Arrange
-        var sut = new ValidationPipelineBehaviour<FakeRequest, Result<string, ApplicationError>>(validator: null);
+        var sut = new ValidationPipelineBehaviour<FakeRequest, ValueResult<string, ApplicationError>>(validator: null);
         var request = new FakeRequest { Name = "Test", Age = 25 };
-        var expectedResult = Result<string, ApplicationError>.Success("Success");
+        var expectedResult = ValueResult<string, ApplicationError>.Success("Success");
 
         // Act
         var result = await sut.Handle(
@@ -51,9 +51,9 @@ public class ValidationPipelineBehaviourTests
     {
         // Arrange
         var validator = new FakeRequestValidator();
-        var sut = new ValidationPipelineBehaviour<FakeRequest, Result<string, ApplicationError>>(validator);
+        var sut = new ValidationPipelineBehaviour<FakeRequest, ValueResult<string, ApplicationError>>(validator);
         var request = new FakeRequest { Name = "Test", Age = 25 };
-        var expectedResult = Result<string, ApplicationError>.Success("Success");
+        var expectedResult = ValueResult<string, ApplicationError>.Success("Success");
 
         // Act
         var result = await sut.Handle(
@@ -71,7 +71,7 @@ public class ValidationPipelineBehaviourTests
     {
         // Arrange
         var validator = new FakeRequestValidator();
-        var sut = new ValidationPipelineBehaviour<FakeRequest, Result<string, ApplicationError>>(validator);
+        var sut = new ValidationPipelineBehaviour<FakeRequest, ValueResult<string, ApplicationError>>(validator);
         var request = new FakeRequest { Name = "", Age = 0 };
 
         // Act

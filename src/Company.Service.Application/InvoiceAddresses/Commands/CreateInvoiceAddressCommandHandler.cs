@@ -47,7 +47,7 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
         _dbContext = dbContext;
     }
 
-    public async ValueTask<Result<InvoiceAdress, ApplicationError>> Handle(CreateInvoiceAddressCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<InvoiceAdress, ApplicationError>> Handle(CreateInvoiceAddressCommand request, CancellationToken cancellationToken)
     {
         return await Address
             .CreateNew(
@@ -63,7 +63,7 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
                     name: request.Name,
                     address: address);
             })
-            .MatchAsync<Result<InvoiceAdress, ApplicationError>>(
+            .MatchAsync<ValueResult<InvoiceAdress, ApplicationError>>(
                 async invoiceAddress =>
                 {
                     _dbContext.InvoiceAdresses.Add(invoiceAddress);

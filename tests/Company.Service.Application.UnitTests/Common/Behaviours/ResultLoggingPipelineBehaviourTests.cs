@@ -10,9 +10,9 @@ namespace Company.Service.Application.UnitTests.Common.Behaviours;
 
 public class ResultLoggingPipelineBehaviourTests
 {
-    private readonly FakeLogger<ResultLoggingPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>>> fakeLogger = new();
+    private readonly FakeLogger<ResultLoggingPipelineBehaviour<FakeApiRequest, ValueResult<string, ApplicationError>>> fakeLogger = new();
 
-    private readonly ResultLoggingPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>> _sut;
+    private readonly ResultLoggingPipelineBehaviour<FakeApiRequest, ValueResult<string, ApplicationError>> _sut;
 
     public ResultLoggingPipelineBehaviourTests()
     {
@@ -26,7 +26,7 @@ public class ResultLoggingPipelineBehaviourTests
     {
         // Arrange
         var error = new ApplicationError { Message = "Something went wrong" };
-        var expectedResult = Result<string, ApplicationError>.Failure(error);
+        var expectedResult = ValueResult<string, ApplicationError>.Failure(error);
 
         // Act
         var result = await _sut.Handle(
@@ -47,7 +47,7 @@ public class ResultLoggingPipelineBehaviourTests
     public async Task Handle_WhenResultIsSuccessful_DoesNotLogAndReturnsResult()
     {
         // Arrange
-        var expectedResult = Result<string, ApplicationError>.Success("Success");
+        var expectedResult = ValueResult<string, ApplicationError>.Success("Success");
 
         // Act
         var result = await _sut.Handle(

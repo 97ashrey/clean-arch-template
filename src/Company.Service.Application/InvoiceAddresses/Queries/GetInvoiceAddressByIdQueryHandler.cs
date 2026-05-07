@@ -23,7 +23,7 @@ internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<Ge
         _context = context;
     }
 
-    public async ValueTask<Result<InvoiceAdress, ApplicationError>> Handle(GetInvoiceAddressByIdQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<InvoiceAdress, ApplicationError>> Handle(GetInvoiceAddressByIdQuery request, CancellationToken cancellationToken)
     {
         var query = _context.InvoiceAdresses
             .AsNoTracking()

@@ -11,17 +11,17 @@ internal interface IApplicationRequest<TResponse> : IRequest<TResponse>
     ApplicationError? ExtractError(TResponse response);
 }
 
-public abstract record class ApplicationRequest<TResponse> : IApplicationRequest<Result<TResponse, ApplicationError>>
+public abstract record class ApplicationRequest<TResponse> : IApplicationRequest<ValueResult<TResponse, ApplicationError>>
 {
-    public Result<TResponse, ApplicationError> CreateApplicationErrorResponse(ApplicationError error)
+    public ValueResult<TResponse, ApplicationError> CreateApplicationErrorResponse(ApplicationError error)
     {
         return error;
     }
 
-    public ApplicationError? ExtractError(Result<TResponse, ApplicationError> response)
+    public ApplicationError? ExtractError(ValueResult<TResponse, ApplicationError> response)
     {
         return response.Error;
     }
 }
 
-internal interface IApplicationRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, Result<TResponse, ApplicationError>> where TRequest : IRequest<Result<TResponse, ApplicationError>> { }
+internal interface IApplicationRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, ValueResult<TResponse, ApplicationError>> where TRequest : IRequest<ValueResult<TResponse, ApplicationError>> { }

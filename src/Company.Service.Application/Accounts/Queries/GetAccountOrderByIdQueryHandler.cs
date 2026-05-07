@@ -23,7 +23,7 @@ internal class GetAccountOrderByIdQueryHandler : IApplicationRequestHandler<GetA
         _context = context;
     }
 
-    public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(GetAccountOrderByIdQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<AccountOrder, ApplicationError>> Handle(GetAccountOrderByIdQuery request, CancellationToken cancellationToken)
     {
         var query = _context.AccountOrders
             .AsNoTracking()

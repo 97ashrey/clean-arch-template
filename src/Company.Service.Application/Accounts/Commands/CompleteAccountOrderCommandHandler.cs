@@ -22,7 +22,7 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
     }
 
 
-    public async ValueTask<Result<AccountOrder, ApplicationError>> Handle(CompleteAccountOrderCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<AccountOrder, ApplicationError>> Handle(CompleteAccountOrderCommand request, CancellationToken cancellationToken)
     {
         var accountOrder = await _context.AccountOrders
             .FirstOrDefaultAsync(ao => ao.Id == request.AccountOrderId, cancellationToken);

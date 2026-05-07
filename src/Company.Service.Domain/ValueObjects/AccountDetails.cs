@@ -17,7 +17,7 @@ public record class AccountDetails
 
     private AccountDetails() { }
 
-    public static Result<AccountDetails, ValidationError> CreateNew(string name, string email, AccountTier tier, Guid invoiceAdressId)
+    public static ValueResult<AccountDetails, ValidationError> CreateNew(string name, string email, AccountTier tier, Guid invoiceAdressId)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(name, nameof(name)),

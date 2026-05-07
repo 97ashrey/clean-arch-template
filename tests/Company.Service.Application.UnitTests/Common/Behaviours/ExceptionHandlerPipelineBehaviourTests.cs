@@ -10,9 +10,9 @@ namespace Company.Service.Application.UnitTests.Common.Behaviours;
 
 public class ExceptionHandlerPipelineBehaviourTests
 {
-    private readonly FakeLogger<ExceptionHandlerPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>>> fakeLogger = new();
+    private readonly FakeLogger<ExceptionHandlerPipelineBehaviour<FakeApiRequest, ValueResult<string, ApplicationError>>> fakeLogger = new();
 
-    private readonly ExceptionHandlerPipelineBehaviour<FakeApiRequest, Result<string, ApplicationError>> _sut;
+    private readonly ExceptionHandlerPipelineBehaviour<FakeApiRequest, ValueResult<string, ApplicationError>> _sut;
 
     public ExceptionHandlerPipelineBehaviourTests()
     {
@@ -48,7 +48,7 @@ public class ExceptionHandlerPipelineBehaviourTests
     public async Task Handle_WhenNoExceptionOccurs_ReturnsSuccessfulResult()
     {
         // Arrange
-        var expectedResult = Result<string, ApplicationError>.Success("Success");
+        var expectedResult = ValueResult<string, ApplicationError>.Success("Success");
 
         // Act
         var result = await _sut.Handle(
