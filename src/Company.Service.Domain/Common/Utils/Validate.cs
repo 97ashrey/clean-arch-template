@@ -1,6 +1,7 @@
+using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 
-namespace Company.Service.Domain.Common.Types.Utils;
+namespace Company.Service.Domain.Common.Utils;
 
 public record SingleFailure(string PropertyName, string Error);
 
