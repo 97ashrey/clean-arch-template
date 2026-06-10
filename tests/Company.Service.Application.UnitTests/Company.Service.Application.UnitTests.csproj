@@ -35,4 +35,10 @@
 		<Using Include="Xunit" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="InvoiceAdresses/" />
+	  <Folder Include="InvoiceAdresses/Commands/" />
+	  <Folder Include="InvoiceAdresses/Queries/" />
+	</ItemGroup>
+
 </Project>

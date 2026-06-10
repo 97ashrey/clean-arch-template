@@ -10,11 +10,11 @@ public class DbContextTestBase : IDisposable
 
     public DbContextTestBase()
     {
-        Connection = new SqliteConnection("Data Source=:memory");
+        Connection = new SqliteConnection("Data Source=:memory:");
         Connection.Open();
 
         var options = new DbContextOptionsBuilder<TestDbContext>()
-            .UseSqlite(Connection)
+            .UseSqlite(Connection, contextOwnsConnection: true)
             .Options;
 
         DbContext = new TestDbContext(options);
@@ -25,7 +25,6 @@ public class DbContextTestBase : IDisposable
     public void Dispose()
     {
         DbContext?.Dispose();
-        Connection.Dispose();
         GC.SuppressFinalize(this);
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Company.Service.Infrastructure.Data.Persistence.EntityConfigurations;
 
-internal class InvoiceAddressEntityConfiguration : IEntityTypeConfiguration<InvoiceAdress>
+internal class InvoiceAddressEntityConfiguration : IEntityTypeConfiguration<InvoiceAddress>
 {
-    public void Configure(EntityTypeBuilder<InvoiceAdress> builder)
+    public void Configure(EntityTypeBuilder<InvoiceAddress> builder)
     {
         builder.HasKey(ia => ia.Id);
 

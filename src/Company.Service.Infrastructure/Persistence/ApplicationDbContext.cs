@@ -21,7 +21,7 @@ internal class ApplicationDbContext : IApplicationDbContext
 
     public DbSet<Account> Accounts => _dbContext.Accounts;
     public DbSet<AccountOrder> AccountOrders => _dbContext.AccountOrders;
-    public DbSet<InvoiceAdress> InvoiceAdresses => _dbContext.InvoiceAdresses;
+    public DbSet<InvoiceAddress> InvoiceAdresses => _dbContext.InvoiceAdresses;
     public DbSet<Subscription> Subscriptions => _dbContext.Subscriptions;
 
     public DatabaseFacade Database => _dbContext.Database;

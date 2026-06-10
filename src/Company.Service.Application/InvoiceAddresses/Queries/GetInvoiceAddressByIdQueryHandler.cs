@@ -7,14 +7,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Company.Service.Application.InvoiceAddresses.Queries;
 
-public record GetInvoiceAddressByIdQuery : ApplicationRequest<InvoiceAdress>
+public record GetInvoiceAddressByIdQuery : ApplicationRequest<InvoiceAddress>
 {
     public required Guid Id { get; init; }
 
     public Guid? TenantId { get; init; }
 }
 
-internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<GetInvoiceAddressByIdQuery, InvoiceAdress>
+internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<GetInvoiceAddressByIdQuery, InvoiceAddress>
 {
     private readonly IApplicationDbContext _context;
 
@@ -23,7 +23,7 @@ internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<Ge
         _context = context;
     }
 
-    public async ValueTask<ValueResult<InvoiceAdress, ApplicationError>> Handle(GetInvoiceAddressByIdQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<InvoiceAddress, ApplicationError>> Handle(GetInvoiceAddressByIdQuery request, CancellationToken cancellationToken)
     {
         var query = _context.InvoiceAdresses
             .AsNoTracking()

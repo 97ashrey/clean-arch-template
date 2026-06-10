@@ -5,7 +5,7 @@ using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
 
-public class InvoiceAdress
+public class InvoiceAddress
 {
     public Guid Id { get; private set; }
 
@@ -15,9 +15,9 @@ public class InvoiceAdress
 
     public Address Address { get; private set; } = default!;
 
-    private InvoiceAdress() { }
+    private InvoiceAddress() { }
 
-    internal InvoiceAdress(Guid id, Guid tenantId, string name, Address address)
+    internal InvoiceAddress(Guid id, Guid tenantId, string name, Address address)
     {
         Id = id;
         TenantId = tenantId;
@@ -25,12 +25,12 @@ public class InvoiceAdress
         Address = address;
     }
 
-    public static ValueResult<InvoiceAdress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
+    public static ValueResult<InvoiceAddress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
     {
         return Validate.ExecuteRules(
             Validate.NotEmpty(tenantId, nameof(tenantId)),
             Validate.NotEmpty(name, nameof(name))
-        ).MapToValueResult(new InvoiceAdress()
+        ).MapToValueResult(new InvoiceAddress()
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,

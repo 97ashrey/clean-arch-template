@@ -59,7 +59,7 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
             ad.Property(a => a.InvoiceAddressId)
                 .IsRequired();
 
-            ad.HasOne<InvoiceAdress>()
+            ad.HasOne<InvoiceAddress>()
                 .WithMany()
                 .HasForeignKey(a => a.InvoiceAddressId)
                 .OnDelete(DeleteBehavior.Restrict)

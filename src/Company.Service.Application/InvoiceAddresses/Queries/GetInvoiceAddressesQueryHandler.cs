@@ -8,17 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Company.Service.Application.InvoiceAddresses.Queries;
 
-public record GetInvoiceAddressesQuery : ApplicationRequest<PagedList<InvoiceAdress>>, IPagableRequest
+public record GetInvoiceAddressesQuery : ApplicationRequest<PagedList<InvoiceAddress>>, IPagableRequest
 {
     public ICollection<Guid>? TenantIds { get; init; }
 
     public ICollection<Guid>? InvoiceAddressIds { get; init; }
 
     public int PageNumber { get; init; }
+
     public int PageSize { get; init; }
 }
 
-internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetInvoiceAddressesQuery, PagedList<InvoiceAdress>>
+internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetInvoiceAddressesQuery, PagedList<InvoiceAddress>>
 {
     private readonly IApplicationDbContext _context;
 
@@ -27,7 +28,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
         _context = context;
     }
 
-    public async ValueTask<ValueResult<PagedList<InvoiceAdress>, ApplicationError>> Handle(GetInvoiceAddressesQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<PagedList<InvoiceAddress>, ApplicationError>> Handle(GetInvoiceAddressesQuery request, CancellationToken cancellationToken)
     {
         var query = _context.InvoiceAdresses.AsNoTracking();
 
@@ -43,7 +44,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
             .Take(pageSize)
             .ToListAsync(cancellationToken);
 
-        var pagedList = new PagedList<InvoiceAdress>(
+        var pagedList = new PagedList<InvoiceAddress>(
             items: [.. addresses],
             currentPage: pageNumber,
             pageSize: pageSize,
@@ -53,7 +54,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
         return pagedList;
     }
 
-    private static IQueryable<InvoiceAdress> ApplyFilters(IQueryable<InvoiceAdress> query, GetInvoiceAddressesQuery request)
+    private static IQueryable<InvoiceAddress> ApplyFilters(IQueryable<InvoiceAddress> query, GetInvoiceAddressesQuery request)
     {
         if (request.TenantIds is not null && request.TenantIds.Count > 0)
         {

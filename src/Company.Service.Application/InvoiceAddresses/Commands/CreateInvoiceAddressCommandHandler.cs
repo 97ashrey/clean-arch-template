@@ -8,7 +8,7 @@ using FluentValidation;
 
 namespace Company.Service.Application.InvoiceAddresses.Commands;
 
-public record CreateInvoiceAddressCommand : ApplicationRequest<InvoiceAdress>
+public record CreateInvoiceAddressCommand : ApplicationRequest<InvoiceAddress>
 {
     public required Guid TenantId { get; init; }
     public required string Name { get; init; }
@@ -38,7 +38,7 @@ internal class CreateInvoiceAddressCommandValidator : AbstractValidator<CreateIn
     }
 }
 
-internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<CreateInvoiceAddressCommand, InvoiceAdress>
+internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<CreateInvoiceAddressCommand, InvoiceAddress>
 {
     private readonly IApplicationDbContext _dbContext;
 
@@ -47,7 +47,7 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
         _dbContext = dbContext;
     }
 
-    public async ValueTask<ValueResult<InvoiceAdress, ApplicationError>> Handle(CreateInvoiceAddressCommand request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<InvoiceAddress, ApplicationError>> Handle(CreateInvoiceAddressCommand request, CancellationToken cancellationToken)
     {
         return await Address
             .CreateNew(
@@ -58,12 +58,12 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
                 request.Address.Number)
             .Bind(address =>
             {
-                return InvoiceAdress.CreateNew(
+                return InvoiceAddress.CreateNew(
                     tenantId: request.TenantId,
                     name: request.Name,
                     address: address);
             })
-            .MatchAsync<ValueResult<InvoiceAdress, ApplicationError>>(
+            .MatchAsync<ValueResult<InvoiceAddress, ApplicationError>>(
                 async invoiceAddress =>
                 {
                     _dbContext.InvoiceAdresses.Add(invoiceAddress);

@@ -10,7 +10,7 @@ public class ServiceDomainPlaceholderDbContext : DbContext
 
     public DbSet<AccountOrder> AccountOrders { get; set; }
 
-    public DbSet<InvoiceAdress> InvoiceAdresses { get; set; }
+    public DbSet<InvoiceAddress> InvoiceAdresses { get; set; }
 
     public DbSet<Subscription> Subscriptions { get; set; }
 

@@ -34,7 +34,7 @@ internal class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
         builder.Property(a => a.SuspendedDate)
             .IsRequired(false);
 
-        builder.HasOne<InvoiceAdress>()
+        builder.HasOne<InvoiceAddress>()
             .WithMany()
             .HasForeignKey(a => a.InvoiceAddressId)
             .OnDelete(DeleteBehavior.Restrict)

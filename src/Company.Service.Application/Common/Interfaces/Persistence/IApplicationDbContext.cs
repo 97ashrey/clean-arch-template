@@ -11,7 +11,7 @@ public interface IApplicationDbContext
 
     DbSet<AccountOrder> AccountOrders { get; }
 
-    DbSet<InvoiceAdress> InvoiceAdresses { get; }
+    DbSet<InvoiceAddress> InvoiceAdresses { get; }
 
     DbSet<Subscription> Subscriptions { get; }
 

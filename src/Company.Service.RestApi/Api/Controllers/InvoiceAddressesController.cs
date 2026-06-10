@@ -14,12 +14,12 @@ namespace Company.Service.RestApi.Api.Controllers
     public class InvoiceAddressesController : ApiControllerBase
     {
         [HttpGet("{id:guid}")]
-        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<InvoiceAdress>>> GetInvoiceAddressById(
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<InvoiceAddress>>> GetInvoiceAddressById(
             [FromRoute] Guid id, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(new GetInvoiceAddressByIdQuery() { Id = id }, cancellationToken);
 
-            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<InvoiceAdress>>>(
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<InvoiceAddress>>>(
                 value => TypedResults.Ok(value),
                 error => error switch
                 {
@@ -30,24 +30,24 @@ namespace Company.Service.RestApi.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<Results<InternalServerError<ProblemDetails>, Ok<PagedList<InvoiceAdress>>>> GetInvoiceAddresses(
+        public async Task<Results<InternalServerError<ProblemDetails>, Ok<PagedList<InvoiceAddress>>>> GetInvoiceAddresses(
             [FromQuery] GetInvoiceAddressesQuery query, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(query, cancellationToken);
 
-            return result.Match<Results<InternalServerError<ProblemDetails>, Ok<PagedList<InvoiceAdress>>>>(
+            return result.Match<Results<InternalServerError<ProblemDetails>, Ok<PagedList<InvoiceAddress>>>>(
                 value => TypedResults.Ok(value),
                 error => InternalServerErrorProblemResponse(error)
             );
         }
 
         [HttpPost]
-        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAdress>>> CreateInvoiceAddress(
+        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAddress>>> CreateInvoiceAddress(
             [FromBody] CreateInvoiceAddressCommand command, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(command, cancellationToken);
 
-            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAdress>>>(
+            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAddress>>>(
                 value => TypedResults.Ok(value),
                 error => error switch
                 {
