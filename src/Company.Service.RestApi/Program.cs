@@ -1,3 +1,6 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
+using Asp.Versioning.Conventions;
 using Company.Service.Application;
 using Company.Service.Infrastructure;
 using Company.Service.RestApi.Common.Authorization;
@@ -5,6 +8,7 @@ using Company.Service.RestApi.Common.Configurations;
 using Company.Service.RestApi.Common.Filters;
 using Company.Service.RestApi.Common.Middleware;
 using Company.Service.RestApi.Common.UserContext;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -22,6 +26,22 @@ builder.Services.AddControllers(opt =>
 {
     opt.Filters.Add<ExceptionHandlerFilter>();
 });
+
+builder.Services.AddApiVersioning(options =>
+{
+    // api/v1/....
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+})
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+})
+.AddMvc(options =>
+{
+    options.Conventions.Add(new VersionByNamespaceConvention());
+})
+.AddOpenApi();
 
 #if !DEBUG
     builder.Logging.ClearProviders();
@@ -53,7 +73,8 @@ if (builder.Configuration.GetValue<bool>("ExportTelemetry"))
 
 #if DEBUG
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(SetupSwagger);
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+builder.Services.AddSwaggerGen();
 #endif
 
 var authorityOptions = builder.Configuration.GetSection(AuthorityOptions.SectionName).Get<AuthorityOptions>();
@@ -83,7 +104,13 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 #if DEBUG
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+    foreach (var description in app.DescribeApiVersions().Reverse())
+    {
+        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+    }
+});
 #endif
 
 app.UseHttpsRedirection();
@@ -95,7 +122,8 @@ app.UseAuthorization();
 app.MapGet("/", () =>
 {
     return Results.Ok("Ok");
-});
+})
+.ExcludeFromDescription();
 
 if (authorityOptions!.Enabled)
 {
@@ -108,33 +136,46 @@ else
 
 app.Run();
 
-static void SetupSwagger(SwaggerGenOptions options)
+internal class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "ServiceDomainPlaceholder Service API",
-        Version = "v1",
-        // TODO: Add API description.
-        Description = ""
-    });
+    private readonly IApiVersionDescriptionProvider _provider;
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-    });
+        _provider = provider;
+    }
 
-    options.AddSecurityRequirement(document =>
+    public void Configure(SwaggerGenOptions options)
     {
-        OpenApiSecuritySchemeReference? schemeRef = new("Bearer");
-        OpenApiSecurityRequirement? requirement = new()
+        // Generate a separate Swagger document for each discovered API version
+        foreach (var description in _provider.ApiVersionDescriptions)
         {
-            [schemeRef] = []
-        };
-        return requirement;
-    });
+            options.SwaggerDoc(description.GroupName, new OpenApiInfo
+            {
+                Title = "ServiceDomainPlaceholder Service API",
+                Version = description.ApiVersion.ToString(),
+                Description = description.IsDeprecated ? "This API version is deprecated." : "Active API version."
+            });
+        }
+
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+        });
+
+        options.AddSecurityRequirement(document =>
+        {
+            OpenApiSecuritySchemeReference? schemeRef = new("Bearer");
+            OpenApiSecurityRequirement? requirement = new()
+            {
+                [schemeRef] = []
+            };
+            return requirement;
+        });
+    }
 }
