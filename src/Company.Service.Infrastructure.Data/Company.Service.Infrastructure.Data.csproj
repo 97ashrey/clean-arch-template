@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Company.Service.Domain\Company.Service.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Persistence/EntityConfigurations/" />
-  </ItemGroup>
-
 </Project>

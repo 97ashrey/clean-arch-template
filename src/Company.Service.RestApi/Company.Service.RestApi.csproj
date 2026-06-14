@@ -31,8 +31,4 @@
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Api/Accounts/V1/Contracts/" />
-  </ItemGroup>
-
 </Project>

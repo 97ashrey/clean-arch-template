@@ -7,13 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ValueObjects/" />
-  </ItemGroup>
-
-  <ItemGroup>
     <InternalsVisibleTo Include="$(MSBuildProjectName).UnitTests" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
