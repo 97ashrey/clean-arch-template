@@ -23,7 +23,8 @@ public class Program
                 "serviceDomainPlaceholder-service-sql-server",
                 port: 52160,
                 password: builder.AddParameter("db-password", "P@5sword", secret: true))
-            .WithLifetime(ContainerLifetime.Persistent);
+            .WithLifetime(ContainerLifetime.Persistent)
+            .WithImageTag("2022-CU25-ubuntu-22.04");
 
         var sqlDatabase = sqlServer.WithVolume("serviceDomainPlaceholderDb-sql-data", "/var/opt/mssql")
             .AddDatabase("ServiceDomainPlaceholderDb");
