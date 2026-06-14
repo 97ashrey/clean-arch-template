@@ -7,7 +7,9 @@
 					<ExcludeByFile>
 						**/Program.cs,
 						**/ConfigureServices.cs,
-						**/Company.Service.RestApi/**/Controllers/*Controller.cs,
+						**/Company.Service.RestApi/API/**/*Controller.cs,
+						**/Company.Service.RestApi/API/**/Contracts/*.cs,
+						**/Company.Service.RestApi/API/PagedResponse.cs,
 						**/Company.Service.RestApi/Health/PingController.cs,
 						**/Company.Service.RestApi/Common/Configurations/*.cs,
 						**/Company.Service.Application.IntegrationEvents/**/*.cs,
