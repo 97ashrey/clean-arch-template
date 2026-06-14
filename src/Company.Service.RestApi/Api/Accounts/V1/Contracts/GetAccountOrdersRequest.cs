@@ -18,7 +18,7 @@ public record class GetAccountOrdersRequest
     public int PageSize { get; init; }
 }
 
-public static class GetAccountOrdersRequestToQueryMapping
+internal static class GetAccountOrdersRequestToQueryMapping
 {
     extension(GetAccountOrdersRequest request)
     {

@@ -13,7 +13,7 @@ public record class GetInvoiceAddressesRequest
     public int PageSize { get; init; }
 }
 
-public static class GetInvoiceAddressesRequestToQueryMapping
+internal static class GetInvoiceAddressesRequestToQueryMapping
 {
     extension(GetInvoiceAddressesRequest request)
     {

@@ -20,7 +20,7 @@ public record class CreateInvoiceAddressRequest
     }
 }
 
-public static class CreateInvoiceAddressRequestToCommandMapping
+internal static class CreateInvoiceAddressRequestToCommandMapping
 {
     extension(CreateInvoiceAddressRequest request)
     {
