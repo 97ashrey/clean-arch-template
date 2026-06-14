@@ -27,7 +27,7 @@ public record class CreateAccountOrderRequest
     }
 }
 
-public static class CreateAccountOrderRequestToCommandMapping
+internal static class CreateAccountOrderRequestToCommandMapping
 {
     extension(CreateAccountOrderRequest request)
     {

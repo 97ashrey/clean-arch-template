@@ -27,7 +27,7 @@ internal static class InvoiceAddressesV2Mapping
     extension(Domain.Entities.InvoiceAddress invoiceAddress)
     {
         public InvoiceAddress ToV2() =>
-            new ()
+            new()
             {
                 Id = invoiceAddress.Id,
                 Name = invoiceAddress.Name,

@@ -1,9 +1,9 @@
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.InvoiceAddresses.Queries;
+using Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
 using Company.Service.RestApi.Common.Controllers;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
 
 namespace Company.Service.RestApi.Api.InvoiceAddresses.V1
 {

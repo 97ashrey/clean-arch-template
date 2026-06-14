@@ -1,7 +1,7 @@
-using System;
 using Company.Service.Application.InvoiceAddresses.Commands;
 using FluentAssertions;
 using FluentValidation.TestHelper;
+using System;
 using Xunit;
 
 namespace Company.Service.Application.UnitTests.InvoiceAdresses.Commands;

@@ -14,10 +14,10 @@ public record class PagedResponse<T>
 
 public static class PagedListMapping
 {
-    extension<T,TOut>(PagedList<T> pagedList)
+    extension<T, TOut>(PagedList<T> pagedList)
     {
         public PagedResponse<TOut> ToPagedResponse(Func<T, TOut> map) =>
-            new ()
+            new()
             {
                 CurrentPage = pagedList.CurrentPage,
                 PageSize = pagedList.PageSize,

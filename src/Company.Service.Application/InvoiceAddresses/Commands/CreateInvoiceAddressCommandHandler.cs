@@ -13,7 +13,7 @@ public record CreateInvoiceAddressCommand : ApplicationRequest<InvoiceAddress>
     public required Guid TenantId { get; init; }
 
     public required string Name { get; init; }
-    
+
     public required AddressCommand Address { get; init; }
 
     public record AddressCommand

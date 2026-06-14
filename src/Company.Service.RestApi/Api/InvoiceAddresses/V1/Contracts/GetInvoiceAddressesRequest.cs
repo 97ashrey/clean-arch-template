@@ -18,12 +18,12 @@ public static class GetInvoiceAddressesRequestToQueryMapping
     extension(GetInvoiceAddressesRequest request)
     {
         public GetInvoiceAddressesQuery ToQuery() =>
-            new ()
-        {
-            TenantIds = request.TenantIds,
-            InvoiceAddressIds = request.InvoiceAddressIds,
-            PageNumber = request.PageNumber,
-            PageSize = request.PageSize
-        };
+            new()
+            {
+                TenantIds = request.TenantIds,
+                InvoiceAddressIds = request.InvoiceAddressIds,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize
+            };
     }
 }

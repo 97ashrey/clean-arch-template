@@ -29,7 +29,7 @@ internal static class InvoiceAddressesV1Mapping
     extension(Domain.Entities.InvoiceAddress invoiceAddress)
     {
         public InvoiceAddress ToV1() =>
-            new ()
+            new()
             {
                 Id = invoiceAddress.Id,
                 TenantId = invoiceAddress.TenantId,
