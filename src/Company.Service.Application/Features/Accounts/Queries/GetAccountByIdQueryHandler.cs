@@ -5,27 +5,27 @@ using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Company.Service.Application.InvoiceAddresses.Queries;
+namespace Company.Service.Application.Features.Accounts.Queries;
 
-public record GetInvoiceAddressByIdQuery : ApplicationRequest<InvoiceAddress>
+public record GetAccountByIdQuery : ApplicationRequest<Account>
 {
     public required Guid Id { get; init; }
 
     public Guid? TenantId { get; init; }
 }
 
-internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<GetInvoiceAddressByIdQuery, InvoiceAddress>
+internal class GetAccountByIdQueryHandler : IApplicationRequestHandler<GetAccountByIdQuery, Account>
 {
     private readonly IApplicationDbContext _context;
 
-    public GetInvoiceAddressByIdQueryHandler(IApplicationDbContext context)
+    public GetAccountByIdQueryHandler(IApplicationDbContext context)
     {
         _context = context;
     }
 
-    public async ValueTask<ValueResult<InvoiceAddress, ApplicationError>> Handle(GetInvoiceAddressByIdQuery request, CancellationToken cancellationToken)
+    public async ValueTask<ValueResult<Account, ApplicationError>> Handle(GetAccountByIdQuery request, CancellationToken cancellationToken)
     {
-        var query = _context.InvoiceAdresses
+        var query = _context.Accounts
             .AsNoTracking()
             .Where(a => a.Id == request.Id);
 
@@ -34,16 +34,16 @@ internal class GetInvoiceAddressByIdQueryHandler : IApplicationRequestHandler<Ge
             query = query.Where(a => a.TenantId == request.TenantId);
         }
 
-        var address = await query.FirstOrDefaultAsync(cancellationToken);
+        var account = await query.FirstOrDefaultAsync(cancellationToken);
 
-        if (address is null)
+        if (account is null)
         {
             return new NotFoundError()
             {
-                Message = $"Invoice address with Id {request.Id} not found."
+                Message = $"Account with Id {request.Id} not found."
             };
         }
 
-        return address;
+        return account;
     }
 }

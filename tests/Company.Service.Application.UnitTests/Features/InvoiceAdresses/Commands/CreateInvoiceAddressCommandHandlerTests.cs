@@ -1,8 +1,8 @@
 using Company.Service.Application.Common.Types.Errors;
-using Company.Service.Application.InvoiceAddresses.Commands;
+using Company.Service.Application.Features.InvoiceAddresses.Commands;
 using FluentAssertions;
 
-namespace Company.Service.Application.UnitTests.InvoiceAdresses.Commands;
+namespace Company.Service.Application.UnitTests.Features.InvoiceAdresses.Commands;
 
 public class CreateInvoiceAddressCommandHandlerTests : DbContextTestBase
 {

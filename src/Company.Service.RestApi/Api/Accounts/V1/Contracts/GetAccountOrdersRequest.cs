@@ -1,4 +1,4 @@
-using Company.Service.Application.Accounts.Queries;
+using Company.Service.Application.Features.Accounts.Queries;
 using Company.Service.Domain.Entities;
 
 namespace Company.Service.RestApi.Api.Accounts.V1.Contracts;

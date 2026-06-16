@@ -1,10 +1,10 @@
-using Company.Service.Application.InvoiceAddresses.Commands;
+using Company.Service.Application.Features.InvoiceAddresses.Commands;
 using FluentAssertions;
 using FluentValidation.TestHelper;
 using System;
 using Xunit;
 
-namespace Company.Service.Application.UnitTests.InvoiceAdresses.Commands;
+namespace Company.Service.Application.UnitTests.Features.InvoiceAdresses.Commands;
 
 public class CreateInvoiceAddressCommandValidatorTests
 {

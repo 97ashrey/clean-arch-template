@@ -1,4 +1,4 @@
-using Company.Service.Application.Accounts.Commands;
+using Company.Service.Application.Features.Accounts.Commands;
 
 namespace Company.Service.RestApi.Api.Accounts.V1.Contracts;
 

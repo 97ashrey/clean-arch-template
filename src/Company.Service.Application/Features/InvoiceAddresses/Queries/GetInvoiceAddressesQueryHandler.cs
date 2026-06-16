@@ -6,7 +6,7 @@ using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Company.Service.Application.InvoiceAddresses.Queries;
+namespace Company.Service.Application.Features.InvoiceAddresses.Queries;
 
 public record GetInvoiceAddressesQuery : ApplicationRequest<PagedList<InvoiceAddress>>, IPagableRequest
 {

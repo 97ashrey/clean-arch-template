@@ -6,7 +6,7 @@ using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Company.Service.Application.Accounts.Queries;
+namespace Company.Service.Application.Features.Accounts.Queries;
 
 public record GetAccountOrdersQuery : ApplicationRequest<PagedList<AccountOrder>>, IPagableRequest
 {

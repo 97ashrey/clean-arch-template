@@ -8,7 +8,7 @@ using Company.Service.Domain.ValueObjects;
 using FluentValidation;
 using MassTransit;
 
-namespace Company.Service.Application.Accounts.Commands;
+namespace Company.Service.Application.Features.Accounts.Commands;
 
 public record CreateAccountOrderCommand : ApplicationRequest<AccountOrder>
 {

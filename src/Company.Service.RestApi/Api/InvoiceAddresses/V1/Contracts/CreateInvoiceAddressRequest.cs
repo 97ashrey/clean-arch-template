@@ -1,4 +1,4 @@
-using Company.Service.Application.InvoiceAddresses.Commands;
+using Company.Service.Application.Features.InvoiceAddresses.Commands;
 
 namespace Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
 

@@ -6,7 +6,7 @@ using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using FluentValidation;
 
-namespace Company.Service.Application.InvoiceAddresses.Commands;
+namespace Company.Service.Application.Features.InvoiceAddresses.Commands;
 
 public record CreateInvoiceAddressCommand : ApplicationRequest<InvoiceAddress>
 {

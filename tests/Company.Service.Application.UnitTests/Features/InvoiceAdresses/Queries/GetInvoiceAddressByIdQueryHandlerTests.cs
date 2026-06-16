@@ -1,10 +1,10 @@
 using Company.Service.Application.Common.Types.Errors;
-using Company.Service.Application.InvoiceAddresses.Queries;
+using Company.Service.Application.Features.InvoiceAddresses.Queries;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using FluentAssertions;
 
-namespace Company.Service.Application.UnitTests.InvoiceAdresses.Queries;
+namespace Company.Service.Application.UnitTests.Features.InvoiceAdresses.Queries;
 
 public class GetInvoiceAddressByIdQueryHandlerTests : DbContextTestBase
 {
