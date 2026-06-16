@@ -3,9 +3,9 @@ using Company.Service.Domain.Common.Types.Errors;
 
 namespace Company.Service.Domain.Common.Utils;
 
-public record SingleFailure(string PropertyName, string Error);
+internal record SingleFailure(string PropertyName, string Error);
 
-public static class Validate
+internal static class Validate
 {
     public static Result<ValidationError> ExecuteRules(params IEnumerable<SingleFailure?> rules)
     {

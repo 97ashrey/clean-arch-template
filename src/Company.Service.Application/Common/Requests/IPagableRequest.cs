@@ -1,8 +1,6 @@
-using System;
-
 namespace Company.Service.Application.Common.Requests;
 
-public interface IPagableRequest
+internal interface IPagableRequest
 {
     public int PageNumber { get; init; }
 

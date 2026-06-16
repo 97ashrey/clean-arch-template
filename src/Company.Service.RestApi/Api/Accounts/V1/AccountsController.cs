@@ -1,6 +1,6 @@
+using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.Features.Accounts.Commands;
 using Company.Service.Application.Features.Accounts.Queries;
-using Company.Service.Application.Common.Types.Errors;
 using Company.Service.RestApi.Api.Accounts.V1.Contracts;
 using Company.Service.RestApi.Common.Controllers;
 using Microsoft.AspNetCore.Http.HttpResults;

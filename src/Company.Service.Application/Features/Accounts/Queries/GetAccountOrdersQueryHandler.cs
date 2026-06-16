@@ -31,7 +31,6 @@ internal class GetAccountOrdersQueryHandler : IApplicationRequestHandler<GetAcco
         _context = context;
     }
 
-
     public async ValueTask<ValueResult<PagedList<AccountOrder>, ApplicationError>> Handle(GetAccountOrdersQuery request, CancellationToken cancellationToken)
     {
         var query = _context.AccountOrders.AsNoTracking();

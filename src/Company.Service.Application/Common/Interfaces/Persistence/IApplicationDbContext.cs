@@ -1,6 +1,5 @@
 ﻿using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Company.Service.Application.Common.Interfaces.Persistence;
