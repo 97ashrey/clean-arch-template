@@ -1,6 +1,7 @@
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
@@ -54,11 +55,13 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly TimeProvider _timeProvider;
 
-    public CreateAccountOrderCommandHandler(IApplicationDbContext dbContext, IPublishEndpoint publishEndpoint)
+    public CreateAccountOrderCommandHandler(IApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
         _publishEndpoint = publishEndpoint;
+        _timeProvider = timeProvider;
     }
 
     public async ValueTask<ValueResult<AccountOrder, ApplicationError>> Handle(CreateAccountOrderCommand request, CancellationToken cancellationToken)
@@ -82,7 +85,7 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                         tenantId: request.TenantId,
                         accountDetails: ad,
                         contactInformation: ci,
-                        createdDate: DateTime.UtcNow
+                        createdDate: _timeProvider.GetUtcNowDateTime()
                     )
                 )
             )

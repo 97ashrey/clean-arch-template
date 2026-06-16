@@ -27,6 +27,8 @@ public static class ConfigureServices
 
         services.AddMemoryCache();
 
+        services.AddSingleton(TimeProvider.System);
+
         return services;
     }
 }

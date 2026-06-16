@@ -13,6 +13,7 @@
 						**/Company.Service.RestApi/Health/PingController.cs,
 						**/Company.Service.RestApi/Common/Configurations/*.cs,
 						**/Company.Service.Application.IntegrationEvents/**/*.cs,
+						**/Company.Service.Application/Utils/TimeProviderExtensions.cs,
 						**/Company.Service.Infrastructure.Data/**/*.cs,
 						**/Company.Service.Infrastructure/Persistence/ApplicationDbContext.cs,
 						**/Company.Service.Infrastructure/Messaging/ConfigureMessagingServices.cs,

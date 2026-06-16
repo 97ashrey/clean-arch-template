@@ -1,6 +1,7 @@
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -15,12 +16,13 @@ public record CompleteAccountOrderCommand : ApplicationRequest<AccountOrder>
 internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<CompleteAccountOrderCommand, AccountOrder>
 {
     private readonly IApplicationDbContext _context;
+    private readonly TimeProvider _timeProvider;
 
-    public CompleteAccountOrderCommandHandler(IApplicationDbContext context)
+    public CompleteAccountOrderCommandHandler(IApplicationDbContext context, TimeProvider timeProvider)
     {
         _context = context;
+        _timeProvider = timeProvider;
     }
-
 
     public async ValueTask<ValueResult<AccountOrder, ApplicationError>> Handle(CompleteAccountOrderCommand request, CancellationToken cancellationToken)
     {
@@ -52,7 +54,7 @@ internal class CompleteAccountOrderCommandHandler : IApplicationRequestHandler<C
             .Tap(account => _context.Accounts.Add(account))
             .Bind(account =>
                 accountOrder
-                    .Complete(account, DateTime.UtcNow)
+                    .Complete(account, _timeProvider.GetUtcNowDateTime())
                     .MapToValueResult(accountOrder)
                     .MapError<ApplicationError>(error => new BadRequestError() { Message = error.Message })
             )
