@@ -43,9 +43,11 @@ builder.Services.AddApiVersioning(options =>
 })
 .AddOpenApi();
 
+//-:cnd:noEmit
 #if !DEBUG
     builder.Logging.ClearProviders();
 #endif
+//+:cnd:noEmit
 
 builder.Logging.AddOpenTelemetry(logging =>
 {
@@ -71,11 +73,13 @@ if (builder.Configuration.GetValue<bool>("ExportTelemetry"))
     otel.UseOtlpExporter();
 }
 
+//-:cnd:noEmit
 #if DEBUG
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 builder.Services.AddSwaggerGen();
 #endif
+//+:cnd:noEmit
 
 var authorityOptions = builder.Configuration.GetSection(AuthorityOptions.SectionName).Get<AuthorityOptions>();
 
@@ -102,6 +106,7 @@ builder.Services.AddAuthorizationBuilder()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+//-:cnd:noEmit
 #if DEBUG
 app.UseSwagger();
 app.UseSwaggerUI(options =>
@@ -112,6 +117,7 @@ app.UseSwaggerUI(options =>
     }
 });
 #endif
+//+:cnd:noEmit
 
 app.UseHttpsRedirection();
 

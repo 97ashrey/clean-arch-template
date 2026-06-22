@@ -18,6 +18,19 @@
   "sourceName": "Company.Service",
   "preferNameDirectory": true,
   "defaultName": "Company.Service",
+  "sources": [
+    {
+      "exclude": [
+        "**/.template.config/**",
+        "**/bin/**",
+        "**/obj/**",
+        "**/.vs/**",
+        "**/.idea/**",
+        "**/test-coverage-reports/**",
+        "**/TestResults/**"
+      ]
+    }
+  ],
   "guids": [
     "00D913C2-6FB4-41A9-B781-C948C0BA17A4",
     "075A5932-6DFE-478C-AE52-F01B0C09B3F5",

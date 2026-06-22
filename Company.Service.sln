@@ -43,7 +43,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{C4AD9936-F0DF-1090-6077-3D4A6324E662}"
 	ProjectSection(SolutionItems) = preProject
 		scripts\test-report.sh = scripts\test-report.sh
-		scripts\print-sln-guids.sh = scripts\print-sln-guids.sh
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Company.Service.Domain.UnitTests", "tests\Company.Service.Domain.UnitTests\Company.Service.Domain.UnitTests.csproj", "{556A7284-A782-4A29-921D-8AEA625CB700}"
