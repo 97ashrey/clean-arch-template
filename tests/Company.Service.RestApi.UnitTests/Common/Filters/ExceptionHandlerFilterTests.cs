@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.RestApi.Common.Filters;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

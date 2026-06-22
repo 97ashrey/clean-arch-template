@@ -1,11 +1,10 @@
+using AwesomeAssertions;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using Company.Service.RestApi.Api;
-using FluentAssertions;
 using Flurl;
 using System.Net;
 using System.Net.Http.Json;
-
 using V1Contracts = Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
 
 namespace Company.Service.RestApi.IntegrationTests.InvoiceAddresses.V1;

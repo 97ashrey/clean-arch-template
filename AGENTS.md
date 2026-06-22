@@ -326,7 +326,7 @@ Key patterns:
 
 ### Testing Best Practices
 
-1. **Use FluentAssertions** v7 only - do NOT upgrade
+1. **Use AwsomeAssertions** community fork of **FluentAssertions**
 2. **Unit tests** focus on command/query handlers with SQLite
 3. **Integration tests** verify full HTTP flow with real database
 4. **Clear database** between tests using Respawn
@@ -428,12 +428,11 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ❌ **Domain events** - Use Results instead; events published at application layer
 ❌ **Anemic models** - Move behavior into domain entities
-❌ **Service layer** - Use MediatR command/query handlers instead
+❌ **Service layer** - Use Mediator command/query handlers instead
 ❌ **Throwing exceptions for validation** - Return Results from domain methods
 ❌ **Persisting in query handlers** - Queries are read-only
 ❌ **Contracts in domain** - Keep domain model separate from API contracts
 ❌ **Direct DbContext queries in controllers** - Use Mediator
-❌ **Upgrading FluentAssertions** - Stay on v7
 
 ---
 

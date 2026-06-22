@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Requests;
-using FluentAssertions;
 
 namespace Company.Service.Application.UnitTests.Common.Requests;
 

@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.Application.Features.InvoiceAddresses.Commands;
-using FluentAssertions;
 using FluentValidation.TestHelper;
 using System;
 using Xunit;

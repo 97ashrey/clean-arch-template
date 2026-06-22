@@ -1,6 +1,6 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.RestApi.Common.Controllers;
-using FluentAssertions;
 using Mediator;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

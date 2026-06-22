@@ -1,6 +1,6 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Interfaces.UserContext;
 using Company.Service.RestApi.Common.UserContext;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;

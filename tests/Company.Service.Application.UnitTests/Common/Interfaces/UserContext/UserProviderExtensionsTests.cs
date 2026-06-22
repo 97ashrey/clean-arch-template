@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Interfaces.UserContext;
-using FluentAssertions;
 
 namespace Company.Service.Application.UnitTests.Common.Interfaces.UserContext;
 

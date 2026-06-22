@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.RestApi.Common.Middleware;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;

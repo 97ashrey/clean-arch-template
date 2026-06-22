@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.Domain.Common.Types;
-using FluentAssertions;
 
 namespace Company.Service.Domain.UnitTests.Common.Types;
 

@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Types.Errors;
-using FluentAssertions;
 
 namespace Company.Service.Application.UnitTests.Common.Types.Errors;
 

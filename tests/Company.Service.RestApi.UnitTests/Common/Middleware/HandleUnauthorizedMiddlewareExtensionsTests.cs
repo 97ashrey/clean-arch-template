@@ -1,5 +1,5 @@
+using AwesomeAssertions;
 using Company.Service.RestApi.Common.Middleware;
-using FluentAssertions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using NSubstitute;

@@ -1,8 +1,8 @@
+using AwesomeAssertions;
 using Company.Service.Application.Common.Behaviours;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Domain.Common.Types;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
 

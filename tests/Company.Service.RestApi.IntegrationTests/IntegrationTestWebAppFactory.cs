@@ -28,7 +28,8 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
              new Dictionary<string, string?>
              {
                 { "Authority:Enabled", "false" },
-                { "ExportTelemetry", "false" }
+                { "ExportTelemetry", "false" },
+                { "ConnectionStrings:MessagingBus", null }
              }
             );
         });
