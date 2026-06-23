@@ -21,13 +21,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
                 CreateInvoiceAddress(Guid.NewGuid(), "Work", "WorkStreet", "10/17")
             ],
             Request = new(),
-            Assert = (response, seed) =>
+            Assert = (pagedResponse, seed) =>
             {
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>().Result;
-                pagedResponse.Should().NotBeNull();
-                pagedResponse!.Items.Should().HaveCount(seed.Count);
+                pagedResponse.Items.Should().HaveCount(seed.Count);
                 pagedResponse.TotalCount.Should().Be(seed.Count);
                 pagedResponse.CurrentPage.Should().Be(1);
             }
@@ -47,13 +43,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
                 {
                     TenantIds = [tenantId]
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(2);
+                    pagedResponse.Items.Should().HaveCount(2);
                     pagedResponse.Items.Should().Contain(item => item.TenantId == tenantId);
                     pagedResponse.Items.Should().NotContain(item => item.TenantId != tenantId);
                 }
@@ -73,13 +65,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
                 {
                     InvoiceAddressIds = [address1.Id, address3.Id]
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(2);
+                    pagedResponse.Items.Should().HaveCount(2);
                     pagedResponse.Items.Should().Contain(item => item.Id == address1.Id);
                     pagedResponse.Items.Should().Contain(item => item.Id == address3.Id);
                     pagedResponse.Items.Should().NotContain(item => item.Id == address2.Id);
@@ -88,9 +76,8 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
         }),
         GetInvoiceAddressesTestCase.CreateFromFactory(() =>
         {
-            var addresses = Enumerable.Range(1, 25)
-                .Select(i => CreateInvoiceAddress(Guid.NewGuid(), $"Address {i}", $"Street{i}", i.ToString()))
-                .ToList();
+            List<InvoiceAddress> addresses = [.. Enumerable.Range(1, 25)
+                .Select(i => CreateInvoiceAddress(Guid.NewGuid(), $"Address {i}", $"Street{i}", i.ToString()))];
 
             return new()
             {
@@ -101,13 +88,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
                     PageNumber = 2,
                     PageSize = 10
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(10);
+                    pagedResponse.Items.Should().HaveCount(10);
                     pagedResponse.CurrentPage.Should().Be(2);
                     pagedResponse.PageSize.Should().Be(10);
                     pagedResponse.TotalCount.Should().Be(25);
@@ -119,13 +102,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
             Name = "Empty result - no invoice addresses",
             Seed = [],
             Request = new(),
-            Assert = (response, seed) =>
+            Assert = (pagedResponse, seed) =>
             {
-                response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>().Result;
-                pagedResponse.Should().NotBeNull();
-                pagedResponse!.Items.Should().BeEmpty();
+                pagedResponse.Items.Should().BeEmpty();
                 pagedResponse.TotalCount.Should().Be(0);
                 pagedResponse.CurrentPage.Should().Be(1);
             }
@@ -146,7 +125,12 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
         var response = await Client.GetAsync("/api/v1/invoice-addresses".SetQueryParams(testCase.Request));
 
         // Assert
-        testCase.AssertResponse(response, testCase.Seed);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>();
+        pagedResponse.Should().NotBeNull();
+
+        testCase.AssertResponse(pagedResponse, testCase.Seed);
     }
 
     private static InvoiceAddress CreateInvoiceAddress(Guid tenantId, string name, string street, string number)
@@ -170,9 +154,9 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
 
         public required V1Contracts.GetInvoiceAddressesRequest Request { get; init; }
 
-        public required Action<HttpResponseMessage, List<InvoiceAddress>> Assert { private get; init; }
+        public required Action<PagedResponse<V1Contracts.InvoiceAddress>, List<InvoiceAddress>> Assert { private get; init; }
 
-        public void AssertResponse(HttpResponseMessage response, List<InvoiceAddress> seed)
+        public void AssertResponse(PagedResponse<V1Contracts.InvoiceAddress> response, List<InvoiceAddress> seed)
         {
             Assert(response, seed);
         }

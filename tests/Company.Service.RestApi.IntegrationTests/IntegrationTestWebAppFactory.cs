@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Time.Testing;
 
 namespace Company.Service.RestApi.IntegrationTests;
 
@@ -42,7 +43,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
         builder.ConfigureTestServices(services =>
         {
             var connectionString = _testContainerFixture.DbContainer.GetConnectionString();
-            services.RemoveAll(typeof(DbContextOptions<ServiceDomainPlaceholderDbContext>));
+            services.RemoveAll<DbContextOptions<ServiceDomainPlaceholderDbContext>>();
 
             services.AddDbContext<ServiceDomainPlaceholderDbContext>(options =>
             {
@@ -57,7 +58,9 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>
                 return _massTransitTestHarness.PublishEndpoint;
             });
 
-
+            // Replace TimeProvider.System with a controllable FakeTimeProvider
+            services.RemoveAll<TimeProvider>();
+            services.AddSingleton<TimeProvider>(new FakeTimeProvider());
         });
     }
 

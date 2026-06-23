@@ -308,31 +308,203 @@ Key patterns:
 
 **Location**: `tests/Company.Service.RestApi.IntegrationTests/[Feature]/V[Version]/`
 
-**See example**: [GetInvoiceAddressByIdTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/GetInvoiceAddressByIdTests.cs)
+**See examples**:
+- [CreateInvoiceAddressTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/CreateInvoiceAddressTests.cs) — validation theory + success pattern
+- [GetInvoiceAddressesTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/GetInvoiceAddressesTests.cs) — TheoryData query tests
 
 Uses TestContainers for actual SQL Server database.
 
 **Test Infrastructure**:
-- `IntegrationTestBase`: Base class providing DbContext, HttpClient, Mediator, MassTransit test harness
+- `IntegrationTestBase`: Base class providing DbContext, HttpClient, Mediator, FakeTimeProvider, MassTransit test harness
 - `IntegrationTestWebAppFactory`: WebApplicationFactory that configures TestContainers
 - `TestContainerFixture`: Manages SQL Server container lifecycle
 - `MassTransitTestHarness`: Captures published events for verification
+- `FakeTimeProvider`: Controllable time source replacing `TimeProvider.System` — allows deterministic time assertions without `DateTime.UtcNow`
 
-Key patterns:
-- Inherit from `IntegrationTestBase`
-- Test full HTTP flow from controller to persistence
-- Verify HTTP status codes and response payloads
-- Database cleared between tests via Respawn
+**Integration Test Patterns**:
+
+#### Validation Tests (TheoryData with `with` expressions)
+Consolidate repetitive validation tests into a single `[Theory]` using `TheoryData<string, Func<...>>`.
+Use `with` expressions on a record to produce each invalid variant from a single inline base request:
+
+```csharp
+public static TheoryData<string, Func<CreateItemRequest, CreateItemRequest>> ValidationTestCases
+{
+    get
+    {
+        var data = new TheoryData<string, Func<CreateItemRequest, CreateItemRequest>>
+        {
+            { "TenantId", r => r with { TenantId = Guid.Empty } },
+            { "Name", r => r with { Name = string.Empty } },
+            { "Nested.Property", r => r with { Nested = r.Nested with { Property = string.Empty } } },
+            // ...
+        };
+        return data;
+    }
+}
+
+[Theory]
+[MemberData(nameof(ValidationTestCases))]
+public async Task Create_ReturnsBadRequest_WhenFieldIsInvalid(
+    string expectedErrorKey,
+    Func<CreateItemRequest, CreateItemRequest> invalidate)
+{
+    var request = invalidate(new() { /* valid base request */ });
+    var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+    problemDetails!.Errors.Should().ContainKey(expectedErrorKey);
+}
+```
+
+#### Success Tests
+- For endpoints requiring FK-constrained entities, seed the parent entities directly via `DbContext` before calling the API
+- Always call `DbContext.ChangeTracker.Clear()` after seeding to avoid state leaks
+- Verify the full response body (all properties), not just `Id`
+- Verify the entity was persisted to the database via `DbContext.FindAsync`
+- For commands that publish integration events, verify via `MassTransitTestHarness.Published<T>()`
+
+```csharp
+// Seed FK-dependent data
+var parentEntity = ParentEntity.CreateNew(tenantId, ...).Value!;
+DbContext.ParentEntities.Add(parentEntity);
+await DbContext.SaveChangesAsync();
+DbContext.ChangeTracker.Clear();
+
+// Act
+var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+
+// Assert response
+response.StatusCode.Should().Be(HttpStatusCode.OK);
+var result = await response.Content.ReadFromJsonAsync<ItemResponse>();
+result!.Id.Should().NotBeEmpty();
+result.TenantId.Should().Be(tenantId);
+// ... verify all properties
+
+// Assert persistence
+var persisted = await DbContext.Items.FindAsync([result.Id], CancellationToken.None);
+persisted.Should().NotBeNull();
+
+// Assert integration event (if applicable)
+var eventPublished = await MassTransitTestHarness.Published<ItemCreatedEvent>();
+eventPublished.Should().BeTrue();
+```
+
+#### Query Tests (TheoryData with TestCase class)
+For list endpoints with filtering/pagination, use `TheoryData<TestCase>` with a test case class
+containing `Seed`, `Request`, and `Assert` fields.
+
+The test case class wraps the assert lambda behind a `private get` to prevent xUnit from
+treating it as a test case to serialize. The `CreateFromFactory` factory method enables lazy
+initialization so each test case gets fresh data:
+
+```csharp
+public class GetItemsTestCase
+{
+    public required string Name { get; init; }
+
+    public required List<DomainEntity> Seed { get; init; }
+
+    public required GetItemsRequest Request { get; init; }
+
+    public required Action<PagedResponse<ItemResponse>, List<DomainEntity>> Assert { private get; init; }
+
+    public void AssertResponse(PagedResponse<ItemResponse> response, List<DomainEntity> seed)
+    {
+        Assert(response, seed);
+    }
+
+    public static GetItemsTestCase CreateFromFactory(Func<GetItemsTestCase> factory) => factory();
+}
+```
+
+Test data is defined as a `TheoryData` using collection expressions with `CreateFromFactory`.
+
+```csharp
+public static TheoryData<GetItemsTestCase> Data =>
+[
+    GetItemsTestCase.CreateFromFactory(() =>
+    {
+        var items = CreateItems();
+        return new()
+        {
+            Name = "Filter by tenant IDs",
+            Seed = items,
+            Request = new() { TenantIds = [tenantId] },
+            Assert = (pagedResponse, seed) =>
+            {
+                // assertions on pagedResponse only...
+            }
+        };
+    }),
+];
+```
+
+#### Time-Sensitive Tests using FakeTimeProvider
+
+The `FakeTimeProvider` (from `Microsoft.Extensions.Time.Testing`) replaces the real `TimeProvider.System`
+in the integration test DI container. Use it to make time assertions deterministic and to simulate time passage.
+
+**Available on `IntegrationTestBase`** as the `FakeTimeProvider` property.
+
+**Key methods**:
+- `FakeTimeProvider.SetUtcNow(DateTimeOffset)` — set the fake clock to a specific moment
+- `FakeTimeProvider.GetUtcNowDateTime()` — get the current fake time as `DateTime` (convenience helper from `Common.Utils`)
+
+**Pattern — asserting creation timestamps**:
+```csharp
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+
+var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+var created = await response.Content.ReadFromJsonAsync<...>();
+created.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+
+var persisted = await DbContext.Entities.FindAsync([created.Id]);
+persisted!.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+```
+
+**Pattern — simulating time passing (e.g., state transitions)**:
+```csharp
+// Arrange: seed entity at time T0
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+
+// ... create and persist entity ...
+
+// Act: advance clock to T0 + 1 day for the completion operation
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow.AddDays(1));
+var response = await Client.PutAsJsonAsync($"/api/v1/.../{entity.Id}/complete", null);
+
+// Assert: completed date reflects the advanced time
+var result = await response.Content.ReadFromJsonAsync<...>();
+result.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+
+var persisted = await DbContext.Entities.FindAsync([entity.Id]);
+persisted!.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+```
+
+**Important guidelines**:
+- Always call `FakeTimeProvider.SetUtcNow()` at the start of each test to establish a known baseline
+- Assert time-dependent fields using `FakeTimeProvider.GetUtcNowDateTime()`, never `DateTime.UtcNow` or `DateTime.Now`
+- When seeding entities with timestamps (e.g., `createdDate`), pass `FakeTimeProvider.GetUtcNowDateTime()` as the seed value to stay consistent
+- This replaces any need for `DateTime.UtcNow` mocking, `Thread.Sleep`, or other time-dependent hacks
+
+**See real examples**:
+- [CreateAccountOrderTests.cs](tests/Company.Service.RestApi.IntegrationTests/Accounts/V1/CreateAccountOrderTests.cs) — asserting `CreatedDate` after creation
+- [CompleteAccountOrderTests.cs](tests/Company.Service.RestApi.IntegrationTests/Accounts/V1/CompleteAccountOrderTests.cs) — simulating time passing for state transitions
 
 ### Testing Best Practices
 
 1. **Use AwsomeAssertions** community fork of **FluentAssertions**
-2. **Unit tests** focus on command/query handlers with SQLite
+2. **Unit tests** focus on command/query handlers with SQLite — assert `result.IsSuccess`, `result.Value`, and `result.Error`
 3. **Integration tests** verify full HTTP flow with real database
 4. **Clear database** between tests using Respawn
-5. **Assert Result patterns** thoroughly - check `IsSuccess`, `Value`, and `Error`
-6. **Verify domain behavior** not just persistence
-7. **Test both success and failure paths** for every handler
+5. **Test both success and failure paths** for every handler
+6. **Consolidate validation tests** into a single `[Theory]` using `TheoryData<string, Func<...>>` with `with` expressions — avoids 90% boilerplate duplication
+7. **Verify full response body** in success tests (all properties, not just Id)
+8. **Verify DB persistence** and **integration events** when applicable
+9. **Seed FK-constrained parents** via DbContext before testing entities with foreign keys
+10. **Use FakeTimeProvider for all time-dependent assertions** — never depend on `DateTime.UtcNow` in integration tests; call `FakeTimeProvider.SetUtcNow()` at test start and assert against `FakeTimeProvider.GetUtcNowDateTime()`
 
 ---
 
@@ -481,4 +653,4 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ---
 
-**Last Updated**: June 2026
+**Last Updated**: June 2026 — Added FakeTimeProvider guidance for integration tests

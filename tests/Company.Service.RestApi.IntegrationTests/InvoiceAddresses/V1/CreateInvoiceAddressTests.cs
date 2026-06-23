@@ -1,6 +1,5 @@
 using AwesomeAssertions;
 using Company.Service.Domain.Entities;
-using Company.Service.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
@@ -10,185 +9,32 @@ namespace Company.Service.RestApi.IntegrationTests.InvoiceAddresses.V1;
 
 public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenTenantIdIsEmpty()
+    public static TheoryData<string, Func<V1Contracts.CreateInvoiceAddressRequest, V1Contracts.CreateInvoiceAddressRequest>> ValidationTestCases
     {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
+        get
         {
-            TenantId = Guid.Empty,
-            Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
+            var data = new TheoryData<string, Func<V1Contracts.CreateInvoiceAddressRequest, V1Contracts.CreateInvoiceAddressRequest>>
             {
-                Street = "Main St",
-                City = "TestCity",
-                ZipCode = "12345",
-                Country = "USA",
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("TenantId");
+                { "TenantId", r => r with { TenantId = Guid.Empty } },
+                { "Name", r => r with { Name = string.Empty } },
+                { "Address.Street", r => r with { Address = r.Address with { Street = string.Empty } } },
+                { "Address.City", r => r with { Address = r.Address with { City = string.Empty } } },
+                { "Address.ZipCode", r => r with { Address = r.Address with { ZipCode = string.Empty } } },
+                { "Address.Country", r => r with { Address = r.Address with { Country = string.Empty } } },
+                { "Address.Number", r => r with { Address = r.Address with { Number = string.Empty } } }
+            };
+            return data;
+        }
     }
 
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenNameIsEmpty()
+    [Theory]
+    [MemberData(nameof(ValidationTestCases))]
+    public async Task CreateInvoiceAddress_ReturnsBadRequest_WhenFieldIsInvalid(
+        string expectedErrorKey,
+        Func<V1Contracts.CreateInvoiceAddressRequest, V1Contracts.CreateInvoiceAddressRequest> invalidate)
     {
         // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
-        {
-            TenantId = Guid.NewGuid(),
-            Name = string.Empty,
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
-            {
-                Street = "Main St",
-                City = "TestCity",
-                ZipCode = "12345",
-                Country = "USA",
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Name");
-    }
-
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenStreetIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
-        {
-            TenantId = Guid.NewGuid(),
-            Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
-            {
-                Street = string.Empty,
-                City = "TestCity",
-                ZipCode = "12345",
-                Country = "USA",
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Address.Street");
-    }
-
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenCityIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
-        {
-            TenantId = Guid.NewGuid(),
-            Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
-            {
-                Street = "Main St",
-                City = string.Empty,
-                ZipCode = "12345",
-                Country = "USA",
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Address.City");
-    }
-
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenZipCodeIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
-        {
-            TenantId = Guid.NewGuid(),
-            Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
-            {
-                Street = "Main St",
-                City = "TestCity",
-                ZipCode = string.Empty,
-                Country = "USA",
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Address.ZipCode");
-    }
-
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenCountryIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
-        {
-            TenantId = Guid.NewGuid(),
-            Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
-            {
-                Street = "Main St",
-                City = "TestCity",
-                ZipCode = "12345",
-                Country = string.Empty,
-                Number = "10"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Address.Country");
-    }
-
-    [Fact]
-    public async Task CreateInvoiceAddress_ReturnsBadRequestWhenNumberIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateInvoiceAddressRequest
+        var request = invalidate(new()
         {
             TenantId = Guid.NewGuid(),
             Name = "Home",
@@ -198,9 +44,9 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
                 City = "TestCity",
                 ZipCode = "12345",
                 Country = "USA",
-                Number = string.Empty
+                Number = "10"
             }
-        };
+        });
 
         // Act
         var response = await Client.PostAsJsonAsync("/api/v1/invoice-addresses", request);
@@ -210,37 +56,25 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("Address.Number");
+        problemDetails!.Errors.Should().ContainKey(expectedErrorKey);
     }
 
     [Fact]
-    public async Task CreateInvoiceAddress_ReturnsCreatedAndSavesToDatabase()
+    public async Task CreateInvoiceAddress_ReturnsOkAndSavesToDatabase()
     {
         // Arrange
         var tenantId = Guid.NewGuid();
-        var invoiceAddressToCreate = InvoiceAddress.CreateNew(
-            tenantId: tenantId,
-            name: "Home",
-            address: Address.CreateNew(
-                country: "TestCountry",
-                city: "TestCity",
-                zipCode: "12345",
-                street: "Main St",
-                number: "10"
-            ).Value!
-        ).Value!;
-
         var request = new V1Contracts.CreateInvoiceAddressRequest
         {
             TenantId = tenantId,
-            Name = invoiceAddressToCreate.Name,
+            Name = "Home",
             Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
             {
-                Street = invoiceAddressToCreate.Address.Street,
-                City = invoiceAddressToCreate.Address.City,
-                ZipCode = invoiceAddressToCreate.Address.ZipCode,
-                Country = invoiceAddressToCreate.Address.Country,
-                Number = invoiceAddressToCreate.Address.Number
+                Street = "Main St",
+                City = "TestCity",
+                ZipCode = "12345",
+                Country = "USA",
+                Number = "10"
             }
         };
 
@@ -253,12 +87,24 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         var createdInvoiceAddress = await response.Content.ReadFromJsonAsync<V1Contracts.InvoiceAddress>();
         createdInvoiceAddress.Should().NotBeNull();
         createdInvoiceAddress!.Id.Should().NotBeEmpty();
-        createdInvoiceAddress!.TenantId.Should().Be(tenantId);
-        createdInvoiceAddress!.Name.Should().Be(invoiceAddressToCreate.Name);
+        createdInvoiceAddress.TenantId.Should().Be(request.TenantId);
+        createdInvoiceAddress.Name.Should().Be(request.Name);
+        createdInvoiceAddress.Address.Street.Should().Be(request.Address.Street);
+        createdInvoiceAddress.Address.City.Should().Be(request.Address.City);
+        createdInvoiceAddress.Address.ZipCode.Should().Be(request.Address.ZipCode);
+        createdInvoiceAddress.Address.Country.Should().Be(request.Address.Country);
+        createdInvoiceAddress.Address.Number.Should().Be(request.Address.Number);
 
         // Verify it was saved to database
-        var persisted = await DbContext.InvoiceAdresses.FindAsync(new object[] { createdInvoiceAddress.Id }, CancellationToken.None);
+        var persisted = await DbContext.InvoiceAdresses.FindAsync([createdInvoiceAddress.Id], CancellationToken.None);
         persisted.Should().NotBeNull();
-        persisted!.TenantId.Should().Be(tenantId);
+        persisted!.TenantId.Should().Be(request.TenantId);
+        persisted.Name.Should().Be(request.Name);
+        persisted.Address.Street.Should().Be(request.Address.Street);
+        persisted.Address.City.Should().Be(request.Address.City);
+        persisted.Address.ZipCode.Should().Be(request.Address.ZipCode);
+        persisted.Address.Country.Should().Be(request.Address.Country);
+        persisted.Address.Number.Should().Be(request.Address.Number);
     }
+
 }
