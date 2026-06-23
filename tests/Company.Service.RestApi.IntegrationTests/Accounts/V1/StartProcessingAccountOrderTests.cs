@@ -141,7 +141,7 @@ public class StartProcessingAccountOrderTests(IntegrationTestWebAppFactory facto
 
         // Verify it was persisted
         DbContext.ChangeTracker.Clear();
-        var persisted = await DbContext.AccountOrders.FindAsync(new object[] { accountOrder.Id }, CancellationToken.None);
+        var persisted = await DbContext.AccountOrders.FindAsync([accountOrder.Id], CancellationToken.None);
         persisted.Should().NotBeNull();
         persisted!.Status.Should().Be(AccountOrderStatus.Processing);
     }

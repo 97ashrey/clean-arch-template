@@ -14,20 +14,10 @@ public class GetInvoiceAddressByIdTests(IntegrationTestWebAppFactory factory) : 
     public async Task GetInvoiceAddressById_ReturnsNotFoundWhenInvoiceAddressDoesNotExist()
     {
         // Arrange
-        var invoiceAddressToNotGet = InvoiceAddress.CreateNew(
-            tenantId: Guid.NewGuid(),
-            name: "Home",
-            address: Address.CreateNew(
-                country: "TestCountry",
-                city: "TestCity",
-                zipCode: "TestZip",
-                street: "HomeStreet",
-                number: "20/34"
-            ).Value!
-        ).Value!;
+        var nonExistentId = Guid.NewGuid();
 
         // Act
-        var response = await Client.GetAsync($"/api/v1/invoice-addresses/{invoiceAddressToNotGet.Id}");
+        var response = await Client.GetAsync($"/api/v1/invoice-addresses/{nonExistentId}");
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -35,15 +25,16 @@ public class GetInvoiceAddressByIdTests(IntegrationTestWebAppFactory factory) : 
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
 
         problemDetails.Should().NotBeNull();
-        problemDetails!.Detail.Should().Be($"Invoice address with Id {invoiceAddressToNotGet.Id} not found.");
+        problemDetails!.Detail.Should().Be($"Invoice address with Id {nonExistentId} not found.");
     }
 
     [Fact]
     public async Task GetInvoiceAddressById_ReturnsInvoiceAddress()
     {
         // Arrange
+        var tenantId = Guid.NewGuid();
         var invoiceAddressToGet = InvoiceAddress.CreateNew(
-            tenantId: Guid.NewGuid(),
+            tenantId: tenantId,
             name: "Home",
             address: Address.CreateNew(
                 country: "TestCountry",
@@ -69,5 +60,12 @@ public class GetInvoiceAddressByIdTests(IntegrationTestWebAppFactory factory) : 
 
         invoiceAddress.Should().NotBeNull();
         invoiceAddress!.Id.Should().Be(invoiceAddressToGet.Id);
+        invoiceAddress.TenantId.Should().Be(tenantId);
+        invoiceAddress.Name.Should().Be("Home");
+        invoiceAddress.Address.Street.Should().Be("HomeStreet");
+        invoiceAddress.Address.City.Should().Be("TestCity");
+        invoiceAddress.Address.ZipCode.Should().Be("TestZip");
+        invoiceAddress.Address.Country.Should().Be("TestCountry");
+        invoiceAddress.Address.Number.Should().Be("20/34");
     }
 }

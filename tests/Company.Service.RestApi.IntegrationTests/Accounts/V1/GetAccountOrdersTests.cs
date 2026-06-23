@@ -132,9 +132,8 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
         {
             var tenantId = Guid.NewGuid();
             var (_, invoiceAddress) = CreateInvoiceAddress(tenantId);
-            var orders = Enumerable.Range(1, 25)
-                .Select(i => CreateAccountOrder(invoiceAddress, tenantId, $"Account {i}"))
-                .ToList();
+            List<AccountOrder> orders = [.. Enumerable.Range(1, 25)
+                .Select(i => CreateAccountOrder(invoiceAddress, tenantId, $"Account {i}"))];
 
             return new()
             {

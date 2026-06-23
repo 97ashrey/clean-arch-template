@@ -11,249 +11,33 @@ namespace Company.Service.RestApi.IntegrationTests.Accounts.V1;
 
 public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenTenantIdIsEmpty()
+    public static TheoryData<string, Func<V1Contracts.CreateAccountOrderRequest, V1Contracts.CreateAccountOrderRequest>> ValidationTestCases
     {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
+        get
         {
-            TenantId = Guid.Empty,
-            AccountDetails = new()
+            var data = new TheoryData<string, Func<V1Contracts.CreateAccountOrderRequest, V1Contracts.CreateAccountOrderRequest>>
             {
-                Name = "Test Account",
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("TenantId");
+                { "TenantId", r => r with { TenantId = Guid.Empty } },
+                { "AccountDetails.Name", r => r with { AccountDetails = r.AccountDetails with { Name = string.Empty } } },
+                { "AccountDetails.Email", r => r with { AccountDetails = r.AccountDetails with { Email = "not-an-email" } } },
+                { "AccountDetails.InvoiceAddressId", r => r with { AccountDetails = r.AccountDetails with { InvoiceAddressId = Guid.Empty } } },
+                { "ContactInformation.FirstName", r => r with { ContactInformation = r.ContactInformation with { FirstName = string.Empty } } },
+                { "ContactInformation.LastName", r => r with { ContactInformation = r.ContactInformation with { LastName = string.Empty } } },
+                { "ContactInformation.Email", r => r with { ContactInformation = r.ContactInformation with { Email = "not-an-email" } } },
+                { "ContactInformation.PhoneNumber", r => r with { ContactInformation = r.ContactInformation with { PhoneNumber = string.Empty } } }
+            };
+            return data;
+        }
     }
 
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenAccountDetailsNameIsEmpty()
+    [Theory]
+    [MemberData(nameof(ValidationTestCases))]
+    public async Task CreateAccountOrder_ReturnsBadRequest_WhenFieldIsInvalid(
+        string expectedErrorKey,
+        Func<V1Contracts.CreateAccountOrderRequest, V1Contracts.CreateAccountOrderRequest> invalidate)
     {
         // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = string.Empty,
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("AccountDetails.Name");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenAccountDetailsEmailIsInvalid()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = "Test Account",
-                Email = "not-an-email",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("AccountDetails.Email");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenAccountDetailsInvoiceAddressIdIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = "Test Account",
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.Empty
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("AccountDetails.InvoiceAddressId");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenContactInformationFirstNameIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = "Test Account",
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = string.Empty,
-                LastName = "Doe",
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("ContactInformation.FirstName");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenContactInformationLastNameIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = "Test Account",
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = string.Empty,
-                Email = "john@example.com",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("ContactInformation.LastName");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenContactInformationEmailIsInvalid()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
-        {
-            TenantId = Guid.NewGuid(),
-            AccountDetails = new()
-            {
-                Name = "Test Account",
-                Email = "test@example.com",
-                Tier = V1Contracts.AccountTier.Business,
-                InvoiceAddressId = Guid.NewGuid()
-            },
-            ContactInformation = new()
-            {
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "not-an-email",
-                PhoneNumber = "+1234567890"
-            }
-        };
-
-        // Act
-        var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-
-        var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
-        problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("ContactInformation.Email");
-    }
-
-    [Fact]
-    public async Task CreateAccountOrder_ReturnsBadRequestWhenContactInformationPhoneNumberIsEmpty()
-    {
-        // Arrange
-        var request = new V1Contracts.CreateAccountOrderRequest
+        var request = invalidate(new()
         {
             TenantId = Guid.NewGuid(),
             AccountDetails = new()
@@ -268,9 +52,9 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
                 FirstName = "John",
                 LastName = "Doe",
                 Email = "john@example.com",
-                PhoneNumber = string.Empty
+                PhoneNumber = "+1234567890"
             }
-        };
+        });
 
         // Act
         var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
@@ -280,7 +64,7 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
         problemDetails.Should().NotBeNull();
-        problemDetails!.Errors.Should().ContainKey("ContactInformation.PhoneNumber");
+        problemDetails!.Errors.Should().ContainKey(expectedErrorKey);
     }
 
     [Fact]

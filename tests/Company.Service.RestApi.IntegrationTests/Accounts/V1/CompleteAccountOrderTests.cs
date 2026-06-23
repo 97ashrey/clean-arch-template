@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Company.Service.Application.IntegrationEvents.V1.Accounts;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
@@ -78,7 +77,7 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
-        problemDetails!.Detail.Should().Be($"Can't complete order. It is not in {Domain.Entities.AccountOrderStatus.Processing} state!.");
+        problemDetails!.Detail.Should().Be($"Can't complete order. It is not in {AccountOrderStatus.Processing} state!.");
     }
 
     [Fact]

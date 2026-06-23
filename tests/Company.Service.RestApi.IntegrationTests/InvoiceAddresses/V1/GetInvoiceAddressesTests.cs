@@ -88,9 +88,8 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
         }),
         GetInvoiceAddressesTestCase.CreateFromFactory(() =>
         {
-            var addresses = Enumerable.Range(1, 25)
-                .Select(i => CreateInvoiceAddress(Guid.NewGuid(), $"Address {i}", $"Street{i}", i.ToString()))
-                .ToList();
+            List<InvoiceAddress> addresses = [.. Enumerable.Range(1, 25)
+                .Select(i => CreateInvoiceAddress(Guid.NewGuid(), $"Address {i}", $"Street{i}", i.ToString()))];
 
             return new()
             {
