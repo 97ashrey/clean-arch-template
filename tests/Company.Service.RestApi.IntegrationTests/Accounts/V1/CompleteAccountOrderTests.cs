@@ -117,14 +117,11 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
             createdDate: DateTime.UtcNow
         ).Value!;
 
+        // Transition to Processing using domain method before persisting
+        accountOrder.StartProcessing();
+
         DbContext.AccountOrders.Add(accountOrder);
         await DbContext.SaveChangesAsync();
-
-        DbContext.ChangeTracker.Clear();
-
-        // First, start processing
-        var processingResponse = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{accountOrder.Id}/start-processing", (object?)null);
-        processingResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
         DbContext.ChangeTracker.Clear();
 
