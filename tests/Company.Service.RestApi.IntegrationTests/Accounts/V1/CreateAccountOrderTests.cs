@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Application.IntegrationEvents.V1.Accounts;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
@@ -110,6 +111,8 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
             }
         };
 
+        FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+
         // Act
         var response = await Client.PostAsJsonAsync("/api/v1/accounts/orders", request);
 
@@ -130,7 +133,7 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
         createdAccountOrder.ContactInformation.PhoneNumber.Should().Be(request.ContactInformation.PhoneNumber);
         createdAccountOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Pending);
         createdAccountOrder.AccountId.Should().BeNull();
-        createdAccountOrder.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        createdAccountOrder.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 
         // Verify it was saved to database
         var persisted = await DbContext.AccountOrders.FindAsync([createdAccountOrder.Id], CancellationToken.None);
@@ -146,7 +149,7 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
         persisted.ContactInformation.LastName.Should().Be(request.ContactInformation.LastName);
         persisted.ContactInformation.Email.Should().Be(request.ContactInformation.Email);
         persisted.ContactInformation.PhoneNumber.Should().Be(request.ContactInformation.PhoneNumber);
-        persisted.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
+        persisted.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 
         // Verify integration event was published
         var eventPublished = await MassTransitTestHarness.Published<AccountOrderCreatedEvent>();

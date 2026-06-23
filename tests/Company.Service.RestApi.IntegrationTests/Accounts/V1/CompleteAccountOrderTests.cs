@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
@@ -125,6 +126,8 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
 
         DbContext.ChangeTracker.Clear();
 
+        FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow.AddDays(1));
+
         // Act — now complete
         var response = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{accountOrder.Id}/complete", (object?)null);
 
@@ -145,7 +148,7 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
         completedOrder.ContactInformation.LastName.Should().Be(accountOrder.ContactInformation.LastName);
         completedOrder.ContactInformation.Email.Should().Be(accountOrder.ContactInformation.Email);
         completedOrder.ContactInformation.PhoneNumber.Should().Be(accountOrder.ContactInformation.PhoneNumber);
-        completedOrder.CreatedDate.Should().BeCloseTo(accountOrder.CreatedDate, TimeSpan.FromSeconds(1));
+        completedOrder.CreatedDate.Should().Be(accountOrder.CreatedDate);
 
         // Verify the order was persisted with completed status
         DbContext.ChangeTracker.Clear();
@@ -153,7 +156,7 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
         persistedOrder.Should().NotBeNull();
         persistedOrder!.Status.Should().Be(AccountOrderStatus.Completed);
         persistedOrder.AccountId.Should().NotBeNull();
-        persistedOrder.CompletedDate.Should().NotBeNull();
+        persistedOrder.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 
         // Verify the account was created
         var persistedAccount = await DbContext.Accounts.FindAsync([persistedOrder.AccountId!.Value], CancellationToken.None);

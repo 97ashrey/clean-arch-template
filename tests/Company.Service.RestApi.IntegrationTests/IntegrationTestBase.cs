@@ -1,6 +1,6 @@
 using Company.Service.Infrastructure.Data.Persistence;
-using Mediator;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Time.Testing;
 using Respawn;
 
 namespace Company.Service.RestApi.IntegrationTests;
@@ -9,24 +9,27 @@ namespace Company.Service.RestApi.IntegrationTests;
 public abstract class IntegrationTestBase : IClassFixture<IntegrationTestWebAppFactory>, IAsyncLifetime
 {
     private readonly IServiceScope _scope;
-    protected readonly ISender Sender;
     protected HttpClient Client;
     internal readonly ServiceDomainPlaceholderDbContext DbContext;
     protected readonly MassTransitTestHarness MassTransitTestHarness;
+    protected readonly FakeTimeProvider FakeTimeProvider;
 
     private readonly string _connectionString;
 
     public IntegrationTestBase(IntegrationTestWebAppFactory factory)
     {
         _scope = factory.Services.CreateScope();
+        
         Client = factory.CreateClient();
-        Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
+
         DbContext = _scope.ServiceProvider.GetRequiredService<ServiceDomainPlaceholderDbContext>();
         MassTransitTestHarness = _scope.ServiceProvider.GetRequiredService<MassTransitTestHarness>();
+        FakeTimeProvider = (_scope.ServiceProvider.GetRequiredService<TimeProvider>() as FakeTimeProvider)!;
+        
         _connectionString = factory.GetConnectionString();
     }
 
-    public Task InitializeAsync()
+    public virtual Task InitializeAsync()
     {
         return Task.CompletedTask;
     }
