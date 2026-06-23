@@ -308,7 +308,9 @@ Key patterns:
 
 **Location**: `tests/Company.Service.RestApi.IntegrationTests/[Feature]/V[Version]/`
 
-**See example**: [GetInvoiceAddressByIdTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/GetInvoiceAddressByIdTests.cs)
+**See examples**:
+- [CreateInvoiceAddressTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/CreateInvoiceAddressTests.cs) — validation theory + success pattern
+- [GetInvoiceAddressesTests.cs](tests/Company.Service.RestApi.IntegrationTests/InvoiceAddresses/V1/GetInvoiceAddressesTests.cs) — TheoryData query tests
 
 Uses TestContainers for actual SQL Server database.
 
@@ -318,21 +320,137 @@ Uses TestContainers for actual SQL Server database.
 - `TestContainerFixture`: Manages SQL Server container lifecycle
 - `MassTransitTestHarness`: Captures published events for verification
 
-Key patterns:
-- Inherit from `IntegrationTestBase`
-- Test full HTTP flow from controller to persistence
-- Verify HTTP status codes and response payloads
-- Database cleared between tests via Respawn
+**Integration Test Patterns**:
+
+#### Validation Tests (TheoryData with `with` expressions)
+Consolidate repetitive validation tests into a single `[Theory]` using `TheoryData<string, Func<...>>`.
+Use `with` expressions on a record to produce each invalid variant from a single inline base request:
+
+```csharp
+public static TheoryData<string, Func<CreateItemRequest, CreateItemRequest>> ValidationTestCases
+{
+    get
+    {
+        var data = new TheoryData<string, Func<CreateItemRequest, CreateItemRequest>>
+        {
+            { "TenantId", r => r with { TenantId = Guid.Empty } },
+            { "Name", r => r with { Name = string.Empty } },
+            { "Nested.Property", r => r with { Nested = r.Nested with { Property = string.Empty } } },
+            // ...
+        };
+        return data;
+    }
+}
+
+[Theory]
+[MemberData(nameof(ValidationTestCases))]
+public async Task Create_ReturnsBadRequest_WhenFieldIsInvalid(
+    string expectedErrorKey,
+    Func<CreateItemRequest, CreateItemRequest> invalidate)
+{
+    var request = invalidate(new() { /* valid base request */ });
+    var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+
+    response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    var problemDetails = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+    problemDetails!.Errors.Should().ContainKey(expectedErrorKey);
+}
+```
+
+#### Success Tests
+- For endpoints requiring FK-constrained entities, seed the parent entities directly via `DbContext` before calling the API
+- Always call `DbContext.ChangeTracker.Clear()` after seeding to avoid state leaks
+- Verify the full response body (all properties), not just `Id`
+- Verify the entity was persisted to the database via `DbContext.FindAsync`
+- For commands that publish integration events, verify via `MassTransitTestHarness.Published<T>()`
+
+```csharp
+// Seed FK-dependent data
+var parentEntity = ParentEntity.CreateNew(tenantId, ...).Value!;
+DbContext.ParentEntities.Add(parentEntity);
+await DbContext.SaveChangesAsync();
+DbContext.ChangeTracker.Clear();
+
+// Act
+var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+
+// Assert response
+response.StatusCode.Should().Be(HttpStatusCode.OK);
+var result = await response.Content.ReadFromJsonAsync<ItemResponse>();
+result!.Id.Should().NotBeEmpty();
+result.TenantId.Should().Be(tenantId);
+// ... verify all properties
+
+// Assert persistence
+var persisted = await DbContext.Items.FindAsync([result.Id], CancellationToken.None);
+persisted.Should().NotBeNull();
+
+// Assert integration event (if applicable)
+var eventPublished = await MassTransitTestHarness.Published<ItemCreatedEvent>();
+eventPublished.Should().BeTrue();
+```
+
+#### Query Tests (TheoryData with TestCase class)
+For list endpoints with filtering/pagination, use `TheoryData<TestCase>` with a test case class
+containing `Seed`, `Request`, and `Assert` fields.
+
+The test case class wraps the assert lambda behind a `private get` to prevent xUnit from
+treating it as a test case to serialize. The `CreateFromFactory` factory method enables lazy
+initialization so each test case gets fresh data:
+
+```csharp
+public class GetItemsTestCase
+{
+    public required string Name { get; init; }
+
+    public required List<DomainEntity> Seed { get; init; }
+
+    public required GetItemsRequest Request { get; init; }
+
+    public required Action<HttpResponseMessage, List<DomainEntity>> Assert { private get; init; }
+
+    public void AssertResponse(HttpResponseMessage response, List<DomainEntity> seed)
+    {
+        Assert(response, seed);
+    }
+
+    public static GetItemsTestCase CreateFromFactory(Func<GetItemsTestCase> factory) => factory();
+}
+```
+
+Test data is defined as a `TheoryData` using collection expressions with `CreateFromFactory`:
+
+```csharp
+public static TheoryData<GetItemsTestCase> Data =>
+[
+    GetItemsTestCase.CreateFromFactory(() =>
+    {
+        var items = CreateItems();
+        return new()
+        {
+            Name = "Filter by tenant IDs",
+            Seed = items,
+            Request = new() { TenantIds = [tenantId] },
+            Assert = (response, seed) =>
+            {
+                // assertions...
+            }
+        };
+    }),
+];
+```
 
 ### Testing Best Practices
 
 1. **Use AwsomeAssertions** community fork of **FluentAssertions**
-2. **Unit tests** focus on command/query handlers with SQLite
+2. **Unit tests** focus on command/query handlers with SQLite — assert `result.IsSuccess`, `result.Value`, and `result.Error`
 3. **Integration tests** verify full HTTP flow with real database
 4. **Clear database** between tests using Respawn
-5. **Assert Result patterns** thoroughly - check `IsSuccess`, `Value`, and `Error`
-6. **Verify domain behavior** not just persistence
-7. **Test both success and failure paths** for every handler
+5. **Test both success and failure paths** for every handler
+6. **Consolidate validation tests** into a single `[Theory]` using `TheoryData<string, Func<...>>` with `with` expressions — avoids 90% boilerplate duplication
+7. **Verify full response body** in success tests (all properties, not just Id)
+8. **Verify DB persistence** and **integration events** when applicable
+9. **Seed FK-constrained parents** via DbContext before testing entities with foreign keys
 
 ---
 
