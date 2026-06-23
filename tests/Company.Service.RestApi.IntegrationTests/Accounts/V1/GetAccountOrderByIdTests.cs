@@ -78,9 +78,17 @@ public class GetAccountOrderByIdTests(IntegrationTestWebAppFactory factory) : In
         var accountOrder = await response.Content.ReadFromJsonAsync<V1Contracts.AccountOrder>();
         accountOrder.Should().NotBeNull();
         accountOrder!.Id.Should().Be(accountOrderToGet.Id);
-        accountOrder.TenantId.Should().Be(tenantId);
+        accountOrder.TenantId.Should().Be(accountOrderToGet.TenantId);
+        accountOrder.AccountId.Should().BeNull();
         accountOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Pending);
-        accountOrder.AccountDetails.Name.Should().Be("Test Account");
-        accountOrder.ContactInformation.FirstName.Should().Be("John");
+        accountOrder.AccountDetails.Name.Should().Be(accountOrderToGet.AccountDetails.Name);
+        accountOrder.AccountDetails.Email.Should().Be(accountOrderToGet.AccountDetails.Email);
+        accountOrder.AccountDetails.Tier.Should().Be((V1Contracts.AccountTier)accountOrderToGet.AccountDetails.Tier);
+        accountOrder.AccountDetails.InvoiceAddressId.Should().Be(accountOrderToGet.AccountDetails.InvoiceAddressId);
+        accountOrder.ContactInformation.FirstName.Should().Be(accountOrderToGet.ContactInformation.FirstName);
+        accountOrder.ContactInformation.LastName.Should().Be(accountOrderToGet.ContactInformation.LastName);
+        accountOrder.ContactInformation.Email.Should().Be(accountOrderToGet.ContactInformation.Email);
+        accountOrder.ContactInformation.PhoneNumber.Should().Be(accountOrderToGet.ContactInformation.PhoneNumber);
+        accountOrder.CreatedDate.Should().BeCloseTo(accountOrderToGet.CreatedDate, TimeSpan.FromSeconds(1));
     }
 }

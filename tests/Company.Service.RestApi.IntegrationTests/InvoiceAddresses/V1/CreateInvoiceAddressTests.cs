@@ -87,19 +87,24 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         var createdInvoiceAddress = await response.Content.ReadFromJsonAsync<V1Contracts.InvoiceAddress>();
         createdInvoiceAddress.Should().NotBeNull();
         createdInvoiceAddress!.Id.Should().NotBeEmpty();
-        createdInvoiceAddress.TenantId.Should().Be(tenantId);
-        createdInvoiceAddress.Name.Should().Be("Home");
-        createdInvoiceAddress.Address.Street.Should().Be("Main St");
-        createdInvoiceAddress.Address.City.Should().Be("TestCity");
-        createdInvoiceAddress.Address.ZipCode.Should().Be("12345");
-        createdInvoiceAddress.Address.Country.Should().Be("USA");
-        createdInvoiceAddress.Address.Number.Should().Be("10");
+        createdInvoiceAddress.TenantId.Should().Be(request.TenantId);
+        createdInvoiceAddress.Name.Should().Be(request.Name);
+        createdInvoiceAddress.Address.Street.Should().Be(request.Address.Street);
+        createdInvoiceAddress.Address.City.Should().Be(request.Address.City);
+        createdInvoiceAddress.Address.ZipCode.Should().Be(request.Address.ZipCode);
+        createdInvoiceAddress.Address.Country.Should().Be(request.Address.Country);
+        createdInvoiceAddress.Address.Number.Should().Be(request.Address.Number);
 
         // Verify it was saved to database
         var persisted = await DbContext.InvoiceAdresses.FindAsync([createdInvoiceAddress.Id], CancellationToken.None);
         persisted.Should().NotBeNull();
-        persisted!.TenantId.Should().Be(tenantId);
-        persisted.Name.Should().Be("Home");
+        persisted!.TenantId.Should().Be(request.TenantId);
+        persisted.Name.Should().Be(request.Name);
+        persisted.Address.Street.Should().Be(request.Address.Street);
+        persisted.Address.City.Should().Be(request.Address.City);
+        persisted.Address.ZipCode.Should().Be(request.Address.ZipCode);
+        persisted.Address.Country.Should().Be(request.Address.Country);
+        persisted.Address.Number.Should().Be(request.Address.Number);
     }
 
 }

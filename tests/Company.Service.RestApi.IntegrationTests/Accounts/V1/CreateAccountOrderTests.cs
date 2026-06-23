@@ -119,7 +119,7 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
         var createdAccountOrder = await response.Content.ReadFromJsonAsync<V1Contracts.AccountOrder>();
         createdAccountOrder.Should().NotBeNull();
         createdAccountOrder!.Id.Should().NotBeEmpty();
-        createdAccountOrder.TenantId.Should().Be(tenantId);
+        createdAccountOrder.TenantId.Should().Be(request.TenantId);
         createdAccountOrder.AccountDetails.Name.Should().Be(request.AccountDetails.Name);
         createdAccountOrder.AccountDetails.Email.Should().Be(request.AccountDetails.Email);
         createdAccountOrder.AccountDetails.Tier.Should().Be(request.AccountDetails.Tier);
@@ -130,12 +130,23 @@ public class CreateAccountOrderTests(IntegrationTestWebAppFactory factory) : Int
         createdAccountOrder.ContactInformation.PhoneNumber.Should().Be(request.ContactInformation.PhoneNumber);
         createdAccountOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Pending);
         createdAccountOrder.AccountId.Should().BeNull();
+        createdAccountOrder.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
         // Verify it was saved to database
         var persisted = await DbContext.AccountOrders.FindAsync([createdAccountOrder.Id], CancellationToken.None);
         persisted.Should().NotBeNull();
-        persisted!.TenantId.Should().Be(tenantId);
+        persisted!.TenantId.Should().Be(request.TenantId);
+        persisted.AccountId.Should().BeNull();
         persisted.Status.Should().Be(AccountOrderStatus.Pending);
+        persisted.AccountDetails.Name.Should().Be(request.AccountDetails.Name);
+        persisted.AccountDetails.Email.Should().Be(request.AccountDetails.Email);
+        persisted.AccountDetails.Tier.Should().Be((AccountTier)request.AccountDetails.Tier);
+        persisted.AccountDetails.InvoiceAddressId.Should().Be(request.AccountDetails.InvoiceAddressId);
+        persisted.ContactInformation.FirstName.Should().Be(request.ContactInformation.FirstName);
+        persisted.ContactInformation.LastName.Should().Be(request.ContactInformation.LastName);
+        persisted.ContactInformation.Email.Should().Be(request.ContactInformation.Email);
+        persisted.ContactInformation.PhoneNumber.Should().Be(request.ContactInformation.PhoneNumber);
+        persisted.CreatedDate.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(5));
 
         // Verify integration event was published
         var eventPublished = await MassTransitTestHarness.Published<AccountOrderCreatedEvent>();

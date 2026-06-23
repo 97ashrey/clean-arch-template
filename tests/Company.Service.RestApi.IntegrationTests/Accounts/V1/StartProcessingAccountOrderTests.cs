@@ -134,7 +134,18 @@ public class StartProcessingAccountOrderTests(IntegrationTestWebAppFactory facto
         var updatedOrder = await response.Content.ReadFromJsonAsync<V1Contracts.AccountOrder>();
         updatedOrder.Should().NotBeNull();
         updatedOrder!.Id.Should().Be(accountOrder.Id);
+        updatedOrder.TenantId.Should().Be(accountOrder.TenantId);
+        updatedOrder.AccountId.Should().BeNull();
         updatedOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Processing);
+        updatedOrder.AccountDetails.Name.Should().Be(accountOrder.AccountDetails.Name);
+        updatedOrder.AccountDetails.Email.Should().Be(accountOrder.AccountDetails.Email);
+        updatedOrder.AccountDetails.Tier.Should().Be((V1Contracts.AccountTier)accountOrder.AccountDetails.Tier);
+        updatedOrder.AccountDetails.InvoiceAddressId.Should().Be(accountOrder.AccountDetails.InvoiceAddressId);
+        updatedOrder.ContactInformation.FirstName.Should().Be(accountOrder.ContactInformation.FirstName);
+        updatedOrder.ContactInformation.LastName.Should().Be(accountOrder.ContactInformation.LastName);
+        updatedOrder.ContactInformation.Email.Should().Be(accountOrder.ContactInformation.Email);
+        updatedOrder.ContactInformation.PhoneNumber.Should().Be(accountOrder.ContactInformation.PhoneNumber);
+        updatedOrder.CreatedDate.Should().BeCloseTo(accountOrder.CreatedDate, TimeSpan.FromSeconds(1));
 
         // Verify it was persisted
         DbContext.ChangeTracker.Clear();

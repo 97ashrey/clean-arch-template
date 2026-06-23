@@ -69,11 +69,12 @@ public class GetAccountByIdTests(IntegrationTestWebAppFactory factory) : Integra
         var account = await response.Content.ReadFromJsonAsync<V1Contracts.Account>();
         account.Should().NotBeNull();
         account!.Id.Should().Be(accountToGet.Id);
-        account.TenantId.Should().Be(tenantId);
+        account.TenantId.Should().Be(accountToGet.TenantId);
         account.Name.Should().Be(accountToGet.Name);
         account.Email.Should().Be(accountToGet.Email);
-        account.Tier.Should().Be(V1Contracts.AccountTier.Enterprise);
-        account.Status.Should().Be(V1Contracts.AccountStatus.Active);
-        account.InvoiceAddressId.Should().Be(invoiceAddress.Id);
+        account.Tier.Should().Be((V1Contracts.AccountTier)accountToGet.Tier);
+        account.Status.Should().Be((V1Contracts.AccountStatus)accountToGet.Status);
+        account.SuspendedDate.Should().BeNull();
+        account.InvoiceAddressId.Should().Be(accountToGet.InvoiceAddressId);
     }
 }

@@ -60,12 +60,12 @@ public class GetInvoiceAddressByIdTests(IntegrationTestWebAppFactory factory) : 
 
         invoiceAddress.Should().NotBeNull();
         invoiceAddress!.Id.Should().Be(invoiceAddressToGet.Id);
-        invoiceAddress.TenantId.Should().Be(tenantId);
-        invoiceAddress.Name.Should().Be("Home");
-        invoiceAddress.Address.Street.Should().Be("HomeStreet");
-        invoiceAddress.Address.City.Should().Be("TestCity");
-        invoiceAddress.Address.ZipCode.Should().Be("TestZip");
-        invoiceAddress.Address.Country.Should().Be("TestCountry");
-        invoiceAddress.Address.Number.Should().Be("20/34");
+        invoiceAddress.TenantId.Should().Be(invoiceAddressToGet.TenantId);
+        invoiceAddress.Name.Should().Be(invoiceAddressToGet.Name);
+        invoiceAddress.Address.Street.Should().Be(invoiceAddressToGet.Address.Street);
+        invoiceAddress.Address.City.Should().Be(invoiceAddressToGet.Address.City);
+        invoiceAddress.Address.ZipCode.Should().Be(invoiceAddressToGet.Address.ZipCode);
+        invoiceAddress.Address.Country.Should().Be(invoiceAddressToGet.Address.Country);
+        invoiceAddress.Address.Number.Should().Be(invoiceAddressToGet.Address.Number);
     }
 }

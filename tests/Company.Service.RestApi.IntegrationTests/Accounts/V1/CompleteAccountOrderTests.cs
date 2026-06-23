@@ -134,8 +134,18 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
         var completedOrder = await response.Content.ReadFromJsonAsync<V1Contracts.AccountOrder>();
         completedOrder.Should().NotBeNull();
         completedOrder!.Id.Should().Be(accountOrder.Id);
-        completedOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Completed);
+        completedOrder.TenantId.Should().Be(accountOrder.TenantId);
         completedOrder.AccountId.Should().NotBeNull();
+        completedOrder.Status.Should().Be(V1Contracts.AccountOrderStatus.Completed);
+        completedOrder.AccountDetails.Name.Should().Be(accountOrder.AccountDetails.Name);
+        completedOrder.AccountDetails.Email.Should().Be(accountOrder.AccountDetails.Email);
+        completedOrder.AccountDetails.Tier.Should().Be((V1Contracts.AccountTier)accountOrder.AccountDetails.Tier);
+        completedOrder.AccountDetails.InvoiceAddressId.Should().Be(accountOrder.AccountDetails.InvoiceAddressId);
+        completedOrder.ContactInformation.FirstName.Should().Be(accountOrder.ContactInformation.FirstName);
+        completedOrder.ContactInformation.LastName.Should().Be(accountOrder.ContactInformation.LastName);
+        completedOrder.ContactInformation.Email.Should().Be(accountOrder.ContactInformation.Email);
+        completedOrder.ContactInformation.PhoneNumber.Should().Be(accountOrder.ContactInformation.PhoneNumber);
+        completedOrder.CreatedDate.Should().BeCloseTo(accountOrder.CreatedDate, TimeSpan.FromSeconds(1));
 
         // Verify the order was persisted with completed status
         DbContext.ChangeTracker.Clear();
@@ -148,11 +158,13 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
         // Verify the account was created
         var persistedAccount = await DbContext.Accounts.FindAsync([persistedOrder.AccountId!.Value], CancellationToken.None);
         persistedAccount.Should().NotBeNull();
-        persistedAccount!.TenantId.Should().Be(tenantId);
-        persistedAccount.Name.Should().Be("Test Account");
-        persistedAccount.Email.Should().Be("test@example.com");
-        persistedAccount.Tier.Should().Be(AccountTier.Business);
-        persistedAccount.InvoiceAddressId.Should().Be(invoiceAddress.Id);
+        persistedAccount!.Id.Should().Be(persistedOrder.AccountId!.Value);
+        persistedAccount.TenantId.Should().Be(accountOrder.TenantId);
+        persistedAccount.Name.Should().Be(accountOrder.AccountDetails.Name);
+        persistedAccount.Email.Should().Be(accountOrder.AccountDetails.Email);
+        persistedAccount.Tier.Should().Be(accountOrder.AccountDetails.Tier);
+        persistedAccount.InvoiceAddressId.Should().Be(accountOrder.AccountDetails.InvoiceAddressId);
         persistedAccount.Status.Should().Be(AccountStatus.Active);
+        persistedAccount.SuspendedDate.Should().BeNull();
     }
 }
