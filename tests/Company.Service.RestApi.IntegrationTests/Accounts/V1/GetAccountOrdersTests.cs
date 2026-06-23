@@ -25,13 +25,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                 InvoiceAddresses = [invoiceAddress],
                 Seed = [order1, order2],
                 Request = new(),
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(seed.Count);
+                    pagedResponse.Items.Should().HaveCount(seed.Count);
                     pagedResponse.TotalCount.Should().Be(seed.Count);
                     pagedResponse.CurrentPage.Should().Be(1);
                 }
@@ -55,13 +51,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                 {
                     TenantIds = [tenantId]
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(2);
+                    pagedResponse.Items.Should().HaveCount(2);
                     pagedResponse.Items.Should().Contain(item => item.TenantId == tenantId);
                     pagedResponse.Items.Should().NotContain(item => item.TenantId != tenantId);
                 }
@@ -84,13 +76,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                 {
                     OrderIds = [order1.Id, order3.Id]
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(2);
+                    pagedResponse.Items.Should().HaveCount(2);
                     pagedResponse.Items.Should().Contain(item => item.Id == order1.Id);
                     pagedResponse.Items.Should().Contain(item => item.Id == order3.Id);
                     pagedResponse.Items.Should().NotContain(item => item.Id == order2.Id);
@@ -114,14 +102,10 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                 {
                     Statuses = [V1Contracts.AccountOrderStatus.Pending]
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
                     // All seeded orders are Pending, so all 3 match
-                    pagedResponse!.Items.Should().HaveCount(3);
+                    pagedResponse.Items.Should().HaveCount(3);
                     pagedResponse.Items.Should().AllSatisfy(item =>
                         item.Status.Should().Be(V1Contracts.AccountOrderStatus.Pending)
                     );
@@ -145,13 +129,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                     PageNumber = 2,
                     PageSize = 10
                 },
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().HaveCount(10);
+                    pagedResponse.Items.Should().HaveCount(10);
                     pagedResponse.CurrentPage.Should().Be(2);
                     pagedResponse.PageSize.Should().Be(10);
                     pagedResponse.TotalCount.Should().Be(25);
@@ -166,13 +146,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
                 InvoiceAddresses = [],
                 Seed = [],
                 Request = new(),
-                Assert = (response, seed) =>
+                Assert = (pagedResponse, seed) =>
                 {
-                    response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-                    var pagedResponse = response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>().Result;
-                    pagedResponse.Should().NotBeNull();
-                    pagedResponse!.Items.Should().BeEmpty();
+                    pagedResponse.Items.Should().BeEmpty();
                     pagedResponse.TotalCount.Should().Be(0);
                     pagedResponse.CurrentPage.Should().Be(1);
                 }
@@ -195,7 +171,12 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
         var response = await Client.GetAsync("/api/v1/accounts/orders".SetQueryParams(testCase.Request));
 
         // Assert
-        testCase.AssertResponse(response, testCase.Seed);
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>();
+        pagedResponse.Should().NotBeNull();
+        
+        testCase.AssertResponse(pagedResponse, testCase.Seed);
     }
 
     private static AccountOrder CreateAccountOrder(InvoiceAddress invoiceAddress, Guid tenantId, string accountName)
@@ -243,9 +224,9 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
 
         public required V1Contracts.GetAccountOrdersRequest Request { get; init; }
 
-        public required Action<HttpResponseMessage, List<AccountOrder>> Assert { private get; init; }
+        public required Action<PagedResponse<V1Contracts.AccountOrder>, List<AccountOrder>> Assert { private get; init; }
 
-        public void AssertResponse(HttpResponseMessage response, List<AccountOrder> seed)
+        public void AssertResponse(PagedResponse<V1Contracts.AccountOrder> response, List<AccountOrder> seed)
         {
             Assert(response, seed);
         }

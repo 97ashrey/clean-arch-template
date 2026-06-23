@@ -407,9 +407,9 @@ public class GetItemsTestCase
 
     public required GetItemsRequest Request { get; init; }
 
-    public required Action<HttpResponseMessage, List<DomainEntity>> Assert { private get; init; }
+    public required Action<PagedResponse<ItemResponse>, List<DomainEntity>> Assert { private get; init; }
 
-    public void AssertResponse(HttpResponseMessage response, List<DomainEntity> seed)
+    public void AssertResponse(PagedResponse<ItemResponse> response, List<DomainEntity> seed)
     {
         Assert(response, seed);
     }
@@ -418,7 +418,7 @@ public class GetItemsTestCase
 }
 ```
 
-Test data is defined as a `TheoryData` using collection expressions with `CreateFromFactory`:
+Test data is defined as a `TheoryData` using collection expressions with `CreateFromFactory`.
 
 ```csharp
 public static TheoryData<GetItemsTestCase> Data =>
@@ -431,9 +431,9 @@ public static TheoryData<GetItemsTestCase> Data =>
             Name = "Filter by tenant IDs",
             Seed = items,
             Request = new() { TenantIds = [tenantId] },
-            Assert = (response, seed) =>
+            Assert = (pagedResponse, seed) =>
             {
-                // assertions...
+                // assertions on pagedResponse only...
             }
         };
     }),

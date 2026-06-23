@@ -11,7 +11,7 @@ namespace Company.Service.RestApi.IntegrationTests.Accounts.V1;
 public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
     [Fact]
-    public async Task CompleteAccountOrder_ReturnsInternalServerErrorWhenOrderDoesNotExist()
+    public async Task CompleteAccountOrder_ReturnsNotFoundWhenOrderDoesNotExist()
     {
         // Arrange
         var nonExistentOrderId = Guid.NewGuid();
@@ -20,7 +20,7 @@ public class CompleteAccountOrderTests(IntegrationTestWebAppFactory factory) : I
         var response = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{nonExistentOrderId}/complete", (object?)null);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();

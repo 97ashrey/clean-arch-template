@@ -11,7 +11,7 @@ namespace Company.Service.RestApi.IntegrationTests.Accounts.V1;
 public class StartProcessingAccountOrderTests(IntegrationTestWebAppFactory factory) : IntegrationTestBase(factory)
 {
     [Fact]
-    public async Task StartProcessingAccountOrder_ReturnsInternalServerErrorWhenOrderDoesNotExist()
+    public async Task StartProcessingAccountOrder_ReturnsNotFoundWhenOrderDoesNotExist()
     {
         // Arrange
         var nonExistentOrderId = Guid.NewGuid();
@@ -20,7 +20,7 @@ public class StartProcessingAccountOrderTests(IntegrationTestWebAppFactory facto
         var response = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{nonExistentOrderId}/start-processing", (object?)null);
 
         // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
 
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
@@ -64,24 +64,21 @@ public class StartProcessingAccountOrderTests(IntegrationTestWebAppFactory facto
             createdDate: DateTime.UtcNow
         ).Value!;
 
+        // Transition to Processing using domain method before persisting
+        accountOrder.StartProcessing();
+
         DbContext.AccountOrders.Add(accountOrder);
         await DbContext.SaveChangesAsync();
 
         DbContext.ChangeTracker.Clear();
 
-        // Start processing — first call succeeds
-        var firstResponse = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{accountOrder.Id}/start-processing", (object?)null);
-        firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        DbContext.ChangeTracker.Clear();
-
-        // Act — second call should fail because status is now Processing
-        var secondResponse = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{accountOrder.Id}/start-processing", (object?)null);
+        // Act — order is now Processing, so start-processing should fail
+        var response = await Client.PutAsJsonAsync($"/api/v1/accounts/orders/{accountOrder.Id}/start-processing", (object?)null);
 
         // Assert
-        secondResponse.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
-        var problemDetails = await secondResponse.Content.ReadFromJsonAsync<ProblemDetails>();
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
         problemDetails!.Detail.Should().Be($"Can't start processing order. It is not in {AccountOrderStatus.Pending} state!");
     }

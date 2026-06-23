@@ -73,15 +73,16 @@ namespace Company.Service.RestApi.Api.Accounts.V1
         }
 
         [HttpPut("orders/{accountOrderId:guid}/start-processing")]
-        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> StartProcessingAccountOrder(
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> StartProcessingAccountOrder(
             [FromRoute] Guid accountOrderId, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(new ProcessAccountOrderCommand() { AccountOrderId = accountOrderId }, cancellationToken);
 
-            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
                 value => TypedResults.Ok(value.ToV1()),
                 error => error switch
                 {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
                     ValidationError ve => ValidationproblemResponse(ve),
                     BadRequestError be => BadRequestProblemResponse(be),
                     _ => InternalServerErrorProblemResponse(error)
@@ -90,15 +91,16 @@ namespace Company.Service.RestApi.Api.Accounts.V1
         }
 
         [HttpPut("orders/{accountOrderId:guid}/complete")]
-        public async Task<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> CompleteAccountOrder(
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>> CompleteAccountOrder(
             [FromRoute] Guid accountOrderId, CancellationToken cancellationToken)
         {
             var result = await Mediator.Send(new CompleteAccountOrderCommand() { AccountOrderId = accountOrderId }, cancellationToken);
 
-            return result.Match<Results<InternalServerError<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, BadRequest<ProblemDetails>, Ok<AccountOrder>>>(
                 value => TypedResults.Ok(value.ToV1()),
                 error => error switch
                 {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
                     ValidationError ve => ValidationproblemResponse(ve),
                     BadRequestError be => BadRequestProblemResponse(be),
                     _ => InternalServerErrorProblemResponse(error)
