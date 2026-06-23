@@ -315,10 +315,11 @@ Key patterns:
 Uses TestContainers for actual SQL Server database.
 
 **Test Infrastructure**:
-- `IntegrationTestBase`: Base class providing DbContext, HttpClient, Mediator, MassTransit test harness
+- `IntegrationTestBase`: Base class providing DbContext, HttpClient, Mediator, FakeTimeProvider, MassTransit test harness
 - `IntegrationTestWebAppFactory`: WebApplicationFactory that configures TestContainers
 - `TestContainerFixture`: Manages SQL Server container lifecycle
 - `MassTransitTestHarness`: Captures published events for verification
+- `FakeTimeProvider`: Controllable time source replacing `TimeProvider.System` — allows deterministic time assertions without `DateTime.UtcNow`
 
 **Integration Test Patterns**:
 
@@ -440,6 +441,58 @@ public static TheoryData<GetItemsTestCase> Data =>
 ];
 ```
 
+#### Time-Sensitive Tests using FakeTimeProvider
+
+The `FakeTimeProvider` (from `Microsoft.Extensions.Time.Testing`) replaces the real `TimeProvider.System`
+in the integration test DI container. Use it to make time assertions deterministic and to simulate time passage.
+
+**Available on `IntegrationTestBase`** as the `FakeTimeProvider` property.
+
+**Key methods**:
+- `FakeTimeProvider.SetUtcNow(DateTimeOffset)` — set the fake clock to a specific moment
+- `FakeTimeProvider.GetUtcNowDateTime()` — get the current fake time as `DateTime` (convenience helper from `Common.Utils`)
+
+**Pattern — asserting creation timestamps**:
+```csharp
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+
+var response = await Client.PostAsJsonAsync("/api/v1/...", request);
+var created = await response.Content.ReadFromJsonAsync<...>();
+created.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+
+var persisted = await DbContext.Entities.FindAsync([created.Id]);
+persisted!.CreatedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+```
+
+**Pattern — simulating time passing (e.g., state transitions)**:
+```csharp
+// Arrange: seed entity at time T0
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+
+// ... create and persist entity ...
+
+// Act: advance clock to T0 + 1 day for the completion operation
+FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow.AddDays(1));
+var response = await Client.PutAsJsonAsync($"/api/v1/.../{entity.Id}/complete", null);
+
+// Assert: completed date reflects the advanced time
+var result = await response.Content.ReadFromJsonAsync<...>();
+result.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+
+var persisted = await DbContext.Entities.FindAsync([entity.Id]);
+persisted!.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
+```
+
+**Important guidelines**:
+- Always call `FakeTimeProvider.SetUtcNow()` at the start of each test to establish a known baseline
+- Assert time-dependent fields using `FakeTimeProvider.GetUtcNowDateTime()`, never `DateTime.UtcNow` or `DateTime.Now`
+- When seeding entities with timestamps (e.g., `createdDate`), pass `FakeTimeProvider.GetUtcNowDateTime()` as the seed value to stay consistent
+- This replaces any need for `DateTime.UtcNow` mocking, `Thread.Sleep`, or other time-dependent hacks
+
+**See real examples**:
+- [CreateAccountOrderTests.cs](tests/Company.Service.RestApi.IntegrationTests/Accounts/V1/CreateAccountOrderTests.cs) — asserting `CreatedDate` after creation
+- [CompleteAccountOrderTests.cs](tests/Company.Service.RestApi.IntegrationTests/Accounts/V1/CompleteAccountOrderTests.cs) — simulating time passing for state transitions
+
 ### Testing Best Practices
 
 1. **Use AwsomeAssertions** community fork of **FluentAssertions**
@@ -451,6 +504,7 @@ public static TheoryData<GetItemsTestCase> Data =>
 7. **Verify full response body** in success tests (all properties, not just Id)
 8. **Verify DB persistence** and **integration events** when applicable
 9. **Seed FK-constrained parents** via DbContext before testing entities with foreign keys
+10. **Use FakeTimeProvider for all time-dependent assertions** — never depend on `DateTime.UtcNow` in integration tests; call `FakeTimeProvider.SetUtcNow()` at test start and assert against `FakeTimeProvider.GetUtcNowDateTime()`
 
 ---
 
@@ -599,4 +653,4 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ---
 
-**Last Updated**: June 2026
+**Last Updated**: June 2026 — Added FakeTimeProvider guidance for integration tests
