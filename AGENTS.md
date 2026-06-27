@@ -505,6 +505,7 @@ persisted!.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 8. **Verify DB persistence** and **integration events** when applicable
 9. **Seed FK-constrained parents** via DbContext before testing entities with foreign keys
 10. **Use FakeTimeProvider for all time-dependent assertions** — never depend on `DateTime.UtcNow` in integration tests; call `FakeTimeProvider.SetUtcNow()` at test start and assert against `FakeTimeProvider.GetUtcNowDateTime()`
+11. **Verify contract mapping with a dedicated `[Fact]` for every endpoint returning a response contract** — Every endpoint that returns a response contract (e.g., GET list returning `PagedResponse<T>`, POST/PUT returning the created/updated entity) should have a specific `[Fact]` test that seeds/creates data, calls the endpoint, and asserts every property of the returned 200/201 OK response matches the expected values. This guards against regressions in the contract mapper (e.g., `ToV1()` extension method) and ensures no properties are silently dropped. Skip this if an existing test already fully verifies all properties of the contract.
 
 ---
 

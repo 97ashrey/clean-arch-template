@@ -133,6 +133,52 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
         testCase.AssertResponse(pagedResponse, testCase.Seed);
     }
 
+    [Fact]
+    public async Task GetInvoiceAddresses_ReturnsFullContractWithAllPropertiesMappedCorrectly()
+    {
+        // Arrange
+        var tenantId = Guid.NewGuid();
+        var invoiceAddress = InvoiceAddress.CreateNew(
+            tenantId: tenantId,
+            name: "Primary Office",
+            address: Address.CreateNew(
+                country: "USA",
+                city: "New York",
+                zipCode: "10001",
+                street: "Broadway",
+                number: "350"
+            ).Value!
+        ).Value!;
+
+        DbContext.InvoiceAdresses.Add(invoiceAddress);
+        await DbContext.SaveChangesAsync();
+
+        DbContext.ChangeTracker.Clear();
+
+        // Act
+        var response = await Client.GetAsync("/api/v1/invoice-addresses");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.InvoiceAddress>>();
+        pagedResponse.Should().NotBeNull();
+        pagedResponse!.Items.Should().HaveCount(1);
+
+        var item = pagedResponse.Items[0];
+
+        item.Id.Should().Be(invoiceAddress.Id);
+        item.TenantId.Should().Be(invoiceAddress.TenantId);
+        item.Name.Should().Be(invoiceAddress.Name);
+
+        item.Address.Should().NotBeNull();
+        item.Address.Country.Should().Be(invoiceAddress.Address.Country);
+        item.Address.City.Should().Be(invoiceAddress.Address.City);
+        item.Address.ZipCode.Should().Be(invoiceAddress.Address.ZipCode);
+        item.Address.Street.Should().Be(invoiceAddress.Address.Street);
+        item.Address.Number.Should().Be(invoiceAddress.Address.Number);
+    }
+
     private static InvoiceAddress CreateInvoiceAddress(Guid tenantId, string name, string street, string number)
         => InvoiceAddress.CreateNew(
             tenantId: tenantId,

@@ -1,4 +1,5 @@
 using AwesomeAssertions;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using Company.Service.RestApi.Api;
@@ -177,6 +178,84 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
         pagedResponse.Should().NotBeNull();
         
         testCase.AssertResponse(pagedResponse, testCase.Seed);
+    }
+
+    [Fact]
+    public async Task GetAccountOrders_ReturnsFullContractWithAllPropertiesMappedCorrectly()
+    {
+        // Arrange
+        var tenantId = Guid.NewGuid();
+        var invoiceAddress = InvoiceAddress.CreateNew(
+            tenantId: tenantId,
+            name: "Default Invoice Address",
+            address: Address.CreateNew(
+                country: "TestCountry",
+                city: "TestCity",
+                zipCode: "12345",
+                street: "Main St",
+                number: "10"
+            ).Value!
+        ).Value!;
+
+        FakeTimeProvider.SetUtcNow(new DateTimeOffset(2026, 6, 27, 12, 0, 0, TimeSpan.Zero));
+        var createdDate = FakeTimeProvider.GetUtcNowDateTime();
+
+        var order = AccountOrder.CreateNew(
+            tenantId: tenantId,
+            accountDetails: AccountDetails.CreateNew(
+                name: "Acme Corp",
+                email: "acme@example.com",
+                tier: AccountTier.Business,
+                invoiceAdressId: invoiceAddress.Id
+            ).Value!,
+            contactInformation: ContactInformation.CreateNew(
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@example.com",
+                phoneNumber: "+1234567890"
+            ).Value!,
+            createdDate: createdDate
+        ).Value!;
+
+        DbContext.InvoiceAdresses.Add(invoiceAddress);
+        DbContext.AccountOrders.Add(order);
+        await DbContext.SaveChangesAsync();
+
+        DbContext.ChangeTracker.Clear();
+
+        // Act
+        var response = await Client.GetAsync("/api/v1/accounts/orders");
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>();
+        pagedResponse.Should().NotBeNull();
+        pagedResponse!.Items.Should().HaveCount(1);
+
+        var item = pagedResponse.Items[0];
+
+        item.Id.Should().Be(order.Id);
+        item.TenantId.Should().Be(order.TenantId);
+        item.AccountId.Should().BeNull();
+
+        // AccountDetails
+        item.AccountDetails.Should().NotBeNull();
+        item.AccountDetails.Name.Should().Be(order.AccountDetails.Name);
+        item.AccountDetails.Email.Should().Be(order.AccountDetails.Email);
+        item.AccountDetails.Tier.Should().Be(V1Contracts.AccountTier.Business);
+        item.AccountDetails.InvoiceAddressId.Should().Be(order.AccountDetails.InvoiceAddressId);
+
+        // ContactInformation
+        item.ContactInformation.Should().NotBeNull();
+        item.ContactInformation.FirstName.Should().Be(order.ContactInformation.FirstName);
+        item.ContactInformation.LastName.Should().Be(order.ContactInformation.LastName);
+        item.ContactInformation.Email.Should().Be(order.ContactInformation.Email);
+        item.ContactInformation.PhoneNumber.Should().Be(order.ContactInformation.PhoneNumber);
+
+        // Status and CreatedDate
+        item.Status.Should().Be(V1Contracts.AccountOrderStatus.Pending);
+        item.CreatedDate.Should().Be(createdDate);
     }
 
     private static AccountOrder CreateAccountOrder(InvoiceAddress invoiceAddress, Guid tenantId, string accountName)
