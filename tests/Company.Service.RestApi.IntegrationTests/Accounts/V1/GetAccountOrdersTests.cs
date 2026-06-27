@@ -176,7 +176,7 @@ public class GetAccountOrdersTests(IntegrationTestWebAppFactory factory) : Integ
 
         var pagedResponse = await response.Content.ReadFromJsonAsync<PagedResponse<V1Contracts.AccountOrder>>();
         pagedResponse.Should().NotBeNull();
-        
+
         testCase.AssertResponse(pagedResponse, testCase.Seed);
     }
 

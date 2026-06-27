@@ -19,13 +19,13 @@ public abstract class IntegrationTestBase : IClassFixture<IntegrationTestWebAppF
     public IntegrationTestBase(IntegrationTestWebAppFactory factory)
     {
         _scope = factory.Services.CreateScope();
-        
+
         Client = factory.CreateClient();
 
         DbContext = _scope.ServiceProvider.GetRequiredService<ServiceDomainPlaceholderDbContext>();
         MassTransitTestHarness = _scope.ServiceProvider.GetRequiredService<MassTransitTestHarness>();
         FakeTimeProvider = (_scope.ServiceProvider.GetRequiredService<TimeProvider>() as FakeTimeProvider)!;
-        
+
         _connectionString = factory.GetConnectionString();
     }
 
