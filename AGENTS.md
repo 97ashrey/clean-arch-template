@@ -292,6 +292,26 @@ This template does NOT use domain events because:
 
 ## 7. Testing
 
+### Unit Tests — Domain Layer
+
+**Location**: `tests/Company.Service.Domain.UnitTests/Entities/` and `tests/Company.Service.Domain.UnitTests/ValueObjects/`
+
+**See examples**:
+- [AccountTests.cs](tests/Company.Service.Domain.UnitTests/Entities/AccountTests.cs)
+- [AccountOrderTests.cs](tests/Company.Service.Domain.UnitTests/Entities/AccountOrderTests.cs)
+- [SubscriptionTests.cs](tests/Company.Service.Domain.UnitTests/Entities/SubscriptionTests.cs)
+- [AddressTests.cs](tests/Company.Service.Domain.UnitTests/ValueObjects/AddressTests.cs)
+
+**Watch out for these common gaps** (as identified during domain test writing):
+
+1. **Exact error messages** — Assert `result.Error!.Message` with `Should().Be()` not `Should().Contain()`. When the production code uses string interpolation with an **enum value** (e.g., `$"... {SomeEnum.SomeValue} ..."`), replicate that interpolation in the test assertion rather than hardcoding the enum name as a string — keeps test and source in sync.
+
+2. **`[Theory]` over `foreach` for enums** — Don't iterate enum values in a `[Fact]` with `foreach`. Use `[Theory]` + `[InlineData(SomeEnum.Value)]` so each case is a separate, independently failing test.
+
+3. **Internal constructor tests** — Every entity needs a test verifying the `internal` constructor (used by EF Core) correctly populates all properties. Missing this is an easy oversight.
+
+4. **State consistency on failure** — When a command method returns a failure `Result`, assert that the entity's state remains unchanged. Don't just check the error — verify the entity wasn't mutated.
+
 ### Unit Tests - Application Layer
 
 **Location**: `tests/Company.Service.Application.UnitTests/Features/[Feature]/`
