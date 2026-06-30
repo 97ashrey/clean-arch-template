@@ -21,7 +21,7 @@ reportTargetDir="$PWD/test-coverage-reports/"
 
 info "Generating report"
 
-dotnet reportgenerator -reports:"./tests/${reportTestMatcher}/TestResults/**/coverage.cobertura.xml" -targetdir:"${reportTargetDir}"
+dotnet reportgenerator -reports:"./tests/${reportTestMatcher}/TestResults/**/coverage.opencover.xml" -targetdir:"${reportTargetDir}"
 
 if [[ "$2" == "open" ]]; then
     xdg-open "${reportTargetDir}/index.html"

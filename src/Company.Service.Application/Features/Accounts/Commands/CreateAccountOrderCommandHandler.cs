@@ -101,7 +101,8 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
     }
 
     private static IntegrationEvents.V1.Accounts.AccountOrderCreatedEvent CreateAccountOrderCreatedEvent(AccountOrder accountOrder)
-        => new(
+    {
+        return new(
             AccountOrderId: accountOrder.Id,
             TenantId: accountOrder.TenantId,
             AccountDetails: new(
@@ -117,5 +118,6 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
             ),
             CreatedDate: accountOrder.CreatedDate
         );
+    }
 
 }

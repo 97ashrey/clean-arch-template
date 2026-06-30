@@ -3,6 +3,7 @@ using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.Features.Accounts.Commands;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Time.Testing;
 
 namespace Company.Service.Application.UnitTests.Features.Accounts.Commands;
@@ -186,5 +187,69 @@ public class CompleteAccountOrderCommandHandlerTests : DbContextTestBase
         persistedAccount.SuspendedDate.Should().BeNull();
     }
 
+    [Fact]
+    public async Task Handle_WithCorruptedOrderData_ReturnsValidationError()
+    {
+        // Arrange
+        _fakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
+        var tenantId = Guid.NewGuid();
+        var invoiceAddress = InvoiceAddress.CreateNew(
+            tenantId: tenantId,
+            name: "Default Invoice Address",
+            address: Address.CreateNew(
+                country: "TestCountry",
+                city: "TestCity",
+                zipCode: "12345",
+                street: "Main St",
+                number: "10"
+            ).Value!
+        ).Value!;
+
+        DbContext.InvoiceAdresses.Add(invoiceAddress);
+        await DbContext.SaveChangesAsync();
+
+        var accountOrder = AccountOrder.CreateNew(
+            tenantId: tenantId,
+            accountDetails: AccountDetails.CreateNew(
+                name: "Test Account",
+                email: "test@example.com",
+                tier: AccountTier.Business,
+                invoiceAdressId: invoiceAddress.Id
+            ).Value!,
+            contactInformation: ContactInformation.CreateNew(
+                firstName: "John",
+                lastName: "Doe",
+                email: "john@example.com",
+                phoneNumber: "+1234567890"
+            ).Value!,
+            createdDate: _fakeTimeProvider.GetUtcNow().DateTime
+        ).Value!;
+
+        // Transition to Processing
+        accountOrder.StartProcessing();
+
+        DbContext.AccountOrders.Add(accountOrder);
+        await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
+
+        // Corrupt the stored order data so Account.CreateNew fails
+        await DbContext.Database.ExecuteSqlRawAsync(
+            "UPDATE AccountOrders SET AccountDetails_Name = '' WHERE Id = {0}", accountOrder.Id);
+
+        DbContext.ChangeTracker.Clear();
+
+        var command = new CompleteAccountOrderCommand
+        {
+            AccountOrderId = accountOrder.Id
+        };
+
+        // Act
+        var result = await _sut.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Value.Should().BeNull();
+        result.Error.Should().BeOfType<ValidationError>();
+    }
 }
 
