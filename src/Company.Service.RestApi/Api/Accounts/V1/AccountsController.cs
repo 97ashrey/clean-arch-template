@@ -24,6 +24,23 @@ namespace Company.Service.RestApi.Api.Accounts.V1
             );
         }
 
+        [HttpPut("{id:guid}")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<Account>>> UpdateAccount(
+            [FromRoute] Guid id, [FromBody] UpdateAccountRequest request, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(request.ToCommand(id), cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<Account>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    ValidationError ve => ValidationproblemResponse(ve),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<Account>>> GetAccountById(
             [FromRoute] Guid id, CancellationToken cancellationToken)
