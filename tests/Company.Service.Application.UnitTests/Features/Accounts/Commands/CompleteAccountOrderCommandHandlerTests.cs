@@ -252,4 +252,3 @@ public class CompleteAccountOrderCommandHandlerTests : DbContextTestBase
         result.Error.Should().BeOfType<ValidationError>();
     }
 }
-
