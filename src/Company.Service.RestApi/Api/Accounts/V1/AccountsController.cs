@@ -24,6 +24,57 @@ namespace Company.Service.RestApi.Api.Accounts.V1
             );
         }
 
+        [HttpPut("{id:guid}/suspend")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>> SuspendAccount(
+            [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new SuspendAccountCommand() { Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("{id:guid}/reactivate")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>> ReactivateAccount(
+            [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new ReactivateAccountCommand() { Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("{id:guid}/remove")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>> RemoveAccount(
+            [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new RemoveAccountCommand() { Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Account>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
         [HttpPut("{id:guid}")]
         public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<Account>>> UpdateAccount(
             [FromRoute] Guid id, [FromBody] UpdateAccountRequest request, CancellationToken cancellationToken)
