@@ -645,6 +645,7 @@ persisted!.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 12. **Don't assert error messages for domain-transformed errors in handler tests** — when a handler maps a domain error via `.MapError()`, assert only the error type, not the message (the domain already covers message content)
 13. **Verify integration event fields, not just publication** — when a handler publishes an event, capture it with `Arg.Do<>` and assert every field is correctly mapped from the source data
 14. **Verify contract mapping with a dedicated `[Fact]` for every endpoint returning a response contract** — Every endpoint that returns a response contract should have a test that seeds data, calls the endpoint, and asserts every property of the response matches expected values
+15. **Verify code coverage after writing unit tests** — Run `bash scripts/test-report.sh unit` to generate an HTML coverage report for all unit tests. Open `test-coverage-reports/index.html` to inspect per-class coverage. Use `--no-build --no-restore` for quick iterations after code changes, or omit them for a full build.
 
 ---
 
@@ -793,4 +794,4 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ---
 
-**Last Updated**: June 2026 — Added FakeTimeProvider guidance for integration tests
+**Last Updated**: June 2026 — Added code coverage verification workflow and script instructions
