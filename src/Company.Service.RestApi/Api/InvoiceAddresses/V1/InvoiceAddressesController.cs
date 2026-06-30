@@ -55,5 +55,22 @@ namespace Company.Service.RestApi.Api.InvoiceAddresses.V1
             );
         }
 
+        [HttpPut("{id:guid}")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAddress>>> UpdateInvoiceAddress(
+            [FromRoute] Guid id, [FromBody] UpdateInvoiceAddressRequest request, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(request.ToCommand(id), cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<InvoiceAddress>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    ValidationError ve => ValidationproblemResponse(ve),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
     }
 }

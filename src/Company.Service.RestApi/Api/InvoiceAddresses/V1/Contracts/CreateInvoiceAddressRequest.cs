@@ -9,15 +9,6 @@ public record class CreateInvoiceAddressRequest
     public required string Name { get; init; }
 
     public required AddressRequest Address { get; init; }
-
-    public record AddressRequest
-    {
-        public required string Street { get; init; }
-        public required string City { get; init; }
-        public required string ZipCode { get; init; }
-        public required string Country { get; init; }
-        public required string Number { get; init; }
-    }
 }
 
 internal static class CreateInvoiceAddressRequestToCommandMapping

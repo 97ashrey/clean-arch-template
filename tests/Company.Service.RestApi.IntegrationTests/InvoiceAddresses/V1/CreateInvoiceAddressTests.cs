@@ -38,7 +38,7 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         {
             TenantId = Guid.NewGuid(),
             Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
+            Address = new V1Contracts.AddressRequest
             {
                 Street = "Main St",
                 City = "TestCity",
@@ -68,7 +68,7 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         {
             TenantId = tenantId,
             Name = "Home",
-            Address = new V1Contracts.CreateInvoiceAddressRequest.AddressRequest
+            Address = new V1Contracts.AddressRequest
             {
                 Street = "Main St",
                 City = "TestCity",
