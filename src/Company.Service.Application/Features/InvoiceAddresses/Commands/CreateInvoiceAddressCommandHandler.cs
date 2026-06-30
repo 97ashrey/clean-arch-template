@@ -74,11 +74,7 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
 
                     return invoiceAddress;
                 },
-                async failure => new ValidationError()
-                {
-                    Message = "Validation failed!",
-                    Failures = failure.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
-                }
+                async failure => failure.ToAppValidationError()
             );
     }
 }

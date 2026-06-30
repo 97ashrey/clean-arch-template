@@ -21,3 +21,20 @@ public record ValidationError : ApplicationError
 }
 
 public record ValidationFailure(string PropertyName, string[] Errors);
+
+internal static class ValidationErrorExtensions
+{
+    extension(Domain.Common.Types.Errors.ValidationError domainError)
+    {
+        public ValidationError ToAppValidationError()
+        {
+            return new ValidationError()
+            {
+                Message = domainError.Message,
+                Failures = domainError.Failures
+                    .Select(f => new ValidationFailure(f.PropertyName, f.Errors))
+                    .ToArray()
+            };
+        }
+    }
+}

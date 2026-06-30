@@ -324,6 +324,122 @@ Key patterns:
 - Assert `result.IsSuccess`, `result.Value`, and `result.Error` appropriately
 - Verify domain behavior, not just persistence
 
+#### Error Assertion Guidance
+
+When a handler transforms a domain error into an application error (via `.MapError()`):
+- **Assert the error type** (`result.Error.Should().BeOfType<SomeError>()`) — this verifies the handler
+  correctly classified the error
+- **Do NOT assert the exact error message** — the message originates from the domain layer,
+  which already has its own unit tests covering that content. The handler test should verify
+  *what* error is returned, not *what it says*.
+
+Exceptions — assert the message when the handler **constructs** the error itself:
+- `NotFoundError` messages (constructed inline in the handler with the entity ID)
+- `ValidationError` messages when the message text is defined in the handler (not the domain)
+- When the error message includes dynamic values the handler injects (e.g., entity IDs)
+
+#### Validation Testing in Handlers
+
+Handler tests should include **one** validation failure test to prove the domain-to-application
+error mapping occurs. Do not test every possible validation rule — the domain layer already has
+its own unit tests covering each rule individually.
+
+```csharp
+[Fact]
+public async Task Handle_WithInvalidData_ReturnsValidationError()
+{
+    // Arrange — single invalid field proves mapping occurs
+    var command = new CreateCommand { /* … one invalid field … */ };
+
+    // Act
+    var result = await _sut.Handle(command, default);
+
+    // Assert
+    result.IsSuccess.Should().BeFalse();
+    result.Value.Should().BeNull();
+    result.Error.Should().BeOfType<ValidationError>();
+}
+```
+
+#### Persistence Validation
+
+When verifying an entity was persisted to the database, assert **all fields** match the
+expected values — not just the field that changed. This guards against silent data loss
+or mapping errors.
+
+```csharp
+// Verify it was persisted — all fields, not just the one that changed
+DbContext.ChangeTracker.Clear();
+var persisted = DbContext.Items.FirstOrDefault(i => i.Id == result.Value!.Id);
+persisted.Should().NotBeNull();
+persisted!.TenantId.Should().Be(command.TenantId);
+persisted.Name.Should().Be(command.Name);
+persisted.Email.Should().Be(command.Email);
+persisted.NestedValue.Name.Should().Be(command.NestedValue.Name);
+persisted.NestedValue.Value.Should().Be(command.NestedValue.Value);
+// ... all properties including nullable ones ...
+persisted.Status.Should().Be(ItemStatus.Pending);
+persisted.CreatedDate.Should().Be(fakeTimeProvider.GetUtcNow().DateTime);
+persisted.ParentId.Should().BeNull();
+persisted.CompletedDate.Should().BeNull();
+```
+
+#### Event Publishing Verification
+
+When a handler publishes an integration event, verify not only that it was published,
+but also that **all event fields are correctly mapped** from the source data.
+Use NSubstitute's `Arg.Do` to capture the published event, then assert each field
+with `Should()` for clear failure messages.
+
+```csharp
+// Arrange — set up capture before the Act call
+ItemCreatedEvent? capturedEvent = null;
+publishEndpoint.Publish(
+        Arg.Do<ItemCreatedEvent>(e => capturedEvent = e),
+        Arg.Any<CancellationToken>())
+    .Returns(Task.CompletedTask);
+
+// Act
+var result = await _sut.Handle(command, default);
+
+// Assert result and persistence (all fields)...
+
+// Assert event fields against persisted data, not the command
+capturedEvent.Should().NotBeNull();
+capturedEvent!.ItemId.Should().Be(persisted.Id);
+capturedEvent.TenantId.Should().Be(persisted.TenantId);
+capturedEvent.Name.Should().Be(persisted.Name);
+capturedEvent.NestedValue.Name.Should().Be(persisted.NestedValue.Name);
+capturedEvent.CreatedDate.Should().Be(persisted.CreatedDate);
+```
+
+Assert against the persisted entity (loaded after `DbContext.ChangeTracker.Clear()`)
+to verify the full chain: command → domain → database → event.
+
+This applies to both unit tests (with mocked publish endpoint) and integration tests
+(use `MassTransitTestHarness.Published<T>()` to get the event and assert its properties).
+
+#### Assert Values from Source Objects, Not Literals
+
+In success-path assertions, reference the **source object's properties** rather than hardcoded strings:
+
+```csharp
+// Prefer this:
+result.Value.Name.Should().Be(command.Name);
+result.Value.Email.Should().Be(command.Email);
+
+// Over this:
+result.Value.Name.Should().Be("Test Name");
+result.Value.Email.Should().Be("test@example.com");
+```
+
+This applies to assertions against:
+- **Command/query properties** — use `command.PropertyName`, `query.PropertyName`
+- **Seeded entity properties** — use `entity.PropertyName`, `order.PropertyName`
+- **FK-related identifiers** — use the seeded parent entity's property, not a copy of the value
+
+This keeps tests in sync with test data — if the test data changes, assertions automatically follow.
+
 ### Integration Tests - RestApi Layer
 
 **Location**: `tests/Company.Service.RestApi.IntegrationTests/[Feature]/V[Version]/`
@@ -519,13 +635,16 @@ persisted!.CompletedDate.Should().Be(FakeTimeProvider.GetUtcNowDateTime());
 2. **Unit tests** focus on command/query handlers with SQLite — assert `result.IsSuccess`, `result.Value`, and `result.Error`
 3. **Integration tests** verify full HTTP flow with real database
 4. **Clear database** between tests using Respawn
-5. **Test both success and failure paths** for every handler
+5. **Test both success and failure paths** for every handler — but **only one validation failure test** is needed in handler tests to prove error mapping works; individual validation rules are tested at the domain layer
 6. **Consolidate validation tests** into a single `[Theory]` using `TheoryData<string, Func<...>>` with `with` expressions — avoids 90% boilerplate duplication
 7. **Verify full response body** in success tests (all properties, not just Id)
-8. **Verify DB persistence** and **integration events** when applicable
+8. **Verify DB persistence with all fields** — when checking persistence, assert every property of the persisted entity against the source values, not just the field that changed
 9. **Seed FK-constrained parents** via DbContext before testing entities with foreign keys
 10. **Use FakeTimeProvider for all time-dependent assertions** — never depend on `DateTime.UtcNow` in integration tests; call `FakeTimeProvider.SetUtcNow()` at test start and assert against `FakeTimeProvider.GetUtcNowDateTime()`
-11. **Verify contract mapping with a dedicated `[Fact]` for every endpoint returning a response contract** — Every endpoint that returns a response contract (e.g., GET list returning `PagedResponse<T>`, POST/PUT returning the created/updated entity) should have a specific `[Fact]` test that seeds/creates data, calls the endpoint, and asserts every property of the returned 200/201 OK response matches the expected values. This guards against regressions in the contract mapper (e.g., `ToV1()` extension method) and ensures no properties are silently dropped. Skip this if an existing test already fully verifies all properties of the contract.
+11. **Assert values from source objects, not literals** — in success assertions, reference the command/entity/query properties (`command.Name`, `entity.Email`) instead of hardcoded strings
+12. **Don't assert error messages for domain-transformed errors in handler tests** — when a handler maps a domain error via `.MapError()`, assert only the error type, not the message (the domain already covers message content)
+13. **Verify integration event fields, not just publication** — when a handler publishes an event, capture it with `Arg.Do<>` and assert every field is correctly mapped from the source data
+14. **Verify contract mapping with a dedicated `[Fact]` for every endpoint returning a response contract** — Every endpoint that returns a response contract should have a test that seeds data, calls the endpoint, and asserts every property of the response matches expected values
 
 ---
 

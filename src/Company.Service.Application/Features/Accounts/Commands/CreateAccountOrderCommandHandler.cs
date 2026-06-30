@@ -89,13 +89,7 @@ internal class CreateAccountOrderCommandHandler : IApplicationRequestHandler<Cre
                     )
                 )
             )
-            .MapError<ApplicationError>(error =>
-                new ValidationError()
-                {
-                    Message = "Validation failed!.",
-                    Failures = error.Failures.Select(f => new ValidationFailure(f.PropertyName, f.Errors)).ToArray()
-                }
-            )
+            .MapError<ApplicationError>(error => error.ToAppValidationError())
             .TapAsync(async accountOrder =>
             {
                 _dbContext.AccountOrders.Add(accountOrder);
