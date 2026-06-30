@@ -23,27 +23,6 @@ public class AccountOrder
 
     public DateTime? CompletedDate { get; private set; }
 
-    internal AccountOrder(
-        Guid id,
-        Guid tenantId,
-        AccountDetails accountDetails,
-        Guid? accountId,
-        ContactInformation contactInformation,
-        AccountOrderStatus status,
-        DateTime createdDate,
-        DateTime? completedDate
-        )
-    {
-        Id = id;
-        TenantId = tenantId;
-        AccountDetails = accountDetails;
-        AccountId = accountId;
-        ContactInformation = contactInformation;
-        Status = status;
-        CreatedDate = createdDate;
-        CompletedDate = completedDate;
-    }
-
     private AccountOrder() { }
 
     public static ValueResult<AccountOrder, ValidationError> CreateNew(Guid tenantId, AccountDetails accountDetails, ContactInformation contactInformation, DateTime createdDate)

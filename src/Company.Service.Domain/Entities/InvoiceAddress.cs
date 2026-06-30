@@ -17,14 +17,6 @@ public class InvoiceAddress
 
     private InvoiceAddress() { }
 
-    internal InvoiceAddress(Guid id, Guid tenantId, string name, Address address)
-    {
-        Id = id;
-        TenantId = tenantId;
-        Name = name;
-        Address = address;
-    }
-
     public static ValueResult<InvoiceAddress, ValidationError> CreateNew(Guid tenantId, string name, Address address)
     {
         return Validate.ExecuteRules(

@@ -207,29 +207,6 @@ public class AccountOrderTests
         order.AccountId.Should().Be(account.Id);
     }
 
-    [Fact]
-    public void InternalConstructor_RecreatesAccountOrderWithGivenValues()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var accountId = Guid.NewGuid();
-        var completedDate = new DateTime(2026, 6, 15);
-
-        // Act
-        var order = new AccountOrder(id, _tenantId, ValidAccountDetails, accountId, ValidContactInformation,
-            AccountOrderStatus.Completed, _createdDate, completedDate);
-
-        // Assert
-        order.Id.Should().Be(id);
-        order.TenantId.Should().Be(_tenantId);
-        order.AccountDetails.Should().Be(ValidAccountDetails);
-        order.AccountId.Should().Be(accountId);
-        order.ContactInformation.Should().Be(ValidContactInformation);
-        order.Status.Should().Be(AccountOrderStatus.Completed);
-        order.CreatedDate.Should().Be(_createdDate);
-        order.CompletedDate.Should().Be(completedDate);
-    }
-
     private AccountOrder CreateValidOrder()
     {
         return AccountOrder.CreateNew(_tenantId, ValidAccountDetails, ValidContactInformation, _createdDate).Value!;

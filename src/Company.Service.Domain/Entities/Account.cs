@@ -24,26 +24,6 @@ public class Account
 
     private Account() { }
 
-    internal Account(
-        Guid id,
-        Guid tenantId,
-        string name,
-        string email,
-        AccountTier tier,
-        AccountStatus status,
-        DateTime? suspendedDate,
-        Guid invoiceAddressId)
-    {
-        Id = id;
-        TenantId = tenantId;
-        Name = name;
-        Email = email;
-        Tier = tier;
-        Status = status;
-        SuspendedDate = suspendedDate;
-        InvoiceAddressId = invoiceAddressId;
-    }
-
     public static ValueResult<Account, ValidationError> CreateNew(Guid tenantId, string name, string email, AccountTier tier, Guid invoiceAddressId)
     {
         return Validate.ExecuteRules(

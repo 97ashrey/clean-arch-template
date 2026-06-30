@@ -324,30 +324,6 @@ public class AccountTests
         account.Status.Should().Be(AccountStatus.Removed);
     }
 
-    [Fact]
-    public void InternalConstructor_RecreatesAccountWithGivenValues()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var tenantId = Guid.NewGuid();
-        var invoiceAddressId = Guid.NewGuid();
-        var suspendedDate = new DateTime(2026, 6, 15);
-
-        // Act
-        var account = new Account(id, tenantId, "Test Account", "test@example.com", AccountTier.Enterprise,
-            AccountStatus.Suspended, suspendedDate, invoiceAddressId);
-
-        // Assert
-        account.Id.Should().Be(id);
-        account.TenantId.Should().Be(tenantId);
-        account.Name.Should().Be("Test Account");
-        account.Email.Should().Be("test@example.com");
-        account.Tier.Should().Be(AccountTier.Enterprise);
-        account.Status.Should().Be(AccountStatus.Suspended);
-        account.SuspendedDate.Should().Be(suspendedDate);
-        account.InvoiceAddressId.Should().Be(invoiceAddressId);
-    }
-
     private Account CreateValidAccount()
     {
         return Account.CreateNew(_tenantId, "Test Account", "test@example.com", AccountTier.Individual, _invoiceAddressId).Value!;

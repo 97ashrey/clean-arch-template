@@ -139,24 +139,6 @@ public class InvoiceAddressTests
     }
 
     [Fact]
-    public void InternalConstructor_RecreatesInvoiceAddressWithGivenValues()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var tenantId = Guid.NewGuid();
-        var name = "Recreated Office";
-
-        // Act
-        var invoiceAddress = new InvoiceAddress(id, tenantId, name, ValidAddress);
-
-        // Assert
-        invoiceAddress.Id.Should().Be(id);
-        invoiceAddress.TenantId.Should().Be(tenantId);
-        invoiceAddress.Name.Should().Be(name);
-        invoiceAddress.Address.Should().Be(ValidAddress);
-    }
-
-    [Fact]
     public void PrivateConstructor_CreatesInstanceWithDefaultValues()
     {
         // Arrange - use reflection to test private constructor is accessible for EF Core

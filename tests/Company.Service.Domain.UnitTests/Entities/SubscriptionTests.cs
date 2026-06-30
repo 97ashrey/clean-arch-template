@@ -375,32 +375,6 @@ public class SubscriptionTests
         subscription.Status.Should().Be(SubscriptionStatus.Canceled);
     }
 
-    [Fact]
-    public void InternalConstructor_RecreatesSubscriptionWithGivenValues()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var suspendedDate = new DateTime(2026, 3, 15);
-        var price = new Price(49.99m, "EUR");
-
-        // Act
-        var subscription = new Subscription(id, _accountId, "Name", "Friendly", price, BillCycle.Yearly,
-            _startDate, _endDate, SubscriptionStatus.Suspended, suspendedDate, _productId);
-
-        // Assert
-        subscription.Id.Should().Be(id);
-        subscription.AccountId.Should().Be(_accountId);
-        subscription.Name.Should().Be("Name");
-        subscription.FriendlyName.Should().Be("Friendly");
-        subscription.PurchasePrice.Should().Be(price);
-        subscription.BillCycle.Should().Be(BillCycle.Yearly);
-        subscription.StartDate.Should().Be(_startDate);
-        subscription.EndDate.Should().Be(_endDate);
-        subscription.Status.Should().Be(SubscriptionStatus.Suspended);
-        subscription.SuspendedDate.Should().Be(suspendedDate);
-        subscription.ProductId.Should().Be(_productId);
-    }
-
     private Subscription CreateValidSubscription()
     {
         return Subscription.CreateNew(_accountId, "Premium Subscription", "Premium",

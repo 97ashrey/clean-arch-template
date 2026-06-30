@@ -308,9 +308,7 @@ This template does NOT use domain events because:
 
 2. **`[Theory]` over `foreach` for enums** — Don't iterate enum values in a `[Fact]` with `foreach`. Use `[Theory]` + `[InlineData(SomeEnum.Value)]` so each case is a separate, independently failing test.
 
-3. **Internal constructor tests** — Every entity needs a test verifying the `internal` constructor (used by EF Core) correctly populates all properties. Missing this is an easy oversight.
-
-4. **State consistency on failure** — When a command method returns a failure `Result`, assert that the entity's state remains unchanged. Don't just check the error — verify the entity wasn't mutated.
+3. **State consistency on failure** — When a command method returns a failure `Result`, assert that the entity's state remains unchanged. Don't just check the error — verify the entity wasn't mutated.
 
 ### Unit Tests - Application Layer
 

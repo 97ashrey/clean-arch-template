@@ -30,32 +30,6 @@ public class Subscription
 
     private Subscription() { }
 
-    internal Subscription(
-        Guid id,
-        Guid accountId,
-        string name,
-        string friendlyName,
-        Price purchasePrice,
-        BillCycle billCycle,
-        DateTime startDate,
-        DateTime endDate,
-        SubscriptionStatus status,
-        DateTime? suspendedDate,
-        Guid productId)
-    {
-        Id = id;
-        AccountId = accountId;
-        Name = name;
-        FriendlyName = friendlyName;
-        PurchasePrice = purchasePrice;
-        BillCycle = billCycle;
-        StartDate = startDate;
-        EndDate = endDate;
-        Status = status;
-        SuspendedDate = suspendedDate;
-        ProductId = productId;
-    }
-
     public static ValueResult<Subscription, ValidationError> CreateNew(
             Guid accountId,
             string name,
