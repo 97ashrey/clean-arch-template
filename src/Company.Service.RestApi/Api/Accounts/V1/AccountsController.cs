@@ -12,6 +12,18 @@ namespace Company.Service.RestApi.Api.Accounts.V1
     [ApiController]
     public class AccountsController : ApiControllerBase
     {
+        [HttpGet]
+        public async Task<Results<InternalServerError<ProblemDetails>, Ok<PagedResponse<Account>>>> GetAccounts(
+            [FromQuery] GetAccountsRequest request, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(request.ToQuery(), cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, Ok<PagedResponse<Account>>>>(
+                value => TypedResults.Ok(value.ToPagedResponse(account => account.ToV1())),
+                error => InternalServerErrorProblemResponse(error)
+            );
+        }
+
         [HttpGet("{id:guid}")]
         public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, Ok<Account>>> GetAccountById(
             [FromRoute] Guid id, CancellationToken cancellationToken)
