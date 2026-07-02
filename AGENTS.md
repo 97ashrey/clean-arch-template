@@ -63,11 +63,9 @@ Domain entities contain behavior and validation logic. They are self-validating 
 
 Key patterns:
 - Factory methods (`CreateNew`, `Recreate`) return `ValueResult<TEntity, ValidationError>` and validate all inputs
-- Command methods return `Result<ValidationError>` if they can fail, or `void` for simple operations
-- Private constructors prevent invalid state; reconstruction via internal constructors
+- Command methods return `Result<TError>`/`ValueResult<TValue, TError>` if they can fail, or `void` for simple operations. `TError` is a sub type of `DomainError` like `ValidationError` or `InvalidOperationError`
+- Private constructors prevent invalid state, and allow EF Core integration
 - All validation logic encapsulated in the entity
-
-
 
 ### Value Objects
 
@@ -83,6 +81,14 @@ When to use:
 - Use value objects for composed concepts (e.g., Address, Money, PhoneNumber)
 - Make value objects records (immutable by default with C# 9+)
 - Return `ValueResult<TValueObject, ValidationError>` from factory methods
+
+### Domain Errors
+
+**Location**: `src/Company.Service.Domain/Common/Types/Errors/`
+
+**See example**: [InvalidOperationError.cs](src/Company.Service.Domain/Common/Types/Errors/InvalidOperationError.cs)
+
+Immutable types that represent a concept of a domain error, generics like `InvalidOperationError` are good enough for most cases, but a specific type can be used to convey additional meaning of the error.
 
 ### Result Types
 
@@ -107,6 +113,14 @@ Two primary result types manage success/failure flows:
 - `.Tap()` / `.TapError()` - Side effects without changing the result
 - `.Match()` - Pattern matching on success/failure
 - `.MatchAsync()` - Async pattern matching
+
+### Important: No Domain Events
+
+This template does NOT use domain events because:
+1. Results are the primary return mechanism
+2. Always need to communicate what went wrong
+3. Domain events would require fallback mechanisms for error cases
+4. Integration events at the application layer serve the cross-service communication need
 
 ---
 
@@ -138,10 +152,8 @@ Key patterns:
 - Command record with nested DTOs for complex inputs
 - Validator defined inline or in same file
 - Handler chains domain factory/command methods via `.Bind()`
-- Domain validation errors converted to application `ValidationError`
+- Domain errors converted to application errors
 - Persistence only after all validations pass
-
-
 
 ### Queries
 
@@ -157,7 +169,7 @@ Key patterns:
 
 ### Reusable Output Contracts
 
-For projections or specific query outputs, define contracts at the query/command level or in a shared location:
+For projections or specific query/command outputs, define contracts at the query/command level or in a shared location:
 - **Inline**: Define DTOs in the query/command file for single-use projections
 - **Shared**: Define DTOs in `Common/Contracts/` if reused across multiple queries
 
@@ -171,8 +183,6 @@ Error hierarchy:
 - `NotFoundError` - Resource not found
 - `InvalidOperationError` - Business rule violations
 - Custom errors as needed
-
-Each error type maps to specific HTTP responses in the controller.
 
 ---
 
@@ -194,7 +204,9 @@ Controller patterns:
 
 ### API Request Contracts
 
-**Location**: [Contracts/](src/Company.Service.RestApi/Api/InvoiceAddresses/V1/Contracts/)
+**Location**: `src/Company.Service.RestApi/Api/[Feature]/V[Version]/Contracts/`
+
+**See example**: [InvoiceAddress](src/Company.Service.RestApi/Api/InvoiceAddresses/V1/Contracts/InvoiceAddress.cs)
 
 Define input/output contracts that map to application commands/queries:
 - Input contracts inherit from API request types (e.g., `CreateInvoiceAddressRequest`)
@@ -204,14 +216,14 @@ Define input/output contracts that map to application commands/queries:
 
 ### API Contract Mappers
 
-Use extension methods on domain entities:
+Use extension methods on domain entities or custom projections:
 - Define mappers per version (`.ToV1()`, `.ToV2()`, etc.)
 - Place in `Contracts/` folder or as static methods in contract files
 - Allow different API versions to have different response shapes
 
 ### Versioning
 
-APIs are versioned through folder structure and multiple contracts per feature:
+APIs are versioned through folder structure/c# namespaces and multiple contracts per feature:
 - `V1/` - First version
 - `V2/` - Second version (breaking changes)
 
@@ -233,17 +245,6 @@ Map between versions at the controller level, NOT at the domain level.
 - Logs with error ID
 - Returns HTTP 500 with error ID
 
-### Application Error Types
-
-**Location**: [Common/Types/Errors/](src/Company.Service.Application/Common/Types/Errors/)
-
-Error hierarchy:
-- `ApplicationError` (base) - All errors inherit with `Id` and `Message` properties
-- `ValidationError` - Validation failures with property/error mappings
-- `NotFoundError` - Resource not found
-- `InvalidOperationError` - Business rule violations
-- Custom errors as needed
-
 ### Error to HTTP Response Mapping
 
 Controllers map specific error types to HTTP responses in the controller.
@@ -251,14 +252,12 @@ Controllers map specific error types to HTTP responses in the controller.
 **Mapping Guide**:
 - `ValidationError` → HTTP 400 Bad Request
 - `NotFoundError` → HTTP 404 Not Found
-- `InvalidOperationError` → HTTP 400 Bad Request (or 409 Conflict)
+- `InvalidOperationError` → HTTP 400 Bad Request
 - Other `ApplicationError` → HTTP 500 Internal Server Error
 
 ---
 
 ## 6. Integration Events
-
-### Overview
 
 Integration events allow services to communicate asynchronously. They're defined in a separate NuGet-ready project.
 
@@ -266,33 +265,26 @@ Integration events allow services to communicate asynchronously. They're defined
 
 ### Event Definition
 
-**Location**: `src/Company.Service.Application.IntegrationEvents/V1/`
+**See example**: [AccountOrderCreatedEvent](src/Company.Service.Application.IntegrationEvents/V1/Accounts/AccountOrderCreatedEvent.cs)
 
 Integration event records contain all relevant data needed by external services:
 - Include all data that external services need to know about the event
 - Use immutable record syntax
 - Include timestamp to track when event occurred
+- Versioned by folders/c# namespaces
 
 ### Event Publishing
 
 Use MassTransit to publish events from command handlers after successful operations:
-- Publish only after persistence succeeds
 - Include all relevant aggregate data in the event
 - Events are asynchronously delivered to subscribers
-
-### Important: No Domain Events
-
-This template does NOT use domain events because:
-1. Results are the primary return mechanism
-2. Always need to communicate what went wrong
-3. Domain events would require fallback mechanisms for error cases
-4. Integration events at the application layer serve the cross-service communication need
+- Outbox pattern is used behind the scenes, events should be published before SaveChanges calls
 
 ---
 
 ## 7. Testing
 
-### Unit Tests — Domain Layer
+### Unit Tests - Domain Layer
 
 **Location**: `tests/Company.Service.Domain.UnitTests/Entities/` and `tests/Company.Service.Domain.UnitTests/ValueObjects/`
 
@@ -302,7 +294,7 @@ This template does NOT use domain events because:
 - [SubscriptionTests.cs](tests/Company.Service.Domain.UnitTests/Entities/SubscriptionTests.cs)
 - [AddressTests.cs](tests/Company.Service.Domain.UnitTests/ValueObjects/AddressTests.cs)
 
-**Watch out for these common gaps** (as identified during domain test writing):
+**Watch out for these common gaps**
 
 1. **Exact error messages** — Assert `result.Error!.Message` with `Should().Be()` not `Should().Contain()`. When the production code uses string interpolation with an **enum value** (e.g., `$"... {SomeEnum.SomeValue} ..."`), replicate that interpolation in the test assertion rather than hardcoding the enum name as a string — keeps test and source in sync.
 
@@ -659,7 +651,19 @@ src/Company.Service.Domain/ValueObjects/[ValueObject].cs
 - Implement behavior methods
 - Use Result types for fallible operations
 
-### Step 2: Create Application Commands/Queries
+### Step 2: Add Entity Configuration and Database Migration
+```
+src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/[Entity]EntityConfiguration.cs
+src/Company.Service.DbDeploy/Migrations/
+```
+
+- Implement `IEntityTypeConfiguration<TEntity>` to configure table mapping, keys, required fields, max lengths, and owned types
+- Place configuration in `Infrastructure.Data/Persistence/EntityConfigurations/`
+- EF Core auto-discovers configurations via `ApplyConfigurationsFromAssembly` in `ServiceDomainPlaceholderDbContext.OnModelCreating`
+- Add EF Core migration via `dotnet ef migrations add` in the DbDeploy project
+- Migrations are deployed separately via the DbDeploy project
+
+### Step 3: Create Application Commands/Queries
 ```
 src/Company.Service.Application/Features/[Feature]/Commands/
 src/Company.Service.Application/Features/[Feature]/Queries/
@@ -670,16 +674,6 @@ src/Company.Service.Application/Features/[Feature]/Queries/
 - Implement handler using domain methods
 - Map domain errors to application errors
 
-### Step 3: Create API Contracts and Controller
-```
-src/Company.Service.RestApi/Api/[Feature]/V1/Contracts/
-src/Company.Service.RestApi/Api/[Feature]/V1/[Feature]Controller.cs
-```
-
-- Define request/response contracts
-- Add mapper extension methods
-- Implement controller with Result matching
-
 ### Step 4: Define Integration Event (if needed)
 ```
 src/Company.Service.Application.IntegrationEvents/V1/[Event].cs
@@ -688,13 +682,15 @@ src/Company.Service.Application.IntegrationEvents/V1/[Event].cs
 - Define event record with all relevant data
 - Publish from command handler on success
 
-### Step 5: Add Database Migration
+### Step 5: Create API Contracts and Controller
 ```
-src/Company.Service.DbDeploy/Migrations/
+src/Company.Service.RestApi/Api/[Feature]/V1/Contracts/
+src/Company.Service.RestApi/Api/[Feature]/V1/[Feature]Controller.cs
 ```
 
-- Add EF Core migration for new entity
-- Deployed separately via DbDeploy project
+- Define request/response contracts
+- Add mapper extension methods
+- Implement controller with Result matching
 
 ### Step 6: Write Tests
 ```
@@ -728,7 +724,7 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 - Pipeline behaviors: logging, exception handling, validation
 
 ### Database Context
-- Named: `ServiceDomainPlaceholderDbContext` (update to your service name)
+- Named: `ServiceDomainPlaceholderDbContext`
 - Interface: `IApplicationDbContext`
 - Injected into handlers for persistence
 - DbContext moved to Infrastructure.Data layer
@@ -751,20 +747,22 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ### Adding a new CRUD feature
 1. Create domain entity with factory and behavior methods
-2. Create Create/Update/Delete commands with handlers
-3. Create Get by ID and Get list queries with handlers
-4. Create API contracts and controller endpoints
-5. Add migration
-6. Add unit and integration tests
-7. Define integration event if cross-service communication needed
+2. Add entity type configuration and database migration
+3. Create Create/Update/Delete commands with handlers
+4. Create Get by ID and Get list queries with handlers
+5. Define integration event if cross-service communication needed
+6. Create API contracts and controller endpoints
+7. Add unit and integration tests
 
 ### Modifying an existing feature
 1. Update domain entity behavior/factory as needed
-2. Update command/query handlers to use new behavior
-3. Update API contracts if input/output changed
-4. Add migration if database schema changed
-5. Update existing tests or add new test cases
-6. Consider backward compatibility for API changes (add new V2)
+2. Update entity type configuration if schema changed
+3. Add migration if database schema changed
+4. Update command/query handlers to use new behavior
+5. Update integration events if need, consider backward compatibility (add new V2)
+6. Update API contracts if input/output changed
+7. Update existing tests or add new test cases
+8. Consider backward compatibility for API changes (add new V2)
 
 ### Debugging a failing test
 1. Check if Result.IsSuccess is being properly tested
@@ -792,4 +790,4 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ---
 
-**Last Updated**: June 2026 — Added code coverage verification workflow and script instructions
+**Last Updated**: June 2026 — Removed some duplicate mentions of various topics
