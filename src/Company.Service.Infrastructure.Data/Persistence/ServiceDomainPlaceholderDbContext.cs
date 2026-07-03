@@ -17,9 +17,9 @@ public class ServiceDomainPlaceholderDbContext : DbContext
     public DbSet<Subscription> Subscriptions { get; set; }
 #endif
 
-//__EXAMPLE_START__
+    //__EXAMPLE_START__
     public DbSet<InvoiceAddress> InvoiceAdresses { get; set; }
-//__EXAMPLE_END__
+    //__EXAMPLE_END__
 
     public ServiceDomainPlaceholderDbContext()
         : base()

@@ -29,9 +29,9 @@ internal class ApplicationDbContext : IApplicationDbContext
     public DbSet<Subscription> Subscriptions => _dbContext.Subscriptions;
 #endif
 
-//__EXAMPLE_START__
+    //__EXAMPLE_START__
     public DbSet<InvoiceAddress> InvoiceAdresses => _dbContext.InvoiceAdresses;
-//__EXAMPLE_END__
+    //__EXAMPLE_END__
 
     public DatabaseFacade Database => _dbContext.Database;
 

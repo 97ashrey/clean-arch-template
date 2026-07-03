@@ -17,9 +17,9 @@ public interface IApplicationDbContext
     DbSet<Subscription> Subscriptions { get; }
 #endif
 
-//__EXAMPLE_START__
+    //__EXAMPLE_START__
     DbSet<InvoiceAddress> InvoiceAdresses { get; }
-//__EXAMPLE_END__
+    //__EXAMPLE_END__
 
     DatabaseFacade Database { get; }
 
