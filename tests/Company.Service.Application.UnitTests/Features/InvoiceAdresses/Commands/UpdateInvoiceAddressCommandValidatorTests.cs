@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Application.Features.InvoiceAddresses.Commands;
 using FluentValidation.TestHelper;
@@ -244,3 +245,4 @@ public class UpdateInvoiceAddressCommandValidatorTests
         result.Errors.Should().HaveCount(4);
     }
 }
+//__EXAMPLE_END__

@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Entities;
@@ -155,3 +156,4 @@ public class InvoiceAddressTests
         return InvoiceAddress.CreateNew(tenantId, "Main Office", ValidAddress).Value!;
     }
 }
+//__EXAMPLE_END__

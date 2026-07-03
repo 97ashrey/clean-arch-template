@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.Features.InvoiceAddresses.Queries;
@@ -203,3 +204,4 @@ public class GetInvoiceAddressByIdQueryHandlerTests : DbContextTestBase
         result.Value!.Should().NotBeEquivalentTo(address2);
     }
 }
+//__EXAMPLE_END__

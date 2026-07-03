@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -108,3 +109,4 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
     }
 
 }
+//__EXAMPLE_END__

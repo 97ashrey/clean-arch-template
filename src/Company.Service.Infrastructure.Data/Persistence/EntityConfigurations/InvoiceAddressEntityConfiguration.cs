@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -43,3 +44,4 @@ internal class InvoiceAddressEntityConfiguration : IEntityTypeConfiguration<Invo
         builder.ToTable("InvoiceAddresses");
     }
 }
+//__EXAMPLE_END__

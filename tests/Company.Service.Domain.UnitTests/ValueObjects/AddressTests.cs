@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.ValueObjects;
@@ -73,3 +74,4 @@ public class AddressTests
         result.Error!.Failures.Should().Contain(f => f.PropertyName == "country");
     }
 }
+//__EXAMPLE_END__

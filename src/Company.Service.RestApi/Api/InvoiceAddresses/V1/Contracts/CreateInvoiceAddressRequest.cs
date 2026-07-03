@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Application.Features.InvoiceAddresses.Commands;
 
 namespace Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
@@ -31,3 +32,4 @@ internal static class CreateInvoiceAddressRequestToCommandMapping
             };
     }
 }
+//__EXAMPLE_END__

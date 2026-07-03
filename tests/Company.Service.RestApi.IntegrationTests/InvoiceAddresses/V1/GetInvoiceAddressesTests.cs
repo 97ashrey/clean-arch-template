@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
@@ -210,3 +211,4 @@ public class GetInvoiceAddressesTests(IntegrationTestWebAppFactory factory) : In
         public static GetInvoiceAddressesTestCase CreateFromFactory(Func<GetInvoiceAddressesTestCase> factory) => factory();
     }
 }
+//__EXAMPLE_END__

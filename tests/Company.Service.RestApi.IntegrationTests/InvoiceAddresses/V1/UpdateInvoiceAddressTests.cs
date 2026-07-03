@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
@@ -168,3 +169,4 @@ public class UpdateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         persisted.Address.Number.Should().Be(request.Address.Number);
     }
 }
+//__EXAMPLE_END__

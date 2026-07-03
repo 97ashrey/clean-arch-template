@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Utils;
@@ -47,3 +48,4 @@ public class InvoiceAddress
         Address = address;
     }
 }
+//__EXAMPLE_END__

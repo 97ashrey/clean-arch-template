@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 namespace Company.Service.RestApi.Api.InvoiceAddresses.V2.Contracts;
 
 public record class InvoiceAddress
@@ -42,3 +43,4 @@ internal static class InvoiceAddressesV2Mapping
             };
     }
 }
+//__EXAMPLE_END__

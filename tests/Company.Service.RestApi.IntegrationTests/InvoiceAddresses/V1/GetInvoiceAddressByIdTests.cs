@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
@@ -69,3 +70,4 @@ public class GetInvoiceAddressByIdTests(IntegrationTestWebAppFactory factory) : 
         invoiceAddress.Address.Number.Should().Be(invoiceAddressToGet.Address.Number);
     }
 }
+//__EXAMPLE_END__

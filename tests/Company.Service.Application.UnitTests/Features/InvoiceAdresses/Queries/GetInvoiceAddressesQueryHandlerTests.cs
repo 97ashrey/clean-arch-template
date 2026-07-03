@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Application.Common.Types;
 using Company.Service.Application.Features.InvoiceAddresses.Queries;
@@ -397,3 +398,4 @@ public class GetInvoiceAddressesQueryHandlerTests : DbContextTestBase
         public static InvoiceAdressesTestCase CreateFromFactory(Func<InvoiceAdressesTestCase> factory) => factory();
     }
 }
+//__EXAMPLE_END__

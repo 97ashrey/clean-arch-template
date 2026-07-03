@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Utils;
@@ -38,3 +39,4 @@ public record Address
         );
     }
 }
+//__EXAMPLE_END__

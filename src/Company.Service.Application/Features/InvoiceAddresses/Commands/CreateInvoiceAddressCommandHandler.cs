@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types.Errors;
@@ -78,3 +79,4 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
             );
     }
 }
+//__EXAMPLE_END__

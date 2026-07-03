@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types;
@@ -69,3 +70,4 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
         return query;
     }
 }
+//__EXAMPLE_END__

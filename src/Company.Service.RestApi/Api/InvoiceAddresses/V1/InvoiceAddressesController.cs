@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.Features.InvoiceAddresses.Queries;
 using Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
@@ -74,3 +75,4 @@ namespace Company.Service.RestApi.Api.InvoiceAddresses.V1
 
     }
 }
+//__EXAMPLE_END__

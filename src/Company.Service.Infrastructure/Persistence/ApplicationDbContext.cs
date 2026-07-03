@@ -1,6 +1,8 @@
-﻿using Company.Service.Application.Common.Interfaces.Persistence;
+using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Domain.Common;
+//__EXAMPLE_START__
 using Company.Service.Domain.Entities;
+//__EXAMPLE_END__
 using Company.Service.Infrastructure.Data.Persistence;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
@@ -19,10 +21,17 @@ internal class ApplicationDbContext : IApplicationDbContext
         _publishEndpoint = publishEndpoint;
     }
 
+#if EXAMPLE
     public DbSet<Account> Accounts => _dbContext.Accounts;
+
     public DbSet<AccountOrder> AccountOrders => _dbContext.AccountOrders;
-    public DbSet<InvoiceAddress> InvoiceAdresses => _dbContext.InvoiceAdresses;
+
     public DbSet<Subscription> Subscriptions => _dbContext.Subscriptions;
+#endif
+
+//__EXAMPLE_START__
+    public DbSet<InvoiceAddress> InvoiceAdresses => _dbContext.InvoiceAdresses;
+//__EXAMPLE_END__
 
     public DatabaseFacade Database => _dbContext.Database;
 

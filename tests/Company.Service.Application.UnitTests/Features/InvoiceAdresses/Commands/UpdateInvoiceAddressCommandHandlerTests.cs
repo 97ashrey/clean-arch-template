@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using AwesomeAssertions;
 using Company.Service.Application.Common.Types.Errors;
 using Company.Service.Application.Features.InvoiceAddresses.Commands;
@@ -151,3 +152,4 @@ public class UpdateInvoiceAddressCommandHandlerTests : DbContextTestBase
         result.Error.Should().BeOfType<ValidationError>();
     }
 }
+//__EXAMPLE_END__

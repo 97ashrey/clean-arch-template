@@ -1,3 +1,4 @@
+//__EXAMPLE_START__
 using Company.Service.Application.Features.InvoiceAddresses.Queries;
 
 namespace Company.Service.RestApi.Api.InvoiceAddresses.V1.Contracts;
@@ -27,3 +28,4 @@ internal static class GetInvoiceAddressesRequestToQueryMapping
             };
     }
 }
+//__EXAMPLE_END__

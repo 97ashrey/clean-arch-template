@@ -27,7 +27,28 @@
         "**/.vs/**",
         "**/.idea/**",
         "**/test-coverage-reports/**",
-        "**/TestResults/**"
+        "**/TestResults/**",
+        "AGENTS_INTERNAL.md",
+        "**/.pi/**",
+        "Directory.Build.props",
+        "src/Company.Service.Domain/Entities/Account.cs",
+        "src/Company.Service.Domain/Entities/AccountOrder.cs",
+        "src/Company.Service.Domain/Entities/Subscription.cs",
+        "src/Company.Service.Domain/ValueObjects/AccountDetails.cs",
+        "src/Company.Service.Domain/ValueObjects/ContactInformation.cs",
+        "src/Company.Service.Application/Features/Accounts/**",
+        "src/Company.Service.RestApi/Api/Accounts/**",
+        "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/AccountEntityConfiguration.cs",
+        "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/AccountOrderEntityConfiguration.cs",
+        "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/SubscriptionEntityConfiguration.cs",
+        "src/Company.Service.DbDeploy/Migrations/**",
+        "tests/Company.Service.Domain.UnitTests/Entities/AccountTests.cs",
+        "tests/Company.Service.Domain.UnitTests/Entities/AccountOrderTests.cs",
+        "tests/Company.Service.Domain.UnitTests/Entities/SubscriptionTests.cs",
+        "tests/Company.Service.Domain.UnitTests/ValueObjects/AccountDetailsTests.cs",
+        "tests/Company.Service.Domain.UnitTests/ValueObjects/ContactInformationTests.cs",
+        "tests/Company.Service.Application.UnitTests/Features/Accounts/**",
+        "tests/Company.Service.RestApi.IntegrationTests/Accounts/**"
       ]
     }
   ],
@@ -52,6 +73,22 @@
     "E00BE20F-DDD5-44E4-9E5F-9C313565EBB8"
   ],
   "symbols": {
+    "exampleStart": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "/*"
+      },
+      "replaces": "//__EXAMPLE_START__"
+    },
+    "exampleEnd": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "*/"
+      },
+      "replaces": "//__EXAMPLE_END__"
+    },
     "serviceDomain": {
       "type": "parameter",
       "datatype": "string",
