@@ -2,10 +2,12 @@
 using Company.Service.Application.Common.Interfaces.Persistence;
 using Company.Service.Application.Common.Requests;
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Application.Common.Utils;
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using FluentValidation;
+using MassTransit;
 
 namespace Company.Service.Application.Features.InvoiceAddresses.Commands;
 
@@ -44,10 +46,14 @@ internal class CreateInvoiceAddressCommandValidator : AbstractValidator<CreateIn
 internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<CreateInvoiceAddressCommand, InvoiceAddress>
 {
     private readonly IApplicationDbContext _dbContext;
+    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly TimeProvider _timeProvider;
 
-    public CreateInvoiceAddressCommandHandler(IApplicationDbContext dbContext)
+    public CreateInvoiceAddressCommandHandler(IApplicationDbContext dbContext, IPublishEndpoint publishEndpoint, TimeProvider timeProvider)
     {
         _dbContext = dbContext;
+        _publishEndpoint = publishEndpoint;
+        _timeProvider = timeProvider;
     }
 
     public async ValueTask<ValueResult<InvoiceAddress, ApplicationError>> Handle(CreateInvoiceAddressCommand request, CancellationToken cancellationToken)
@@ -66,17 +72,32 @@ internal class CreateInvoiceAddressCommandHandler : IApplicationRequestHandler<C
                     name: request.Name,
                     address: address);
             })
-            .MatchAsync<ValueResult<InvoiceAddress, ApplicationError>>(
-                async invoiceAddress =>
-                {
-                    _dbContext.InvoiceAdresses.Add(invoiceAddress);
+            .MapError<ApplicationError>(error => error.ToAppValidationError())
+            .TapAsync(async invoiceAddress =>
+            {
+                _dbContext.InvoiceAdresses.Add(invoiceAddress);
 
-                    await _dbContext.SaveChangesAsync(cancellationToken);
+                await _publishEndpoint.Publish(CreateInvoiceAddressCreatedEvent(invoiceAddress));
 
-                    return invoiceAddress;
-                },
-                async failure => failure.ToAppValidationError()
-            );
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            });
+    }
+
+    private IntegrationEvents.V1.InvoiceAddresses.InvoiceAddressCreatedEvent CreateInvoiceAddressCreatedEvent(InvoiceAddress invoiceAddress)
+    {
+        return new(
+            InvoiceAddressId: invoiceAddress.Id,
+            TenantId: invoiceAddress.TenantId,
+            Name: invoiceAddress.Name,
+            Address: new IntegrationEvents.V1.Shared.Address(
+                invoiceAddress.Address.Country,
+                invoiceAddress.Address.City,
+                invoiceAddress.Address.ZipCode,
+                invoiceAddress.Address.Street,
+                invoiceAddress.Address.Number
+            ),
+            CreatedDate: _timeProvider.GetUtcNowDateTime()
+        );
     }
 }
 //__EXAMPLE_END__

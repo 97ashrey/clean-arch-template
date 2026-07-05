@@ -1,6 +1,6 @@
 //__EXAMPLE_START__
 using AwesomeAssertions;
-using Company.Service.Domain.Entities;
+using Company.Service.Application.IntegrationEvents.V1.InvoiceAddresses;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
@@ -64,6 +64,7 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
     public async Task CreateInvoiceAddress_ReturnsOkAndSavesToDatabase()
     {
         // Arrange
+        FakeTimeProvider.SetUtcNow(DateTimeOffset.UtcNow);
         var tenantId = Guid.NewGuid();
         var request = new V1Contracts.CreateInvoiceAddressRequest
         {
@@ -106,6 +107,10 @@ public class CreateInvoiceAddressTests(IntegrationTestWebAppFactory factory) : I
         persisted.Address.ZipCode.Should().Be(request.Address.ZipCode);
         persisted.Address.Country.Should().Be(request.Address.Country);
         persisted.Address.Number.Should().Be(request.Address.Number);
+
+        // Verify integration event was published
+        var eventPublished = await MassTransitTestHarness.Published<InvoiceAddressCreatedEvent>();
+        eventPublished.Should().BeTrue();
     }
 
 }

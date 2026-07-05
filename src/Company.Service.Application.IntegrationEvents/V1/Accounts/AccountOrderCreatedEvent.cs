@@ -1,4 +1,3 @@
-//__EXAMPLE_START__
 using Company.Service.Application.IntegrationEvents.V1.Shared;
 
 namespace Company.Service.Application.IntegrationEvents.V1.Accounts;
@@ -10,4 +9,3 @@ public record AccountOrderCreatedEvent(
     ContactInformation ContactInformation,
     DateTime CreatedDate
 );
-//__EXAMPLE_END__

@@ -48,7 +48,8 @@
         "tests/Company.Service.Domain.UnitTests/ValueObjects/AccountDetailsTests.cs",
         "tests/Company.Service.Domain.UnitTests/ValueObjects/ContactInformationTests.cs",
         "tests/Company.Service.Application.UnitTests/Features/Accounts/**",
-        "tests/Company.Service.RestApi.IntegrationTests/Accounts/**"
+        "tests/Company.Service.RestApi.IntegrationTests/Accounts/**",
+        "src/Company.Service.Application.IntegrationEvents/V1/Accounts/AccountOrderCreatedEvent.cs"
       ]
     }
   ],
