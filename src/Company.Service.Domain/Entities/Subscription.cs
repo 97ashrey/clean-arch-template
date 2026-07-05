@@ -1,6 +1,7 @@
 using Company.Service.Domain.Common.Types;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Common.Utils;
+using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.Entities;
 
@@ -44,8 +45,7 @@ public class Subscription
             Validate.NotEmpty(accountId, nameof(accountId)),
             Validate.NotEmpty(name, nameof(name)),
             Validate.NotEmpty(friendlyName, nameof(friendlyName)),
-            Validate.NotZero(purchasePrice.Value, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Value)}"),
-            Validate.NotEmpty(purchasePrice.Currency, $"{nameof(purchasePrice)}.{nameof(purchasePrice.Currency)}"),
+
             Validate.Must(() =>
             {
                 if (startDate > endDate)
@@ -133,5 +133,3 @@ public enum BillCycle
     Monthly,
     Yearly
 }
-
-public record Price(decimal Value, string Currency);

@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using Company.Service.Domain.Common.Types.Errors;
 using Company.Service.Domain.Entities;
+using Company.Service.Domain.ValueObjects;
 
 namespace Company.Service.Domain.UnitTests.Entities;
 
@@ -72,36 +73,6 @@ public class SubscriptionTests
         result.IsSuccess.Should().BeFalse();
         result.Error.Should().BeOfType<ValidationError>();
         result.Error!.Failures.Should().Contain(f => f.PropertyName == "friendlyName");
-    }
-
-    [Fact]
-    public void CreateNew_WithZeroPriceValue_ReturnsValidationError()
-    {
-        // Arrange
-        var zeroPrice = new Price(0m, "USD");
-
-        // Act
-        var result = Subscription.CreateNew(_accountId, "Name", "Friendly", zeroPrice, BillCycle.Monthly, _startDate, _endDate, _productId);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().BeOfType<ValidationError>();
-        result.Error!.Failures.Should().Contain(f => f.PropertyName == "purchasePrice.Value");
-    }
-
-    [Fact]
-    public void CreateNew_WithEmptyPriceCurrency_ReturnsValidationError()
-    {
-        // Arrange
-        var invalidPrice = new Price(99.99m, "");
-
-        // Act
-        var result = Subscription.CreateNew(_accountId, "Name", "Friendly", invalidPrice, BillCycle.Monthly, _startDate, _endDate, _productId);
-
-        // Assert
-        result.IsSuccess.Should().BeFalse();
-        result.Error.Should().BeOfType<ValidationError>();
-        result.Error!.Failures.Should().Contain(f => f.PropertyName == "purchasePrice.Currency");
     }
 
     [Fact]
