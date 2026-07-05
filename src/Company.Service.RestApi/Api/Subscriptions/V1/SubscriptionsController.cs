@@ -72,5 +72,56 @@ namespace Company.Service.RestApi.Api.Subscriptions.V1
                 error => InternalServerErrorProblemResponse(error)
             );
         }
+
+        [HttpPut("{id:guid}/suspend")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>> SuspendSubscription(
+            [FromRoute] Guid accountId, [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new SuspendSubscriptionCommand() { AccountId = accountId, Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("{id:guid}/reactivate")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>> ReActivateSubscription(
+            [FromRoute] Guid accountId, [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new ReActivateSubscriptionCommand() { AccountId = accountId, Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("{id:guid}/cancel")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>> CancelSubscription(
+            [FromRoute] Guid accountId, [FromRoute] Guid id, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(new CancelSubscriptionCommand() { AccountId = accountId, Id = id }, cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ProblemDetails>, Ok<Subscription>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    BadRequestError be => BadRequestProblemResponse(be),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
     }
 }
