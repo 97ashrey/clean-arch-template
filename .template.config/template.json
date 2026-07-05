@@ -37,7 +37,9 @@
         "src/Company.Service.Domain/ValueObjects/AccountDetails.cs",
         "src/Company.Service.Domain/ValueObjects/ContactInformation.cs",
         "src/Company.Service.Application/Features/Accounts/**",
+        "src/Company.Service.Application/Features/Subscriptions/**",
         "src/Company.Service.RestApi/Api/Accounts/**",
+        "src/Company.Service.RestApi/Api/Subscriptions/**",
         "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/AccountEntityConfiguration.cs",
         "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/AccountOrderEntityConfiguration.cs",
         "src/Company.Service.Infrastructure.Data/Persistence/EntityConfigurations/SubscriptionEntityConfiguration.cs",
@@ -48,8 +50,16 @@
         "tests/Company.Service.Domain.UnitTests/ValueObjects/AccountDetailsTests.cs",
         "tests/Company.Service.Domain.UnitTests/ValueObjects/ContactInformationTests.cs",
         "tests/Company.Service.Application.UnitTests/Features/Accounts/**",
+        "tests/Company.Service.Application.UnitTests/Features/Subscriptions/**",
         "tests/Company.Service.RestApi.IntegrationTests/Accounts/**",
-        "src/Company.Service.Application.IntegrationEvents/V1/Accounts/AccountOrderCreatedEvent.cs"
+        "tests/Company.Service.RestApi.IntegrationTests/Subscriptions/**",
+        "src/Company.Service.Application.IntegrationEvents/V1/Accounts/AccountOrderCreatedEvent.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Subscriptions/SubscriptionCreatedEvent.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Shared/AccountDetails.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Shared/AccountTier.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Shared/BillCycle.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Shared/ContactInformation.cs",
+        "src/Company.Service.Application.IntegrationEvents/V1/Shared/Price.cs"
       ]
     }
   ],
