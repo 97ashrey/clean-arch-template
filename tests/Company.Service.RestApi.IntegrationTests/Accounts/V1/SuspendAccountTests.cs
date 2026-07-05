@@ -5,6 +5,7 @@ using Company.Service.Domain.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Http.Json;
+using DomainSubscriptionStatus = Company.Service.Domain.Entities.SubscriptionStatus;
 using V1Contracts = Company.Service.RestApi.Api.Accounts.V1.Contracts;
 
 namespace Company.Service.RestApi.IntegrationTests.Accounts.V1;
@@ -71,6 +72,60 @@ public class SuspendAccountTests(IntegrationTestWebAppFactory factory) : Integra
         var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
         problemDetails.Should().NotBeNull();
         problemDetails!.Detail.Should().Be($"Can't suspend the account it is not in {AccountStatus.Active} state!");
+    }
+
+    [Fact]
+    public async Task SuspendAccount_ReturnsBadRequestWhenAccountHasNonCanceledSubscriptions()
+    {
+        // Arrange
+        var tenantId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
+        var invoiceAddress = InvoiceAddress.CreateNew(
+            tenantId: tenantId,
+            name: "Default Invoice Address",
+            address: Address.CreateNew(
+                country: "TestCountry",
+                city: "TestCity",
+                zipCode: "12345",
+                street: "Main St",
+                number: "10"
+            ).Value!
+        ).Value!;
+
+        var account = Account.CreateNew(
+            tenantId: tenantId,
+            name: "Test Account",
+            email: "test@example.com",
+            tier: AccountTier.Business,
+            invoiceAddressId: invoiceAddress.Id
+        ).Value!;
+
+        var subscription = Subscription.CreateNew(
+            accountId: account.Id,
+            name: "Premium",
+            friendlyName: "Premium Subscription",
+            purchasePrice: Price.CreateNew(29.99m, "USD").Value!,
+            billCycle: BillCycle.Monthly,
+            startDate: new DateTime(2026, 1, 1),
+            endDate: new DateTime(2026, 12, 31),
+            productId: productId
+        ).Value!;
+
+        DbContext.InvoiceAdresses.Add(invoiceAddress);
+        DbContext.Accounts.Add(account);
+        DbContext.Subscriptions.Add(subscription);
+        await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
+
+        // Act — trying to suspend an account with active subscriptions
+        var response = await Client.PutAsJsonAsync($"/api/v1/accounts/{account.Id}/suspend", (object?)null);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>();
+        problemDetails.Should().NotBeNull();
+        problemDetails!.Detail.Should().Be("Can't suspend the account because it has non-canceled subscriptions!");
     }
 
     [Fact]

@@ -37,6 +37,17 @@ internal class SuspendAccountCommandHandler : IApplicationRequestHandler<Suspend
             };
         }
 
+        var hasNonCanceledSubscriptions = await _context.Subscriptions
+            .AnyAsync(s => s.AccountId == request.Id && s.Status != SubscriptionStatus.Canceled, cancellationToken);
+
+        if (hasNonCanceledSubscriptions)
+        {
+            return new BadRequestError()
+            {
+                Message = "Can't suspend the account because it has non-canceled subscriptions!"
+            };
+        }
+
         return await account.Suspend(_timeProvider.GetUtcNowDateTime())
             .TapAsync(async () => await _context.SaveChangesAsync(cancellationToken))
             .MapToValueResultAsync(account)

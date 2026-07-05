@@ -6,6 +6,8 @@ using Company.Service.Domain.Entities;
 using Company.Service.Domain.ValueObjects;
 using Microsoft.Extensions.Time.Testing;
 
+using DomainSubscriptionStatus = Company.Service.Domain.Entities.SubscriptionStatus;
+
 namespace Company.Service.Application.UnitTests.Features.Accounts.Commands;
 
 public class SuspendAccountCommandHandlerTests : DbContextTestBase
@@ -67,6 +69,51 @@ public class SuspendAccountCommandHandlerTests : DbContextTestBase
         result.IsSuccess.Should().BeFalse();
         result.Value.Should().BeNull();
         result.Error.Should().BeOfType<BadRequestError>();
+    }
+
+    [Fact]
+    public async Task Handle_WithActiveAccountHavingNonCanceledSubscriptions_ReturnsBadRequestError()
+    {
+        // Arrange
+        var tenantId = Guid.NewGuid();
+        var productId = Guid.NewGuid();
+        var invoiceAddress = CreateInvoiceAddress(tenantId);
+
+        var account = Account.CreateNew(
+            tenantId: tenantId,
+            name: "Test Account",
+            email: "test@example.com",
+            tier: AccountTier.Business,
+            invoiceAddressId: invoiceAddress.Id
+        ).Value!;
+
+        var subscription = Subscription.CreateNew(
+            accountId: account.Id,
+            name: "Premium",
+            friendlyName: "Premium Subscription",
+            purchasePrice: Price.CreateNew(29.99m, "USD").Value!,
+            billCycle: BillCycle.Monthly,
+            startDate: new DateTime(2026, 1, 1),
+            endDate: new DateTime(2026, 12, 31),
+            productId: productId
+        ).Value!;
+
+        DbContext.InvoiceAdresses.Add(invoiceAddress);
+        DbContext.Accounts.Add(account);
+        DbContext.Subscriptions.Add(subscription);
+        await DbContext.SaveChangesAsync();
+        DbContext.ChangeTracker.Clear();
+
+        var command = new SuspendAccountCommand { Id = account.Id };
+
+        // Act — trying to suspend an account with active subscriptions
+        var result = await _sut.Handle(command, default);
+
+        // Assert
+        result.IsSuccess.Should().BeFalse();
+        result.Value.Should().BeNull();
+        result.Error.Should().BeOfType<BadRequestError>();
+        result.Error!.Message.Should().Be("Can't suspend the account because it has non-canceled subscriptions!");
     }
 
     [Fact]
