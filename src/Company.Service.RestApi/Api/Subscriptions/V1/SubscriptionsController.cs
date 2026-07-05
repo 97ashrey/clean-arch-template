@@ -1,4 +1,5 @@
 using Company.Service.Application.Common.Types.Errors;
+using Company.Service.Application.Features.Subscriptions.Commands;
 using Company.Service.Application.Features.Subscriptions.Queries;
 using Company.Service.RestApi.Api.Subscriptions.V1.Contracts;
 using Company.Service.RestApi.Common.Controllers;
@@ -38,6 +39,23 @@ namespace Company.Service.RestApi.Api.Subscriptions.V1
                 error => error switch
                 {
                     NotFoundError nf => NotFoundProblemResponse(nf),
+                    _ => InternalServerErrorProblemResponse(error)
+                }
+            );
+        }
+
+        [HttpPut("{id:guid}")]
+        public async Task<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<Subscription>>> UpdateSubscription(
+            [FromRoute] Guid accountId, [FromRoute] Guid id, [FromBody] UpdateSubscriptionRequest request, CancellationToken cancellationToken)
+        {
+            var result = await Mediator.Send(request.ToCommand(accountId, id), cancellationToken);
+
+            return result.Match<Results<InternalServerError<ProblemDetails>, NotFound<ProblemDetails>, BadRequest<ValidationProblemDetails>, Ok<Subscription>>>(
+                value => TypedResults.Ok(value.ToV1()),
+                error => error switch
+                {
+                    NotFoundError nf => NotFoundProblemResponse(nf),
+                    ValidationError ve => ValidationproblemResponse(ve),
                     _ => InternalServerErrorProblemResponse(error)
                 }
             );
