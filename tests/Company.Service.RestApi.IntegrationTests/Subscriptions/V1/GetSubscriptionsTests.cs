@@ -15,17 +15,17 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
     [
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "Premium", "Premium Sub", Domain.Entities.BillCycle.Monthly, productId1);
-            var s2 = CreateSubscription(accountId, "Basic", "Basic Sub", Domain.Entities.BillCycle.Yearly, productId2);
+            var s1 = CreateSubscription(account.Id, "Premium", "Premium Sub", Domain.Entities.BillCycle.Monthly, productId1);
+            var s2 = CreateSubscription(account.Id, "Basic", "Basic Sub", Domain.Entities.BillCycle.Yearly, productId2);
 
             return new()
             {
                 Name = "Get all subscriptions",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = [s1, s2],
                 Request = new(),
                 Assert = (pagedResponse, seed) =>
@@ -38,19 +38,19 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         }),
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
             var productId3 = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "A", "Sub A", Domain.Entities.BillCycle.Monthly, productId1);
-            var s2 = CreateSubscription(accountId, "B", "Sub B", Domain.Entities.BillCycle.Yearly, productId2);
-            var s3 = CreateSubscription(accountId, "C", "Sub C", Domain.Entities.BillCycle.Monthly, productId3);
+            var s1 = CreateSubscription(account.Id, "A", "Sub A", Domain.Entities.BillCycle.Monthly, productId1);
+            var s2 = CreateSubscription(account.Id, "B", "Sub B", Domain.Entities.BillCycle.Yearly, productId2);
+            var s3 = CreateSubscription(account.Id, "C", "Sub C", Domain.Entities.BillCycle.Monthly, productId3);
 
             return new()
             {
                 Name = "Filter by IDs",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = [s1, s2, s3],
                 Request = new()
                 {
@@ -67,19 +67,19 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         }),
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
             var productId3 = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "Premium Plan", "Premium Sub", Domain.Entities.BillCycle.Monthly, productId1);
-            var s2 = CreateSubscription(accountId, "Basic Plan", "Basic Sub", Domain.Entities.BillCycle.Yearly, productId2);
-            var s3 = CreateSubscription(accountId, "Gold Plan", "Gold Sub", Domain.Entities.BillCycle.Monthly, productId3);
+            var s1 = CreateSubscription(account.Id, "Premium Plan", "Premium Sub", Domain.Entities.BillCycle.Monthly, productId1);
+            var s2 = CreateSubscription(account.Id, "Basic Plan", "Basic Sub", Domain.Entities.BillCycle.Yearly, productId2);
+            var s3 = CreateSubscription(account.Id, "Gold Plan", "Gold Sub", Domain.Entities.BillCycle.Monthly, productId3);
 
             return new()
             {
                 Name = "Filter by search term",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = [s1, s2, s3],
                 Request = new()
                 {
@@ -94,19 +94,19 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         }),
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
             var productId3 = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "Monthly A", "Monthly Sub", Domain.Entities.BillCycle.Monthly, productId1);
-            var s2 = CreateSubscription(accountId, "Yearly B", "Yearly Sub", Domain.Entities.BillCycle.Yearly, productId2);
-            var s3 = CreateSubscription(accountId, "Monthly C", "Monthly Sub C", Domain.Entities.BillCycle.Monthly, productId3);
+            var s1 = CreateSubscription(account.Id, "Monthly A", "Monthly Sub", Domain.Entities.BillCycle.Monthly, productId1);
+            var s2 = CreateSubscription(account.Id, "Yearly B", "Yearly Sub", Domain.Entities.BillCycle.Yearly, productId2);
+            var s3 = CreateSubscription(account.Id, "Monthly C", "Monthly Sub C", Domain.Entities.BillCycle.Monthly, productId3);
 
             return new()
             {
                 Name = "Filter by bill cycles",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = [s1, s2, s3],
                 Request = new()
                 {
@@ -123,13 +123,13 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         }),
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
             var productId3 = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "Active A", "Active Sub", Domain.Entities.BillCycle.Monthly, productId1);
-            var s2 = CreateSubscription(accountId, "Suspended B", "Suspended Sub", Domain.Entities.BillCycle.Monthly, productId2);
-            var s3 = CreateSubscription(accountId, "Canceled C", "Canceled Sub", Domain.Entities.BillCycle.Monthly, productId3);
+            var s1 = CreateSubscription(account.Id, "Active A", "Active Sub", Domain.Entities.BillCycle.Monthly, productId1);
+            var s2 = CreateSubscription(account.Id, "Suspended B", "Suspended Sub", Domain.Entities.BillCycle.Monthly, productId2);
+            var s3 = CreateSubscription(account.Id, "Canceled C", "Canceled Sub", Domain.Entities.BillCycle.Monthly, productId3);
 
             s2.Suspend(new DateTime(2026, 6, 1));
             s3.Suspend(new DateTime(2026, 6, 1));
@@ -139,7 +139,7 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
             {
                 Name = "Filter by statuses",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = [s1, s2, s3],
                 Request = new()
                 {
@@ -156,10 +156,10 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         }),
         GetSubscriptionsTestCase.CreateFromFactory(() =>
         {
-            var (accountId, invoiceAddress, _) = SeedHierarchy();
+            var (invoiceAddress, account) = SeedHierarchy();
             List<Subscription> subscriptions = [.. Enumerable.Range(1, 25)
                 .Select(i => CreateSubscription(
-                    accountId,
+                    account.Id,
                     $"Subscription {i}",
                     $"Sub {i}",
                     i % 2 == 0 ? Domain.Entities.BillCycle.Monthly : Domain.Entities.BillCycle.Yearly,
@@ -169,7 +169,7 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
             {
                 Name = "Pagination - get second page with 10 items",
                 InvoiceAddresses = [invoiceAddress],
-                Accounts = [CreateAccount(invoiceAddress)],
+                Accounts = [account],
                 Seed = subscriptions,
                 Request = new()
                 {
@@ -317,18 +317,7 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
         ).Value!;
     }
 
-    private static Account CreateAccount(InvoiceAddress invoiceAddress)
-    {
-        return Account.CreateNew(
-            tenantId: Guid.NewGuid(),
-            name: "Test Account",
-            email: "test@example.com",
-            tier: AccountTier.Business,
-            invoiceAddressId: invoiceAddress.Id
-        ).Value!;
-    }
-
-    private static (Guid AccountId, InvoiceAddress InvoiceAddress, Guid TenantId) SeedHierarchy()
+    private static (InvoiceAddress InvoiceAddress, Account Account) SeedHierarchy()
     {
         var tenantId = Guid.NewGuid();
 
@@ -352,7 +341,7 @@ public class GetSubscriptionsTests(IntegrationTestWebAppFactory factory) : Integ
             invoiceAddressId: invoiceAddress.Id
         ).Value!;
 
-        return (account.Id, invoiceAddress, tenantId);
+        return (invoiceAddress, account);
     }
 
     public class GetSubscriptionsTestCase
