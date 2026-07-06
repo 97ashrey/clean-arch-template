@@ -351,6 +351,41 @@ public async Task Handle_WithInvalidData_ReturnsValidationError()
 }
 ```
 
+#### Validator Testing
+
+Every command/query validator must have a dedicated test class with tests for the
+validator itself (not the handler). These tests use `FluentValidation.TestHelper`
+to verify validation rules directly, independently of handler logic.
+
+**Location**: Same directory as handler tests, named `[Command/Query]ValidatorTests.cs`
+
+**Test patterns**:
+- One `CreateValidCommand()` factory method to establish a baseline valid command
+- One `[Fact]` per rule proving it fires on invalid input, using `with` expressions
+- One `[Fact]` for the valid case (`ShouldNotHaveAnyValidationErrors()`)
+- One `[Fact]` combining multiple invalid fields to verify the total error count
+- Assert the error code (e.g., `WithErrorCode("NotEmptyValidator")`) to pin the exact rule
+
+```csharp
+[Fact]
+public void Validate_WithEmptyName_ShouldHaveError()
+{
+    // Arrange
+    var command = CreateValidCommand() with { Name = string.Empty };
+
+    // Act
+    var result = _validator.TestValidate(command);
+
+    // Assert
+    result.ShouldHaveValidationErrorFor(x => x.Name)
+        .WithErrorCode("NotEmptyValidator");
+}
+```
+
+**See examples**:
+- [CreateInvoiceAddressCommandValidatorTests.cs](tests/Company.Service.Application.UnitTests/Features/InvoiceAdresses/Commands/CreateInvoiceAddressCommandValidatorTests.cs)
+- [UpdateInvoiceAddressCommandValidatorTests.cs](tests/Company.Service.Application.UnitTests/Features/InvoiceAdresses/Commands/UpdateInvoiceAddressCommandValidatorTests.cs)
+
 #### Persistence Validation
 
 When verifying an entity was persisted to the database, assert **all fields** match the
