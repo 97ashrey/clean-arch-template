@@ -29,6 +29,7 @@
         "**/test-coverage-reports/**",
         "**/TestResults/**",
         "AGENTS_INTERNAL.md",
+        "README.md",
         "**/.pi/**",
         "Directory.Build.props",
         "src/Company.Service.Domain/Entities/Account.cs",
@@ -135,6 +136,15 @@
       },
       "replaces": "companyNamePlaceholder",
       "fileRename": "companyNamePlaceholder"
+    },
+    "scaffoldedReadme": {
+      "type": "generated",
+      "generator": "constant",
+      "parameters": {
+        "value": "README"
+      },
+      "replaces": "README__SCAFFOLDED",
+      "fileRename": "README__SCAFFOLDED"
     }
   }
 }
