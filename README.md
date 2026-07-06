@@ -76,7 +76,7 @@ dotnet build
 The solution uses an **Aspire** host project to bootstrap all dependencies locally.
 
 ```bash
-cd YourCompany.YourService/aspire/YourCompany.YourService.AppHost
+cd Acme.Billing/aspire/Acme.Billing.AppHost
 dotnet run
 ```
 
