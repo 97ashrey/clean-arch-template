@@ -95,7 +95,35 @@ Defines the `EXAMPLE` constant for the template repo build.
 2. Wrap each file's content in `//__EXAMPLE_START__` / `//__EXAMPLE_END__`
 3. If it references a DbSet, add `#if EXAMPLE` / `#endif` in the 3 bridging files
 4. Add file/directory to `template.json` `exclude` list if it shouldn't be in output
-5. Build and test
+5. Update `scripts/clean-examples.sh` — add the new feature's files and directories to the removal lists so the script can clean them from scaffolded output
+6. Build and test
+
+### Keeping `scripts/clean-examples.sh` Up to Date
+
+The `scripts/clean-examples.sh` script removes all commented-out example files from a
+scaffolded project. When adding a **commented-out** example feature (one wrapped in
+`//__EXAMPLE_START__` / `//__EXAMPLE_END__`), you must also add its files to this script.
+
+**What to add**:
+
+1. **Directory patterns** — Add the feature's directory path to the `find -type d` block
+   (e.g., `-path "*/InvoiceAddresses"`). This scrubs the entire directory.
+
+2. **File name patterns** — Add each individual file to the `find -type f` block via
+   `-name "*.cs"` clauses. Cover all files across layers:
+   - Domain entities and value objects
+   - Entity type configurations
+   - Application commands, queries, handlers, validators
+   - API controllers, contracts, mappers
+   - Integration events
+   - All test files (unit + integration)
+
+**Checklist before committing**:
+- All new `.cs` files are represented by a `-name` pattern in the file removal section
+- Any new subdirectory is represented by a `-path` pattern in the directory removal section
+- Both the singular and plural directory naming conventions are covered (e.g.,
+  `InvoiceAddresses` and `InvoiceAdresses` — since the real domain name and the
+  DbContext property name may differ)
 
 ---
 

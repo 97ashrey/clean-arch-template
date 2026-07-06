@@ -53,6 +53,8 @@ dotnet new clean-arch -n Acme.Billing --companyName Acme --serviceDomain Billing
 | `--serviceDomain` | **Required.** The domain/service name (the second part of `-n`). Replaces `ServiceDomainPlaceholder` throughout the codebase. |
 
 > **📝 Note about example code** — The scaffolded project includes an `InvoiceAddress` feature (entity, value objects, commands, queries, controller, contracts, integration events, entity configuration, and tests). These files are **commented out** in the output and serve as a reference for agents or developers when implementing new features. Treat them as documentation-in-code — replace them with your actual domain logic as you build out the service.
+>
+> If you decide to replace the commented-out examples with your own production logic, you can run [`bash scripts/clean-examples.sh`](scripts/clean-examples.sh) afterwards to strip any remaining example code and markers from the project.
 
 After scaffolding, apply your first database migration:
 
