@@ -16,6 +16,40 @@ This template repo compiles in two modes:
 
 ---
 
+## Code Examples in AGENTS.md Must Be Generic
+
+All code examples in `AGENTS.md` must use **generic, domain-agnostic placeholders** — never
+feature-specific types, names, or context. This ensures the guide reads as a reusable pattern
+reference rather than being tied to any example feature in the repo.
+
+**Guidelines:**
+
+| Avoid (domain-specific) | Use instead (generic) |
+|---|---|
+| `InvoiceAdressesTestCase` | `EntityQueryTestCase` |
+| `InvoiceAddress` | `TEntity` |
+| `GetInvoiceAddressesQuery` | `TQuery` |
+| `PagedList<InvoiceAddress>` | `TPaginatedResult` |
+| `DbContext.InvoiceAdresses` | `DbContext.Set<TEntity>()` |
+| `tenantId`, `TenantIds` | `parentId`, `ParentId` |
+| "Filter by tenant IDs" | "Filter by parent ID" |
+| `homeAddress`, `workAddress` | `child1`, `child2` |
+| `Handle_ReturnsInvoiceAdresses` | `Handle_ReturnsEntities` |
+
+**When to apply this**:
+
+1. **Adding a new code example** in AGENTS.md — always use generic types and descriptive-but-neutral names.
+2. **Updating an existing example** — replace any domain-specific terms that may have been introduced.
+
+**Exception**: When documenting a **specific example file** as a link reference (e.g., "See example:
+[file.cs](path)"), the surrounding prose may refer to that concrete file, but the inline code
+blocks in AGENTS.md must remain generic.
+
+**Rationale**: The AGENTS.md is the primary reference for developers using the scaffolded output,
+where no example features exist. Generic examples are immediately applicable to their own domain.
+
+---
+
 ## How Example Features Are Handled
 
 ### InvoiceAddress (kept as commented reference)

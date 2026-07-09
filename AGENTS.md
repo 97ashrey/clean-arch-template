@@ -444,6 +444,102 @@ to verify the full chain: command → domain → database → event.
 This applies to both unit tests (with mocked publish endpoint) and integration tests
 (use `MassTransitTestHarness.Published<T>()` to get the event and assert its properties).
 
+#### Query Tests with Complex Filters (TheoryData with TestCase class)
+
+For list queries with filtering/pagination options, use `TheoryData<TestCase>` with a test case class
+containing `Seed`, `Query`, and `Assertion` fields.
+
+**See example**: [GetInvoiceAddressesQueryHandlerTests.cs](tests/Company.Service.Application.UnitTests/Features/InvoiceAdresses/Queries/GetInvoiceAddressesQueryHandlerTests.cs)
+
+The test case class wraps the assert lambda behind a `private get` to prevent xUnit from
+treating it as a test case to serialize. The `CreateFromFactory` factory method enables lazy
+initialization so each test case gets fresh data (e.g., random GUIDs):
+
+```csharp
+public class EntityQueryTestCase
+{
+    public required string Name { get; init; }
+
+    public required List<TEntity> Seed { get; init; }
+
+    public required TQuery Query { get; init; }
+
+    public required Action<TPaginatedResult, List<TEntity>> Assertion { private get; init; }
+
+    public void Assert(TPaginatedResult result)
+    {
+        Assertion(result, Seed);
+    }
+
+    public static EntityQueryTestCase CreateFromFactory(Func<EntityQueryTestCase> factory) => factory();
+}
+```
+
+Test data is defined as a `static TheoryData<TestCase>` property using collection expressions.
+Simple cases where all data is known upfront use a direct `new() { ... }` entry.
+Cases requiring random or computed data at runtime use `CreateFromFactory(() => ...)`:
+
+```csharp
+public static TheoryData<EntityQueryTestCase> Data =>
+[
+    // Simple case — all values known at compile/collection-init time
+    new()
+    {
+        Name = "Get all entities",
+        Seed = [entity1, entity2],
+        Query = new(),
+        Assertion = (result, seed) =>
+        {
+            result.Items.Should().BeEquivalentTo(seed);
+        }
+    },
+    // Factory case — needs fresh random GUIDs per test run
+    EntityQueryTestCase.CreateFromFactory(() =>
+    {
+        var parentId = Guid.NewGuid();
+        return new()
+        {
+            Name = "Filter by parent ID",
+            Seed = [child1, child2, otherChild],
+            Query = new() { ParentId = parentId },
+            Assertion = (result, seed) =>
+            {
+                result.Items.Should().BeEquivalentTo([child1, child2]);
+            }
+        };
+    }),
+];
+```
+
+The test method seeds the database, saves, clears the change tracker to simulate a fresh
+read, calls the handler, and delegates assertions to the test case's `Assert` method:
+
+```csharp
+[Theory]
+[MemberData(nameof(Data))]
+public async Task Handle_ReturnsEntities(EntityQueryTestCase testCase)
+{
+    // Arrange
+    DbContext.Set<TEntity>().AddRange(testCase.Seed);
+    await DbContext.SaveChangesAsync();
+    DbContext.ChangeTracker.Clear();
+
+    // Act
+    var queryResult = await _sut.Handle(testCase.Query, default);
+
+    // Assert
+    queryResult.IsSuccess.Should().BeTrue();
+    testCase.Assert(queryResult.Value!);
+}
+```
+
+**Key rules**:
+- Assert against the **seed objects** or the **query's filter values**, not against hardcoded strings or IDs — this keeps tests in sync with test data
+- Use `BeEquivalentTo` for unordered collection comparisons (ignores insertion order)
+- Use `HaveCount` + `ContainEquivalentOf` / `NotContain` for more explicit assertions when needed
+- Always call `DbContext.ChangeTracker.Clear()` after seeding to ensure the handler reads fresh data from the database, not the tracked entities
+- Cover edge cases: empty results, filters with no matches, pagination (first page, middle page, last page), and combinations of multiple filters
+
 #### Assert Values from Source Objects, Not Literals
 
 In success-path assertions, reference the **source object's properties** rather than hardcoded strings:
