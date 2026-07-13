@@ -35,7 +35,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
 
         query = ApplyFilters(query, request);
 
-        var totalCount = query.Count();
+        var totalCount = await query.CountAsync(cancellationToken);
 
         int pageNumber = request.GetPageNumberOrDefault();
         int pageSize = request.GetPageSizeOrDefault();

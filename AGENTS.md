@@ -166,7 +166,6 @@ Key patterns:
 - Return domain entities directly (contract reuse)
 - Define projections at the query level if needed (specific DTOs for complex queries)
 - Always return appropriate error types (`NotFoundError`, `ValidationError`, etc.)
-- Always order paginated queries add `.OrderBy(e => e.Id)` before `.Skip()`/`.Take()` to guarantee stable ordering across pages. Without it, results can be returned in an unpredictable order, potentially causing duplicate or missing items across pages.
 
 ### Reusable Output Contracts
 
