@@ -41,6 +41,7 @@ internal class GetInvoiceAddressesQueryHandler : IApplicationRequestHandler<GetI
         int pageSize = request.GetPageSizeOrDefault();
 
         var addresses = await query
+            .OrderBy(a => a.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

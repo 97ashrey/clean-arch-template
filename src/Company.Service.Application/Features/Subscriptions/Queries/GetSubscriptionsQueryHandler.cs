@@ -46,6 +46,7 @@ internal class GetSubscriptionsQueryHandler : IApplicationRequestHandler<GetSubs
         int pageSize = request.GetPageSizeOrDefault();
 
         var subscriptions = await query
+            .OrderBy(s => s.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

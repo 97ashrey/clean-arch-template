@@ -46,6 +46,7 @@ internal class GetAccountsQueryHandler : IApplicationRequestHandler<GetAccountsQ
         int pageSize = request.GetPageSizeOrDefault();
 
         var accounts = await query
+            .OrderBy(a => a.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);
