@@ -25,8 +25,7 @@ namespace Company.Service.DbDeploy.Migrations
             modelBuilder.Entity("Company.Service.Domain.Entities.Account", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -34,7 +33,7 @@ namespace Company.Service.DbDeploy.Migrations
                         .HasColumnType("nvarchar(320)");
 
                     b.Property<Guid>("InvoiceAddressId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -67,11 +66,10 @@ namespace Company.Service.DbDeploy.Migrations
             modelBuilder.Entity("Company.Service.Domain.Entities.AccountOrder", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<Guid?>("AccountId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<DateTime?>("CompletedDate")
                         .HasColumnType("datetime2");
@@ -95,8 +93,7 @@ namespace Company.Service.DbDeploy.Migrations
             modelBuilder.Entity("Company.Service.Domain.Entities.InvoiceAdress", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -114,11 +111,10 @@ namespace Company.Service.DbDeploy.Migrations
             modelBuilder.Entity("Company.Service.Domain.Entities.Subscription", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<Guid>("AccountId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("binary(16)");
 
                     b.Property<string>("BillCycle")
                         .IsRequired()
@@ -343,14 +339,14 @@ namespace Company.Service.DbDeploy.Migrations
                     b.OwnsOne("Company.Service.Domain.ValueObjects.AccountDetails", "AccountDetails", b1 =>
                         {
                             b1.Property<Guid>("AccountOrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("binary(16)");
 
                             b1.Property<string>("Email")
                                 .IsRequired()
                                 .HasColumnType("nvarchar(max)");
 
                             b1.Property<Guid>("InvoiceAddressId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("binary(16)");
 
                             b1.Property<string>("Name")
                                 .IsRequired()
@@ -381,7 +377,7 @@ namespace Company.Service.DbDeploy.Migrations
                     b.OwnsOne("ContactInformation", "ContactInformation", b1 =>
                         {
                             b1.Property<Guid>("AccountOrderId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("binary(16)");
 
                             b1.Property<string>("Email")
                                 .IsRequired()
@@ -423,7 +419,7 @@ namespace Company.Service.DbDeploy.Migrations
                     b.OwnsOne("Company.Service.Domain.ValueObjects.Address", "Address", b1 =>
                         {
                             b1.Property<Guid>("InvoiceAdressId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("binary(16)");
 
                             b1.Property<string>("City")
                                 .IsRequired()
@@ -473,7 +469,7 @@ namespace Company.Service.DbDeploy.Migrations
                     b.OwnsOne("Company.Service.Domain.Entities.Price", "PurchasePrice", b1 =>
                         {
                             b1.Property<Guid>("SubscriptionId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("binary(16)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()

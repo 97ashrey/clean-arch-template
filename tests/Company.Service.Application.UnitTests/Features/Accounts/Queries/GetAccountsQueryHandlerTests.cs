@@ -154,23 +154,6 @@ public class GetAccountsQueryHandlerTests : DbContextTestBase
 
             return new()
             {
-                Name = "Search by Id (Guid string)",
-                InvoiceAddresses = [invoiceAddress],
-                Seed = accounts,
-                Query = new() { SearchTerm = accounts[0].Id.ToString() },
-                Assertion = (result, seed) =>
-                {
-                    result.Items.Should().HaveCount(1);
-                    result.Items.Should().Contain(a => a.Id == accounts[0].Id);
-                }
-            };
-        }),
-        GetAccountsTestCase.CreateFromFactory(() =>
-        {
-            var (invoiceAddress, accounts) = CreateAccounts(3);
-
-            return new()
-            {
                 Name = "Search by partial name (contains match)",
                 InvoiceAddresses = [invoiceAddress],
                 Seed = accounts,

@@ -25,7 +25,7 @@ public class InvoiceAddress
             Validate.NotEmpty(name, nameof(name))
         ).MapToValueResult(new InvoiceAddress()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             TenantId = tenantId,
             Name = name,
             Address = address

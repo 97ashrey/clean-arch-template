@@ -70,8 +70,7 @@ internal class GetSubscriptionsQueryHandler : IApplicationRequestHandler<GetSubs
             var search = request.SearchTerm.Trim().ToLower();
             query = query.Where(s =>
                 s.Name.ToLower().Contains(search) ||
-                s.FriendlyName.ToLower().Contains(search) ||
-                s.ProductId.ToString().ToLower().Contains(search));
+                s.FriendlyName.ToLower().Contains(search));
         }
 
         if (request.Ids is not null && request.Ids.Count > 0)

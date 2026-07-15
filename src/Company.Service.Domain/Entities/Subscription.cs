@@ -58,7 +58,7 @@ public class Subscription
         )
         .MapToValueResult(new Subscription()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             AccountId = accountId,
             Name = name,
             FriendlyName = friendlyName,

@@ -1,5 +1,6 @@
 //__EXAMPLE_START__
 using Company.Service.Domain.Entities;
+using Company.Service.Infrastructure.Data.Persistence.ValueConverters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,6 +11,10 @@ internal class InvoiceAddressEntityConfiguration : IEntityTypeConfiguration<Invo
     public void Configure(EntityTypeBuilder<InvoiceAddress> builder)
     {
         builder.HasKey(ia => ia.Id);
+
+        builder.Property(ia => ia.Id)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>();
 
         builder.Property(ia => ia.TenantId)
             .IsRequired();

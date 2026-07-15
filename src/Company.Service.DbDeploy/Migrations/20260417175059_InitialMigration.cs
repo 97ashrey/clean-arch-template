@@ -38,7 +38,7 @@ namespace Company.Service.DbDeploy.Migrations
                 name: "InvoiceAddresses",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "binary(16)", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Address_Country = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
@@ -72,13 +72,13 @@ namespace Company.Service.DbDeploy.Migrations
                 name: "AccountOrders",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "binary(16)", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AccountDetails_Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     AccountDetails_Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AccountDetails_Tier = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    AccountDetails_InvoiceAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    AccountDetails_InvoiceAddressId = table.Column<Guid>(type: "binary(16)", nullable: false),
+                    AccountId = table.Column<Guid>(type: "binary(16)", nullable: true),
                     ContactInformation_FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ContactInformation_LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ContactInformation_Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),
@@ -102,14 +102,14 @@ namespace Company.Service.DbDeploy.Migrations
                 name: "Accounts",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "binary(16)", nullable: false),
                     TenantId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(320)", maxLength: 320, nullable: false),
                     Tier = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     SuspendedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    InvoiceAddressId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    InvoiceAddressId = table.Column<Guid>(type: "binary(16)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -168,8 +168,8 @@ namespace Company.Service.DbDeploy.Migrations
                 name: "Subscriptions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "binary(16)", nullable: false),
+                    AccountId = table.Column<Guid>(type: "binary(16)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     FriendlyName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PurchasePrice_Value = table.Column<decimal>(type: "decimal(18,2)", nullable: false),

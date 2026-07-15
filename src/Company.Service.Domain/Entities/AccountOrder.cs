@@ -31,7 +31,7 @@ public class AccountOrder
             Validate.NotEmpty(tenantId, nameof(tenantId))
         ).MapToValueResult(new AccountOrder
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             TenantId = tenantId,
             AccountDetails = accountDetails,
             ContactInformation = contactInformation,

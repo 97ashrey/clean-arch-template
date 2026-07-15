@@ -1,4 +1,5 @@
 using Company.Service.Domain.Entities;
+using Company.Service.Infrastructure.Data.Persistence.ValueConverters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +11,11 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
     {
         builder.HasKey(ao => ao.Id);
 
-        builder.Property(a => a.TenantId)
+        builder.Property(ao => ao.Id)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>();
+
+        builder.Property(ao => ao.TenantId)
             .IsRequired();
 
 
@@ -33,6 +38,11 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
                 .IsRequired()
                 .HasMaxLength(20);
         });
+
+        builder.Property(ao => ao.AccountId)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>()
+            .IsRequired(false);
 
         builder.Property(ao => ao.Status)
             .IsRequired()
@@ -57,6 +67,8 @@ internal class AccountOrderEntityConfiguration : IEntityTypeConfiguration<Accoun
                 .HasMaxLength(30);
 
             ad.Property(a => a.InvoiceAddressId)
+                .HasColumnType("binary(16)")
+                .HasConversion<GuidValueConverter>()
                 .IsRequired();
 
             ad.HasOne<InvoiceAddress>()

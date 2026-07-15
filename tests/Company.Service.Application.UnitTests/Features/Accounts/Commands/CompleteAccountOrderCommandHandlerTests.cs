@@ -233,8 +233,9 @@ public class CompleteAccountOrderCommandHandlerTests : DbContextTestBase
         DbContext.ChangeTracker.Clear();
 
         // Corrupt the stored order data so Account.CreateNew fails
+        // Pass the ID as byte[] in big-endian order to match the binary(16) column storage
         await DbContext.Database.ExecuteSqlRawAsync(
-            "UPDATE AccountOrders SET AccountDetails_Name = '' WHERE Id = {0}", accountOrder.Id);
+            "UPDATE AccountOrders SET AccountDetails_Name = '' WHERE Id = {0}", accountOrder.Id.ToByteArray(bigEndian: true));
 
         DbContext.ChangeTracker.Clear();
 

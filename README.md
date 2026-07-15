@@ -700,6 +700,8 @@ bash scripts/test-report.sh unit
 | **API Versioning at Contract Layer** | Domain and application are version-agnostic; breaking changes are handled by adding new API contract versions |
 | **Rich Domain Models** | Behavior lives in the entity, not in services — `InvoiceAddress.ChangeName()` instead of `InvoiceAddressService.ChangeName()` |
 | **No Service Layer** | Mediator handlers replace the traditional service layer — each handler is a single, focused use case |
+| **`binary(16)` + Converter for PK/FK UUIDs** | Primary keys and foreign keys use `binary(16)` storage with `GuidValueConverter` (big-endian RFC 4122 byte order). This makes version 7 time-ordered UUIDs sort correctly in SQL Server's clustered indexes. Other GUID columns (e.g., `TenantId`) stay as `uniqueidentifier`. |
+| **Non-SQL Server Providers** | The `binary(16)` + converter pattern is **SQL Server-specific** — its `uniqueidentifier` type doesn't sort by the UUID byte order. Other providers (PostgreSQL, SQLite, etc.) handle v7 UUIDs natively in their `uuid` type. If you switch providers, remove the `.HasColumnType()` and `.HasConversion()` calls and let the provider use its native UUID type. See [`AGENTS.md`](AGENTS.md) for the entity configuration guidance to adjust. |
 
 ---
 

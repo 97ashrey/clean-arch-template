@@ -63,6 +63,7 @@ Domain entities contain behavior and validation logic. They are self-validating 
 
 Key patterns:
 - Factory methods (`CreateNew`, `Recreate`) return `ValueResult<TEntity, ValidationError>` and validate all inputs
+- Use `Guid.CreateVersion7()` for ID generation (never `Guid.NewGuid()`) — version 7 UUIDs are time-ordered and enable efficient clustered index performance when stored as `binary(16)`
 - Command methods return `Result<TError>`/`ValueResult<TValue, TError>` if they can fail, or `void` for simple operations. `TError` is a sub type of `DomainError` like `ValidationError` or `InvalidOperationError`
 - Private constructors prevent invalid state, and allow EF Core integration
 - All validation logic encapsulated in the entity
@@ -327,6 +328,7 @@ Exceptions — assert the message when the handler **constructs** the error itse
 - `NotFoundError` messages (constructed inline in the handler with the entity ID)
 - `ValidationError` messages when the message text is defined in the handler (not the domain)
 - When the error message includes dynamic values the handler injects (e.g., entity IDs)
+
 
 #### Validation Testing in Handlers
 
@@ -790,6 +792,22 @@ src/Company.Service.DbDeploy/Migrations/
 
 - Implement `IEntityTypeConfiguration<TEntity>` to configure table mapping, keys, required fields, max lengths, and owned types
 - Place configuration in `Infrastructure.Data/Persistence/EntityConfigurations/`
+- **Only primary keys and foreign key columns** should be stored as `binary(16)` with `HasConversion<GuidValueConverter>()`.
+  Other GUID columns (e.g., `TenantId`, `ProductId`) stay as the default `uniqueidentifier`.
+  ```csharp
+  // PK / FK — use binary(16) for efficient clustered index + join performance
+  builder.Property(x => x.Id)
+      .HasColumnType("binary(16)")
+      .HasConversion<GuidValueConverter>();
+
+  builder.Property(x => x.SomeForeignKeyId)
+      .HasColumnType("binary(16)")
+      .HasConversion<GuidValueConverter>();
+
+  // Non-key GUID — keep as uniqueidentifier (default)
+  builder.Property(x => x.TenantId);
+  ```
+  The [`GuidValueConverter`](src/Company.Service.Infrastructure.Data/Persistence/ValueConverters/GuidValueConverter.cs) uses big-endian (RFC 4122) byte order via `Guid.ToByteArray(bigEndian: true)`. This ensures version 7 time-ordered UUIDs sort correctly in `binary(16)` columns.
 - EF Core auto-discovers configurations via `ApplyConfigurationsFromAssembly` in `ServiceDomainPlaceholderDbContext.OnModelCreating`
 - Add EF Core migration via `dotnet ef migrations add` in the DbDeploy project
 - Migrations are deployed separately via the DbDeploy project
@@ -911,6 +929,7 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 - Application Request base: [src/Company.Service.Application/Common/Requests/ApplicationRequest.cs](src/Company.Service.Application/Common/Requests/ApplicationRequest.cs)
 - Exception handling: [src/Company.Service.Application/Common/Behaviours/ExceptionHandlerPipelineBehaviour.cs](src/Company.Service.Application/Common/Behaviours/ExceptionHandlerPipelineBehaviour.cs)
 - Service registration: [src/Company.Service.Application/ConfigureServices.cs](src/Company.Service.Application/ConfigureServices.cs)
+- Guid value converter: [src/Company.Service.Infrastructure.Data/Persistence/ValueConverters/GuidValueConverter.cs](src/Company.Service.Infrastructure.Data/Persistence/ValueConverters/GuidValueConverter.cs)
 
 ### Example Vertical Slice
 - Domain: [src/Company.Service.Domain/Entities/InvoiceAddress.cs](src/Company.Service.Domain/Entities/InvoiceAddress.cs)
@@ -921,4 +940,4 @@ tests/Company.Service.RestApi.IntegrationTests/[Feature]/V1/
 
 ---
 
-**Last Updated**: June 2026 — Removed some duplicate mentions of various topics
+**Last Updated**: July 2026 — Added guidance on Guid.CreateVersion7(), binary(16) storage, GuidValueConverter, and search filter conventions

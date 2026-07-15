@@ -1,4 +1,5 @@
 using Company.Service.Domain.Entities;
+using Company.Service.Infrastructure.Data.Persistence.ValueConverters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +10,10 @@ internal class SubscriptionEntityConfiguration : IEntityTypeConfiguration<Subscr
     public void Configure(EntityTypeBuilder<Subscription> builder)
     {
         builder.HasKey(s => s.Id);
+
+        builder.Property(s => s.Id)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>();
 
         builder.Property(s => s.Name)
             .IsRequired()
@@ -48,6 +53,11 @@ internal class SubscriptionEntityConfiguration : IEntityTypeConfiguration<Subscr
             .IsRequired(false);
 
         builder.Property(s => s.ProductId)
+            .IsRequired();
+
+        builder.Property(s => s.AccountId)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>()
             .IsRequired();
 
         builder.HasOne<Account>()

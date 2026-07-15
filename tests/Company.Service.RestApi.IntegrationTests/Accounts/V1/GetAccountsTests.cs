@@ -192,29 +192,6 @@ public class GetAccountsTests(IntegrationTestWebAppFactory factory) : Integratio
         {
             var tenantId = Guid.NewGuid();
             var (_, invoiceAddress) = CreateInvoiceAddress(tenantId);
-            var account = CreateAccount(invoiceAddress, tenantId, "Target Account", "target@example.com");
-            var otherAccount = CreateAccount(invoiceAddress, tenantId, "Other Account", "other@example.com");
-
-            return new()
-            {
-                Name = "Search by Id (Guid string)",
-                InvoiceAddresses = [invoiceAddress],
-                Seed = [account, otherAccount],
-                Request = new()
-                {
-                    SearchTerm = account.Id.ToString()
-                },
-                Assert = (pagedResponse, seed) =>
-                {
-                    pagedResponse.Items.Should().HaveCount(1);
-                    pagedResponse.Items.Should().Contain(item => item.Id == account.Id);
-                }
-            };
-        }),
-        GetAccountsTestCase.CreateFromFactory(() =>
-        {
-            var tenantId = Guid.NewGuid();
-            var (_, invoiceAddress) = CreateInvoiceAddress(tenantId);
             List<Account> accounts = [.. Enumerable.Range(1, 25)
                 .Select(i => CreateAccount(invoiceAddress, tenantId, $"Account {i}", $"account{i}@example.com"))];
 

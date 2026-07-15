@@ -127,32 +127,6 @@ public class GetSubscriptionsQueryHandlerTests : DbContextTestBase
         SubscriptionsTestCase.CreateFromFactory(() =>
         {
             var (accountId, invoiceAddress, account) = CreateHierarchy();
-            var productIdTarget = Guid.NewGuid();
-            var productIdOther = Guid.NewGuid();
-            var s1 = CreateSubscription(accountId, "A", "Sub A", BillCycle.Monthly, productIdTarget);
-            var s2 = CreateSubscription(accountId, "B", "Sub B", BillCycle.Yearly, productIdOther);
-
-            return new()
-            {
-                Name = "Filter by search term - product ID",
-                InvoiceAddresses = [invoiceAddress],
-                Accounts = [account],
-                Seed = [s1, s2],
-                Query = new()
-                {
-                    AccountId = accountId,
-                    SearchTerm = productIdTarget.ToString()
-                },
-                Assertion = (result, seed) =>
-                {
-                    result.Items.Should().HaveCount(1);
-                    result.Items.Should().Contain(i => i.Id == s1.Id);
-                }
-            };
-        }),
-        SubscriptionsTestCase.CreateFromFactory(() =>
-        {
-            var (accountId, invoiceAddress, account) = CreateHierarchy();
             var productId1 = Guid.NewGuid();
             var productId2 = Guid.NewGuid();
             var productId3 = Guid.NewGuid();

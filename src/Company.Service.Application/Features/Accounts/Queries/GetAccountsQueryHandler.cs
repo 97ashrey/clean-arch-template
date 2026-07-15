@@ -68,8 +68,7 @@ internal class GetAccountsQueryHandler : IApplicationRequestHandler<GetAccountsQ
             var search = request.SearchTerm.Trim().ToLower();
             query = query.Where(a =>
                 a.Name.ToLower().Contains(search) ||
-                a.Email.ToLower().Contains(search) ||
-                a.Id.ToString().ToLower().Contains(search));
+                a.Email.ToLower().Contains(search));
         }
 
         if (request.TenantIds is not null && request.TenantIds.Count > 0)

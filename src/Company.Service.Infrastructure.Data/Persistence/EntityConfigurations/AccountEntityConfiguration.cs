@@ -1,4 +1,5 @@
 using Company.Service.Domain.Entities;
+using Company.Service.Infrastructure.Data.Persistence.ValueConverters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,6 +10,10 @@ internal class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
     public void Configure(EntityTypeBuilder<Account> builder)
     {
         builder.HasKey(a => a.Id);
+
+        builder.Property(a => a.Id)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>();
 
         builder.Property(a => a.TenantId)
             .IsRequired();
@@ -33,6 +38,11 @@ internal class AccountEntityConfiguration : IEntityTypeConfiguration<Account>
 
         builder.Property(a => a.SuspendedDate)
             .IsRequired(false);
+
+        builder.Property(a => a.InvoiceAddressId)
+            .HasColumnType("binary(16)")
+            .HasConversion<GuidValueConverter>()
+            .IsRequired();
 
         builder.HasOne<InvoiceAddress>()
             .WithMany()

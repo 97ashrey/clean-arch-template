@@ -33,7 +33,7 @@ public class Account
             Validate.NotEmpty(invoiceAddressId, nameof(invoiceAddressId))
         ).MapToValueResult(new Account()
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.CreateVersion7(),
             TenantId = tenantId,
             Name = name,
             Email = email,
